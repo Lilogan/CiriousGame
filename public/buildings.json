@@ -1,0 +1,10 @@
+{
+  "building":[
+    {
+      "type":"factory",
+      "id": 2,
+      "width": 2,
+      "height": 2
+    }
+  ]
+}
