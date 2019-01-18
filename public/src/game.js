@@ -1,9 +1,15 @@
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
-let config = {
+let spriteWidth = 51.5;
+let pointer;
+let game;
+let config;
+let mapObjects;
+config = {
     type: Phaser.AUTO,
     width: windowWidth,
     height: windowHeight,
+    backgroundColor: 0x87CEEB,
     physics: {
         default: 'arcade',
         arcade: {
@@ -17,11 +23,10 @@ let config = {
     }
 };
 
-let game = new Phaser.Game(config);
+game = new Phaser.Game(config);
 
 
-let spriteWidth = 51.5;
-let pointer;
+
 
 function preload() {
     this.load.crossOrigin = 'Anonymous';
@@ -31,61 +36,26 @@ function preload() {
     this.load.image('shop1', 'assets/buildings/shop1.png');
     this.load.image("roadNS", "assets/roads/roadNS.png");
     this.load.image("roadNSE", "assets/roads/roadNSE.png");
-    this.load.image("roadNW", "assets/roads/roadNW.png");
+    this.load.image("roadNE", "assets/roads/roadNE.png");
     this.load.image("roadEW", "assets/roads/roadEW.png");
     this.load.image("tree1", "assets/roads/tree1.png");
 }
 
 function create() {
-    let objects = {
-        "building1":{
-            "type": "building1",
-            "id": 0,
-            "width": 1,
-            "height": 1,
-        },
-        "roadNS":{
-            "type": "roadNS",
-            "id": 1,
-            "width": 1,
-            "height": 1,
-        },
-        "roadNSE":{
-            "type": "roadNSE",
-            "id": 2,
-            "width": 1,
-            "height": 1,
-        }
-        ,
-        "roadEW":{
-            "type": "roadEW",
-            "id": 3,
-            "width": 1,
-            "height": 1,
-        },
-        "tree1":{
-            "type": "tree1",
-            "id": 4,
-            "width": 1,
-            "height": 1,
-        },
-        "shop1":{
-            "type": "shop1",
-            "id": 0,
-            "width": 1,
-            "height": 1,
-        },
-    };
+
     let mapSize = 50;
     let mapData = [
         //posX, posY, dataType
-        [7,6,"roadNS"],
-        [7,7,"roadNS"],
+        [24,27,"shop1"],
+        [24,26,"shop1"],
+        [23,27,"roadNS"],
+        [23,26,"roadNS"],
+        [23,28,"roadNE"],
+        [22,28,"roadEW"],
 
     ];
 
-    let map = this.add.group();
-
+    mapObjects = this.add.group();
     let borderOffset = new Phaser.Geom.Point(windowWidth/2, 50/2+windowHeight/2-50*Math.floor(mapSize/2)); // define the offset to center the map
 
     //display the floor
@@ -108,7 +78,9 @@ function create() {
         point.x = curData[1] * spriteWidth;
         point.y = curData[0] * spriteWidth;
         let isoPoint = fromCartToIso(point);
-        let sprite = this.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, spriteType, false).setOrigin(0.5,1);
+        let sprite = this.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y-14, spriteType, false).setOrigin(0.5,1);
+        sprite.depth = sprite.y;
+
     });
 
     // Zoom camera

@@ -50,14 +50,16 @@
     <session id="731197827">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="4" />
+          <entry key="project.closed" value="5" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.11" value="1" />
           <entry key="project.open.time.17" value="1" />
           <entry key="project.open.time.26" value="1" />
+          <entry key="project.open.time.35" value="1" />
           <entry key="project.open.time.36" value="1" />
           <entry key="project.open.time.47" value="1" />
           <entry key="project.open.time.65" value="1" />
+<<<<<<< Updated upstream
           <entry key="project.opened" value="7" />
 =======
     <session id="-700541061">
@@ -70,12 +72,19 @@
           <entry key="project.open.time.41" value="2" />
           <entry key="project.opened" value="5" />
 >>>>>>> Stashed changes
+=======
+          <entry key="project.opened" value="8" />
+>>>>>>> Stashed changes
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           <entry key="html" value="8112" />
+=======
+          <entry key="html" value="9552" />
+>>>>>>> Stashed changes
           <entry key="json" value="57" />
 =======
           <entry key="html" value="63" />
@@ -86,7 +95,11 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           <entry key="HTML" value="8112" />
+=======
+          <entry key="HTML" value="9552" />
+>>>>>>> Stashed changes
           <entry key="JSON" value="57" />
 =======
           <entry key="HTML" value="63" />
@@ -129,8 +142,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/public/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="112" column="18" selection-start-line="112" selection-start-column="18" selection-end-line="112" selection-end-column="18" />
+            <state relative-caret-position="225">
+              <caret line="119" column="31" lean-forward="true" selection-start-line="119" selection-start-column="31" selection-end-line="119" selection-end-column="31" />
               <folding>
                 <element signature="n#head#0;n#html#0;n#!!top" />
               </folding>
@@ -226,6 +239,7 @@
       <find>renderXY</find>
       <find>point</find>
       <find>conso</find>
+      <find>450</find>
     </findStrings>
     <replaceStrings>
       <replace>let</replace>
@@ -280,8 +294,8 @@
   </component>
 <<<<<<< Updated upstream
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-262" />
-    <option name="y" value="-8" />
+    <option name="x" value="-50" />
+    <option name="y" value="-9" />
     <option name="width" value="1366" />
     <option name="height" value="728" />
 =======
@@ -298,6 +312,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -348,7 +363,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -359,6 +373,9 @@
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\LeoTILLIEU\Documents\ciriousGame\public" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Programmation\CiriousGame\public\lib" />
       <recent name="D:\Programmation\CiriousGame3\public" />
@@ -394,6 +411,7 @@
       <workItem from="1547622687246" duration="2625000" />
       <workItem from="1547634979894" duration="8134000" />
       <workItem from="1547651755559" duration="4313000" />
+<<<<<<< Updated upstream
       <workItem from="1547657946412" duration="14378000" />
 =======
       <workItem from="1547486024388" duration="4120000" />
@@ -402,12 +420,20 @@
       <workItem from="1547573179143" duration="6924000" />
       <workItem from="1547669715364" duration="597000" />
 >>>>>>> Stashed changes
+=======
+      <workItem from="1547657946412" duration="15014000" />
+      <workItem from="1547733096447" duration="13102000" />
+>>>>>>> Stashed changes
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     <option name="totallyTimeSpent" value="57655000" />
+=======
+    <option name="totallyTimeSpent" value="71393000" />
+>>>>>>> Stashed changes
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
@@ -502,9 +528,13 @@
       </provider>
     </entry>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     <entry file="file://$PROJECT_DIR$/public/assets/wall.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
+=======
+    <entry file="file://$PROJECT_DIR$/public/assets/wall.png" />
+>>>>>>> Stashed changes
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
@@ -519,6 +549,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< Updated upstream
     <entry file="file://$PROJECT_DIR$/public/assets/roadNS.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -553,10 +584,13 @@
       <provider selected="true" editor-type-id="images" />
     </entry>
 <<<<<<< Updated upstream
+=======
+    <entry file="file://$PROJECT_DIR$/public/assets/roadNS.png" />
+>>>>>>> Stashed changes
     <entry file="file://$PROJECT_DIR$/public/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="112" column="18" selection-start-line="112" selection-start-column="18" selection-end-line="112" selection-end-column="18" />
+        <state relative-caret-position="225">
+          <caret line="119" column="31" lean-forward="true" selection-start-line="119" selection-start-column="31" selection-end-line="119" selection-end-column="31" />
           <folding>
             <element signature="n#head#0;n#html#0;n#!!top" />
           </folding>
@@ -582,6 +616,15 @@
 >>>>>>> Stashed changes
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/assets/factory.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/assets/building.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/assets/floor.png">
+      <provider selected="true" editor-type-id="images" />
     </entry>
   </component>
 </project>
