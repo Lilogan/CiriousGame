@@ -1,7 +1,9 @@
+let windowWidth = $(window).width();
+let windowHeight = $(window).height();
 let config = {
     type: Phaser.AUTO,
-    width: 900,
-    height: 800,
+    width: windowWidth,
+    height: windowHeight,
     physics: {
         default: 'arcade',
         arcade: {
@@ -18,19 +20,17 @@ let config = {
 let game = new Phaser.Game(config);
 
 
-let spriteWidth = 51;
-
+let spriteWidth = 51.5;
+let pointer;
 
 function preload() {
+    this.load.crossOrigin = 'Anonymous';
     //load all necessary assets
     this.load.image('floor', 'assets/floor.png');
     this.load.image('building', 'assets/buildings/building1.png');
     this.load.image('shop1', 'assets/buildings/shop1.png');
-    this.load.image("roadNS", "assets/roads/roadNS.png");
-    this.load.image("roadNSE", "assets/roads/roadNSE.png");
-    this.load.image("roadNW", "assets/roads/roadNW.png");
-    this.load.image("roadEW", "assets/roads/roadEW.png");
-    this.load.image("tree1", "assets/roads/tree1.png");
+    this.load.image("roadNS", "assets/road finished/roadNS.png");
+    this.load.image("roadEW", "assets/road finished/roadEW.png");
 
 }
 
@@ -74,41 +74,17 @@ function create() {
             "height": 1,
         },
     };
-    let mapSize = 30;
+    let mapSize = 50;
     let mapData = [
         //posX, posY, dataType
-        [15,6,"roadNS"],
-        [15,7,"roadNS"],
-        [15,8,"roadNS"],
-        [15,9,"roadNS"],
-        [15,10,"roadNS"],
-        [15,11,"roadNS"],
-        [15,12,"roadNS"],
-        [15,13,"roadNS"],
-        [15,14,"roadNS"],
-        [15,15,"roadNS"],
-        [15,16,"roadNSE"],
-        [15,17,"roadNS"],
-        [15,18,"roadNS"],
-        [15,19,"roadNS"],
-        [15,20,"roadNW"],
-        [15,20,"roadNW"],
-        [16,20,"roadEW"],
-        [17,20,"roadEW"],
-        [18,20,"roadEW"],
-        [19,20,"roadEW"],
-        [20,20,"roadEW"],
-        [21,20,"roadEW"],
-        [22,20,"roadEW"],
-        [14,16,"building"],
-        [14,10,"shop1"],
-        [14,15,"tree1"],
-        [14,17,"tree1"],
+        [7,6,"roadNS"],
+        [7,7,"roadNS"],
+
     ];
 
     let map = this.add.group();
 
-    let borderOffset = new Phaser.Geom.Point(450, 50/2+400-50*Math.floor(mapSize/2)); // define the offset to center the map
+    let borderOffset = new Phaser.Geom.Point(windowWidth/2, 50/2+windowHeight/2-50*Math.floor(mapSize/2)); // define the offset to center the map
 
     //display the floor
     for(let i = 0; i < mapSize; i++) {
@@ -130,14 +106,26 @@ function create() {
         point.x = curData[1] * spriteWidth;
         point.y = curData[0] * spriteWidth;
         let isoPoint = fromCartToIso(point);
-        let sprite = this.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y-14, spriteType, false).setOrigin(0.5,1);
-    })
-
-
+        let sprite = this.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, spriteType, false).setOrigin(0.5,1);
+    });
+    window.addEventListener("wheel", (e) => {
+        console.log(e);
+        if(e.deltaY < 1){
+            this.cameras.main.zoom += 0.5;
+        }else if(e.deltaY > 1){
+            this.cameras.main.zoom -= 0.5;
+        }
+    });
+    pointer = this.input.activePointer;
 }
-
 function update() {
-
+    // this.cameras.main.setBounds(this.cameras.main.x,this.cameras.main.y,10000,10000);
+    if (pointer.isDown && pointer.justMoved && pointer.buttons === 1){
+        this.cameras.main.scrollX -= pointer.x-pointer.prevPosition.x;
+        this.cameras.main.scrollY -= pointer.y-pointer.prevPosition.y;
+    }else if(WheelEvent.deltaX){
+        console.log("chibre");
+    }
 }
 
 function fromCartToIso(point) {
