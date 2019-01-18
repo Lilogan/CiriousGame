@@ -29,9 +29,11 @@ function preload() {
     this.load.image('floor', 'assets/floor.png');
     this.load.image('building', 'assets/buildings/building1.png');
     this.load.image('shop1', 'assets/buildings/shop1.png');
-    this.load.image("roadNS", "assets/road finished/roadNS.png");
-    this.load.image("roadEW", "assets/road finished/roadEW.png");
-
+    this.load.image("roadNS", "assets/roads/roadNS.png");
+    this.load.image("roadNSE", "assets/roads/roadNSE.png");
+    this.load.image("roadNW", "assets/roads/roadNW.png");
+    this.load.image("roadEW", "assets/roads/roadEW.png");
+    this.load.image("tree1", "assets/roads/tree1.png");
 }
 
 function create() {
@@ -108,12 +110,13 @@ function create() {
         let isoPoint = fromCartToIso(point);
         let sprite = this.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, spriteType, false).setOrigin(0.5,1);
     });
+
+    // Zoom camera
     window.addEventListener("wheel", (e) => {
-        console.log(e);
-        if(e.deltaY < 1){
-            this.cameras.main.zoom += 0.5;
-        }else if(e.deltaY > 1){
-            this.cameras.main.zoom -= 0.5;
+        if(e.deltaY < 0 && this.cameras.main.zoom < 2){
+            this.cameras.main.zoomTo(this.cameras.main.zoom + 0.5, 100);
+        }else if(e.deltaY > 0 && this.cameras.main.zoom > 0.5){
+            this.cameras.main.zoomTo(this.cameras.main.zoom - 0.5, 100);
         }
     });
     pointer = this.input.activePointer;
@@ -123,8 +126,6 @@ function update() {
     if (pointer.isDown && pointer.justMoved && pointer.buttons === 1){
         this.cameras.main.scrollX -= pointer.x-pointer.prevPosition.x;
         this.cameras.main.scrollY -= pointer.y-pointer.prevPosition.y;
-    }else if(WheelEvent.deltaX){
-        console.log("chibre");
     }
 }
 
