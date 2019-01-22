@@ -1,24 +1,25 @@
+var game;
+
 import GameScene from "./game.js";
-import MenuScene from "./menu.js";
+import HudScene from "./hud.js";
 
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
-
 let config = {
     type: Phaser.AUTO,
     parent: 'content',
     width: windowWidth,
     height: windowHeight,
+    autoResize: true,
     backgroundColor: 0x87CEEB,
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 }
+            gravity: {y: 0}
         }
     },
-    scene: [GameScene, MenuScene]
+    scene: [GameScene, HudScene]
 };
-let game;
 
 
 game = new Phaser.Game(config);

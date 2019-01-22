@@ -1,14 +1,17 @@
 function fromCartToIso(point) {
     let isoPoint = new Phaser.Geom.Point;
-
     isoPoint.x = point.x - point.y;
     isoPoint.y = (point.x + point.y) / 2;
 
     return isoPoint;
 }
 
+let scene;
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
+let spriteSize = 51;
+let mapSize = 50; //size of map (square)
+let borderOffset = new Phaser.Geom.Point(windowWidth / 2, spriteSize / 2 + windowHeight / 2 - spriteSize * Math.floor(mapSize / 2));
 
 var GameScene = new Phaser.Class({
 
@@ -19,96 +22,133 @@ var GameScene = new Phaser.Class({
         function GameScene() {
             Phaser.Scene.call(this, {key: "gameScene"});
         },
-    preload: function()
-    {
+    preload: function () {
+        scene = this;
+        scene.mapData = [
+            [
+                1224,
+                1479,
+                "beachS"
+            ]
+        ];
+             //objects on the map
+        scene.curPlacedBlock = undefined; //object to place
+        scene.scene.sendToBack();
         // load resources
-        this.load.crossOrigin = 'Anonymous';
+        scene.load.crossOrigin = 'Anonymous';
+
         //load all necessary assets
-        this.load.image('floor', 'assets/floor.png');
-        this.load.image('building', 'assets/buildings/building1.png');
-        this.load.image('shop1', 'assets/buildings/shop1.png');
-        this.load.image("roadNS", "assets/roads/roadNS.png");
-        this.load.image("roadNSE", "assets/roads/roadNSE.png");
-        this.load.image("roadNE", "assets/roads/roadNE.png");
-        this.load.image("roadEW", "assets/roads/roadEW.png");
-        this.load.image("tree1", "assets/roads/tree1.png");
+        $.each(objects, function (index, values) {
+            if(values.type === "building"){
+                scene.load.image(index, "/assets/buildings/" + index + ".png");
+                scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + ".png");
+            }else{
+                scene.load.image(index, "/assets/roads/" + index + ".png");
+                scene.load.image(index+"Icon", "/assets/hudIcons/roads/" + index + ".png");
+            }
+
+        });
+
+
+        scene.load.image("grass", "/assets/roads/grass.png");
+        scene.load.image("nextPage", "/assets/hudIcons/nextPage.png");
+        scene.load.image("previousPage", "/assets/hudIcons/previousPage.png");
     }
     ,
 
-    create: function () {
+    create:
 
-        this.pointer = this.input.activePointer;
-
-        let mapData = [
-            //posX, posY, dataType
-            [24, 26, "shop1"],
-            [24, 27, "shop1"],
-            [23, 27, "roadNS"],
-            [23, 26, "roadNS"],
-            [23, 28, "roadNE"],
-            [22, 28, "roadEW"],
-        ];
-
-        this.spriteWidth = 50;
-        this.mapSize = 50;
-        this.borderOffset = new Phaser.Geom.Point(windowWidth / 2, 50 / 2 + windowHeight / 2 - 50 * Math.floor(this.mapSize / 2)); // define the offset to center the map
-
-        //display the floor
-        for (let i = 0; i < this.mapSize; i++) {
-            for (let j = 0; j < this.mapSize; j++) {
-                this.point = new Phaser.Geom.Point();
-                this.point.x = j * this.spriteWidth;
-                this.point.y = i * this.spriteWidth;
-                let isoPoint = fromCartToIso(this.point);
-                // this.isoPoint = fromCartToIso(this.point);
-                this.sprite = this.add.sprite(isoPoint.x + this.borderOffset.x, isoPoint.y + this.borderOffset.y + 14, "floor", false).setOrigin(0.5, 1);
+        function () {
+            scene.pointer = scene.input.activePointer;
 
 
-                // Preview d'un shop quand le curseur passe au dessus d'une tile, add le shop au click
-                this.sprite.setInteractive({pixelPerfect: true});
-                this.sprite.on("pointerover", () => {
-                    this.tmpSprite = this.add.sprite(isoPoint.x + this.borderOffset.x, isoPoint.y + this.borderOffset.y, "shop1", false).setOrigin(0.5, 1);
-                    this.tmpSprite.alpha = 0.7;
-                    this.tmpSprite.depth = this.tmpSprite.y+windowWidth;
-                }, this);
-                this.sprite.on("pointerout", () => {
-                    this.tmpSprite.destroy();
-                }, this);
-                this.sprite.on("pointerdown", () => {
-                    this.tmpSprite.alpha = 1;
-                    this.tmpSprite = this.add.sprite(isoPoint.x + this.borderOffset.x, isoPoint.y + this.borderOffset.y, "shop1", false).setOrigin(0.5, 1);
-                }, this);
+
+            // define the offset to center the map
+
+
+            //display the floor
+            for (let i = 0; i < mapSize; i++) {
+                for (let j = 0; j < mapSize; j++) {
+                    let point = new Phaser.Geom.Point();
+                    point.x = j * spriteSize;
+                    point.y = i * spriteSize;
+                    let isoPoint = fromCartToIso(point);
+                    // scene.isoPoint = fromCartToIso(scene.point);
+                    let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 14, "grass", false).setOrigin(0.5, 1);
+                    let tmpSprite = undefined;
+
+                    // Preview d'un shop quand le curseur passe au dessus d'une tile, add au click
+                    sprite.setInteractive({pixelPerfect: true});
+                    sprite.on("pointerover", () => {
+                        if(scene.curPlacedBlock !== undefined){
+                            tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                            tmpSprite.alpha = 0.7;
+                            tmpSprite.depth = tmpSprite.y + windowWidth;
+                            scene.mapData.find(function(element) {
+                                if(element[0] === point.x && element[1] === point.y){
+                                    if(objects[element[2]].type !== "road" || objects[scene.curPlacedBlock].type !== "road"){
+                                        tmpSprite.tint = 0xf44250;
+                                    }
+                                }
+                            });
+                        }
+                    }, this);
+                    console.log(tmpSprite);
+                    sprite.on("pointerout", () => {
+                        if(tmpSprite !== undefined){
+                            tmpSprite.destroy();
+                        }
+                    }, this);
+                    sprite.on("pointerdown", () => {
+                        if(scene.curPlacedBlock !== undefined){
+                            let isOnBlock = scene.mapData.find(function(element) {
+                                if(element[0] === point.x && element[1] === point.y){
+                                    return element[2];
+                                }
+                            });
+
+                            if(isOnBlock === undefined){
+                                isOnBlock = false;
+                            }
+                            console.log(objects[isOnBlock[2]]);
+                            if(!isOnBlock || (objects[isOnBlock[2]].type === "road" && objects[scene.curPlacedBlock].type === "road")){
+                                tmpSprite.alpha = 1;
+                                tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                                scene.mapData.push([point.x, point.y, scene.curPlacedBlock]);
+                            }
+
+                        }
+                    }, this);
+                }
             }
+
+            //display elements
+            scene.mapData.forEach((curData) => {
+                let object = objects[curData[2]];
+                let point = new Phaser.Geom.Point();
+                point.x = curData[0];
+                point.y = curData[1];
+                let isoPoint = fromCartToIso(point);
+                let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, curData[2], false).setOrigin(0.5, 1);
+                sprite.depth = sprite.y + windowWidth;
+            });
+
+            // Zoom camera
+            window.addEventListener("wheel", (e) => {
+                if (e.deltaY < 0 && scene.cameras.main.zoom < 2) {
+                    scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.5, 100);
+                } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.5) {
+                    scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.5, 100);
+                }
+            });
         }
 
-        //display elements
-        mapData.forEach((curData) => {
-            let spriteType = curData[2];
-            let object = objects[curData[2]];
-            let point = new Phaser.Geom.Point();
-            point.x = curData[1] * this.spriteWidth;
-            point.y = curData[0] * this.spriteWidth;
-            this.isoPoint = fromCartToIso(point);
-            this.sprite = this.add.sprite(this.isoPoint.x + this.borderOffset.x, this.isoPoint.y + this.borderOffset.y, spriteType, false).setOrigin(0.5, 1);
-            this.sprite.depth = this.sprite.y + windowWidth;
-        });
-
-        // Zoom camera
-        window.addEventListener("wheel", (e) => {
-            if (e.deltaY < 0 && this.cameras.main.zoom < 2) {
-                this.cameras.main.zoomTo(this.cameras.main.zoom + 0.5, 100);
-            } else if (e.deltaY > 0 && this.cameras.main.zoom > 0.5) {
-                this.cameras.main.zoomTo(this.cameras.main.zoom - 0.5, 100);
-            }
-        });
-    }
     ,
 
     update: function () {
-
-        if (this.pointer.isDown && this.pointer.justMoved && this.pointer.buttons === 1) {
-            this.cameras.main.scrollX -= (this.pointer.x - this.pointer.prevPosition.x) / this.cameras.main.zoom;
-            this.cameras.main.scrollY -= (this.pointer.y - this.pointer.prevPosition.y) / this.cameras.main.zoom;
+        if (scene.pointer.isDown && scene.pointer.justMoved && scene.pointer.buttons === 1) {
+            scene.cameras.main.scrollX -= (scene.pointer.x - scene.pointer.prevPosition.x) / scene.cameras.main.zoom;
+            scene.cameras.main.scrollY -= (scene.pointer.y - scene.pointer.prevPosition.y) / scene.cameras.main.zoom;
         }
     }
 
