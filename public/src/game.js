@@ -20,7 +20,7 @@ var GameScene = new Phaser.Class({
     initialize:
 
         function GameScene() {
-            Phaser.Scene.call(this, {key: "gameScene"});
+            Phaser.Scene.call(this, {key: "GameScene"});
         },
     preload: function () {
         scene = this;
@@ -151,8 +151,6 @@ var GameScene = new Phaser.Class({
             scene.cameras.main.scrollY -= (scene.pointer.y - scene.pointer.prevPosition.y) / scene.cameras.main.zoom;
         }
     }
-
-
 });
 
 export default GameScene;

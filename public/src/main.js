@@ -2,6 +2,7 @@ var game;
 
 import GameScene from "./game.js";
 import HudScene from "./hud.js";
+import MenuScene from "./menu.js";
 
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
@@ -18,7 +19,7 @@ let config = {
             gravity: {y: 0}
         }
     },
-    scene: [GameScene, HudScene]
+    scene: [MenuScene, GameScene, HudScene]
 };
 
 
