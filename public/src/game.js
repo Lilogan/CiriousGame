@@ -93,7 +93,6 @@ var GameScene = new Phaser.Class({
                             });
                         }
                     }, this);
-                    console.log(tmpSprite);
                     sprite.on("pointerout", () => {
                         if(tmpSprite !== undefined){
                             tmpSprite.destroy();

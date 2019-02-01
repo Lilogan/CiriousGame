@@ -16,7 +16,7 @@ function buildHud(begin, buildType) {
 
     isLast = false;
     hudBuildGroup = scene.add.group("buildHud");
-    gameScene = scene.scene.get("gameScene");
+    gameScene = scene.scene.get("GameScene");
     let background = new Phaser.Geom.Rectangle(150, windowHeight - 400 - hudHeight, 300, 400);
     let graphics = scene.add.graphics({key: "graph", fillStyle: {color: 0x5b5b5b}});
     hudBuildGroup.add(graphics);
@@ -79,7 +79,7 @@ var HudScene = new Phaser.Class({
     initialize:
 
         function HudScene() {
-            Phaser.Scene.call(this, {key: "hudScene", active: true});
+            Phaser.Scene.call(this, {key: "HudScene"});
 
         },
     preload: function () {
@@ -94,7 +94,7 @@ var HudScene = new Phaser.Class({
     create: function () {
         isLast = false;
         scene.pointer = scene.input.activePointer;
-        gameScene = scene.scene.get("gameScene");
+        gameScene = scene.scene.get("GameScene");
 
 
         scene.hud = new Phaser.Geom.Rectangle(0, windowHeight - hudHeight, windowWidth, hudHeight);
