@@ -30,6 +30,9 @@ var MenuScene = new Phaser.Class({
         this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
         this.load.image("buildRoad", "/assets/hudIcons/buildRoad.png");
         this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
+        this.load.image('jouer', '/assets/menu/jouer.png');
+        this.load.image('options', '/assets/menu/options.png');
+        this.load.image('quitter', '/assets/menu/quitter.png');
     },
 
     create: function () {
