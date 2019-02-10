@@ -31,7 +31,9 @@ function buildHud(begin, buildType) {
     while(nbElementSet < 24 && values !== undefined) {
         values = Object.values(objects)[begin+curPos];
         let index = Object.keys(objects)[begin+curPos];
-        if (index !== undefined && values.type === buildType) {
+        if (index !== undefined && values.type === buildType && values.isIcon === true) {
+            console.log(index);
+            console.log(values);
             scene.sprite = hudBuildGroup.create(200-(4*curLine-nbElementSet)*70,windowHeight-hudHeight-330+curLine*55, index+"Icon");
             scene.sprite.setOrigin(0.5,1);
             scene.sprite.setScale(0.6);

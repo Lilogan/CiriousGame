@@ -17,8 +17,10 @@ fs.readdir("./public/assets/roads/", function(err, items) {
         objectToAdd.type = undefined;
         objectToAdd.width = 1;
         objectToAdd.height = 1;
+        objectToAdd.isIcon = false;
         if(curItem.indexOf("road") !== -1){
             objectToAdd.type = "road";
+            objectToAdd.isIcon = true;
             objectToAdd.north = curItem.indexOf("N") !== -1;
             objectToAdd.south = curItem.indexOf("S") !== -1;
             objectToAdd.east = curItem.indexOf("E") !== -1;
@@ -31,6 +33,10 @@ fs.readdir("./public/assets/roads/", function(err, items) {
             var objectToAdd = {};
             curItem = curItem.replace(".png","");
             objectToAdd.type = "building";
+            objectToAdd.isIcon = false;
+            if(curItem[curItem.length - 1] === "W"){
+                objectToAdd.isIcon = true;
+            }
             objectToAdd.width = 1;
             objectToAdd.height = 1;
             objects[curItem] = objectToAdd;

@@ -10,10 +10,11 @@ let scene;
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
 let spriteSize = 51;
-let mapSize = 5; //size of map (square)
+let mapSize = 50; //size of map (square)
 let borderOffset = new Phaser.Geom.Point(windowWidth / 2, spriteSize / 2 + windowHeight / 2 - spriteSize * Math.floor(mapSize / 2));
-let minPosCamX = -50*mapSize+borderOffset.x - 50;
-let minPosCamY = -25*mapSize+borderOffset.x - 50;
+let minPosCamX = -50 * mapSize + borderOffset.x - 50;
+let minPosCamY = -25 * mapSize + borderOffset.x - 50;
+let orientations = ["N", "E", "S", "W"];
 
 var GameScene = new Phaser.Class({
 
@@ -27,6 +28,9 @@ var GameScene = new Phaser.Class({
     preload: function () {
         scene = this;
         scene.mapData = [
+            [
+                mapSize
+            ],
             [
                 1224,
                 1479,
@@ -45,8 +49,8 @@ var GameScene = new Phaser.Class({
 
         function () {
             scene.pointer = this.input.activePointer;
-            scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S,Q, D');
-
+            scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S,Q, D, I, R');
+            scene.orientation = "W";
             //display the floor
             for (let i = 0; i < mapSize; i++) {
                 for (let j = 0; j < mapSize; j++) {
@@ -56,27 +60,28 @@ var GameScene = new Phaser.Class({
                     let isoPoint = fromCartToIso(point);
                     // scene.isoPoint = fromCartToIso(scene.point);
                     let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 14, "grass", false).setOrigin(0.5, 1);
-                    let tmpSprite;
-
                     // Preview d'un shop quand le curseur passe au dessus d'une tile, add au click
                     sprite.setInteractive({pixelPerfect: true});
                     sprite.on("pointerover", () => {
                         if (scene.curPlacedBlock !== undefined) {
-                            tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                            tmpSprite.alpha = 0.7;
-                            tmpSprite.depth = tmpSprite.y + windowWidth;
+                            scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                            scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow"+scene.orientation, false).setOrigin(0.5, 1);
+                            scene.tmpSprite.alpha = 0.7;
+                            scene.tmpSprite.depth = scene.tmpSprite.y + windowWidth;
                             scene.mapData.find(function (element) {
+                                console.log(element);
                                 if (element[0] === point.x && element[1] === point.y) {
                                     if (objects[element[2]].type !== "road" || objects[scene.curPlacedBlock].type !== "road") {
-                                        tmpSprite.tint = 0xf44250;
+                                        scene.tmpSprite.tint = 0xf44250;
                                     }
                                 }
                             });
                         }
                     }, this);
                     sprite.on("pointerout", () => {
-                        if (tmpSprite !== undefined) {
-                            tmpSprite.destroy();
+                        if (scene.tmpSprite !== undefined) {
+                            scene.tmpSprite.destroy();
+                            scene.tmpArrow.destroy();
                         }
                     }, this);
                     sprite.on("pointerdown", () => {
@@ -91,8 +96,8 @@ var GameScene = new Phaser.Class({
                                 isOnBlock = false;
                             }
                             if (!isOnBlock || (objects[isOnBlock[2]].type === "road" && objects[scene.curPlacedBlock].type === "road")) {
-                                tmpSprite.alpha = 1;
-                                tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                                scene.tmpSprite.alpha = 1;
+                                scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
                                 scene.mapData.push([point.x, point.y, scene.curPlacedBlock]);
                             }
 
@@ -114,8 +119,8 @@ var GameScene = new Phaser.Class({
 
             // Zoom camera
             window.addEventListener("wheel", (e) => {
-                minPosCamX = -50*mapSize+borderOffset.x/scene.cameras.main.zoom - 50;
-                minPosCamY = (-50*mapSize)/scene.cameras.main.zoom ;
+                minPosCamX = -50 * mapSize + borderOffset.x / scene.cameras.main.zoom - 50;
+                minPosCamY = (-50 * mapSize) / scene.cameras.main.zoom;
                 if (e.deltaY < 0 && scene.cameras.main.zoom < 2) {
                     scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.5, 100);
                 } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.5) {
@@ -145,7 +150,7 @@ var GameScene = new Phaser.Class({
             }
         }
 
-        if ((scene.keys.LEFT.isDown || scene.keys.Q.isDown) && scene.cameras.main.scrollX > minPosCamX ) {
+        if ((scene.keys.LEFT.isDown || scene.keys.Q.isDown) && scene.cameras.main.scrollX > minPosCamX) {
             for (let i = 0; i < 500; i++) {
                 scene.cameras.main.scrollX -= 0.017;
             }
@@ -160,9 +165,30 @@ var GameScene = new Phaser.Class({
         if (Phaser.Input.Keyboard.JustDown(scene.keys.ESC)) {
             if (scene.curPlacedBlock !== undefined) {
                 scene.curPlacedBlock = undefined;
-            } else {
-                scene.scene.start("MenuScene");
             }
+        }
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.R)) {
+            if (scene.curPlacedBlock !== undefined) {
+                let orientation = scene.curPlacedBlock[scene.curPlacedBlock.length - 1];
+                let newOrientation = orientations[(orientations.indexOf(orientation) + 1) % 4];
+                scene.curPlacedBlock = scene.curPlacedBlock.replace(orientation, newOrientation);
+                let x = scene.tmpSprite.x;
+                let y = scene.tmpSprite.y;
+                scene.tmpArrow.destroy();
+                scene.tmpArrow = scene.add.sprite(x , y, "arrow"+newOrientation, false).setOrigin(0.5, 1);
+                scene.orientation = newOrientation;
+                scene.tmpSprite.destroy();
+                scene.tmpSprite = scene.add.sprite(x, y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                scene.tmpSprite.alpha = 0.7;
+                scene.tmpSprite.depth = y + windowWidth;
+
+
+            }
+        }
+
+        //REMOVE THIS
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.I)) {
+            console.log(scene.mapData);
         }
 
 
