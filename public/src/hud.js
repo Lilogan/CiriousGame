@@ -32,8 +32,6 @@ function buildHud(begin, buildType) {
         values = Object.values(objects)[begin+curPos];
         let index = Object.keys(objects)[begin+curPos];
         if (index !== undefined && values.type === buildType && values.isIcon === true) {
-            console.log(index);
-            console.log(values);
             scene.sprite = hudBuildGroup.create(200-(4*curLine-nbElementSet)*70,windowHeight-hudHeight-330+curLine*55, index+"Icon");
             scene.sprite.setOrigin(0.5,1);
             scene.sprite.setScale(0.6);
@@ -81,12 +79,14 @@ var HudScene = new Phaser.Class({
     initialize:
 
         function HudScene() {
-            Phaser.Scene.call(this, {key: "HudScene"});
+            Phaser.Scene.call(this, {key: "HudScene", active: true});
 
         },
     preload: function () {
         scene = this;
         scene.scene.bringToTop();
+        scene.load.image("pollution", "assets/hudIcons/pollution.png");
+        scene.load.image("energy", "assets/hudIcons/energy.png");
 
     },
 
@@ -100,13 +100,19 @@ var HudScene = new Phaser.Class({
         scene.graphics = scene.add.graphics({fillStyle: {color: 0xffffff}});
         scene.graphics.setAlpha(0.8);
 
+        scene.pollutionIcon = scene.add.sprite(50, windowHeight - hudHeight + hudHeight / 2, "pollution");
+        scene.energyIcon = scene.add.sprite(180, windowHeight - hudHeight + hudHeight / 2, "energy");
         scene.buildRoadIcon = scene.add.sprite(310, windowHeight - hudHeight + hudHeight / 2, "buildRoad");
         scene.buildBuildingIcon = scene.add.sprite(380, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
 
+        scene.pollutionIcon.setScale(0.5);
+        scene.energyIcon.setScale(0.5);
         scene.buildRoadIcon.setScale(0.5);
         scene.buildBuildingIcon.setScale(0.5);
         scene.graphics.fillRectShape(scene.hud);
 
+        scene.pollutionIcon.setInteractive({pixelPerfect: false});
+        scene.energyIcon.setInteractive({pixelPerfect: false});
         scene.buildRoadIcon.setInteractive({pixelPerfect: false});
         scene.buildBuildingIcon.setInteractive({pixelPerfect: false});
 
@@ -116,7 +122,7 @@ var HudScene = new Phaser.Class({
                 buildingHudState = false;
                 gameScene.curPlacedBlock = undefined;
                 buildHud(0, "road");
-            } else if(hudBuildGroup !== undefined){
+            } else {
                 roadHudState = false;
                 hudBuildGroup.destroy(true);
             }

@@ -11,6 +11,7 @@ var MenuScene = new Phaser.Class({
     preload: function(){
         scene = this;
 
+        scene.scene.stop("HudScene");
 
         //progress bar
         var progressBar = scene.add.graphics();
@@ -34,7 +35,6 @@ var MenuScene = new Phaser.Class({
         //load all necessary assets
         $.each(objects, function (index, values) {
             if(values.type === "building"){
-                console.log(index);
                 scene.load.image(index, "/assets/buildings/" + index+".png");
                 scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + ".png");
             }else{
@@ -44,8 +44,8 @@ var MenuScene = new Phaser.Class({
 
         });
         //in game menu
-        this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
-        this.load.image("buildRoad", "/assets/hudIcons/buildRoad.png");
+        this.load.image("buildRoad", "assets/hudIcons/buildRoad.png");
+        this.load.image("buildBuilding", "assets/hudIcons/buildBuilding.png");
         this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
 
         //main menu
@@ -68,9 +68,9 @@ var MenuScene = new Phaser.Class({
         scene.add.sprite(window.innerWidth/2, window.innerHeight/10 * 6.5, 'quitter', false).setOrigin(0.5, 0);
         sprite.setInteractive();
         sprite.on("pointerdown", () => {
-            scene.scene.start("HudScene");
-            scene.scene.start('GameScene');
-            scene.scene.stop('MenuScene');
+            this.scene.start('GameScene');
+            this.scene.start('HudScene');
+            this.scene.stop('MenuScene');
         }, this);
     }
 });
