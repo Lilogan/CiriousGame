@@ -6,14 +6,25 @@ function fromCartToIso(point) {
     return isoPoint;
 }
 
+function setTmpSpriteTint(coord, color){
+    scene.mapData.find(function (element) {
+        if (element[0] === coord.x && element[1] === coord.y) {
+            if (objects[element[2]].type !== "road" || objects[scene.curPlacedBlock].type !== "road") {
+                scene.tmpSprite.tint = color;
+            }
+        }
+    });
+}
+
 let scene;
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
 let spriteSize = 51;
 let mapSize = 50; //size of map (square)
+// let borderOffset = new Phaser.Geom.Point(0, 0);
 let borderOffset = new Phaser.Geom.Point(windowWidth / 2, spriteSize / 2 + windowHeight / 2 - spriteSize * Math.floor(mapSize / 2));
-let minPosCamX = -50 * mapSize + borderOffset.x - 50;
-let minPosCamY = -25 * mapSize + borderOffset.x - 50;
+let minPosCamX = -spriteSize * mapSize + borderOffset.x;
+let minPosCamY = -spriteSize*mapSize - borderOffset.y + windowHeight;
 let orientations = ["W","N","E","S"];
 
 var GameScene = new Phaser.Class({
@@ -29,11 +40,7 @@ var GameScene = new Phaser.Class({
         scene = this;
         scene.orientation = "W";
         scene.mapData = [
-            [
-                1224,
-                1479,
-                "beachS"
-            ]
+
         ];
         //objects on the map
         scene.curPlacedBlock = undefined; //object to place
@@ -65,17 +72,16 @@ var GameScene = new Phaser.Class({
                         if (scene.curPlacedBlock !== undefined) {
                             scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
                             if(objects[scene.curPlacedBlock].type === "building"){
-                                scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrowW", false).setOrigin(0.5, 1);
+                                scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow"+scene.orientation, false).setOrigin(0.5, 1);
                             }
                             scene.tmpSprite.alpha = 0.7;
                             scene.tmpSprite.depth = scene.tmpSprite.y + windowWidth;
-                            scene.mapData.find(function (element) {
-                                if (element[0] === point.x && element[1] === point.y) {
-                                    if (objects[element[2]].type !== "road" || objects[scene.curPlacedBlock].type !== "road") {
-                                        scene.tmpSprite.tint = 0xf44250;
-                                    }
-                                }
-                            });
+                            let spriteCoord = {
+                                x: scene.tmpSprite.x,
+                                y: scene.tmpSprite.y,
+                            };
+                            setTmpSpriteTint(spriteCoord, 0xf44250);
+                            console.log(isoPoint);
                         }
                     }, this);
                     sprite.on("pointerout", () => {
@@ -89,7 +95,7 @@ var GameScene = new Phaser.Class({
                     sprite.on("pointerdown", () => {
                         if (scene.curPlacedBlock !== undefined && !scene.pointer.justMoved) {
                             let isOnBlock = scene.mapData.find(function (element) {
-                                if (element[0] === point.x && element[1] === point.y) {
+                                if (element[0] === scene.tmpSprite.x && element[1] === scene.tmpSprite.y) {
                                     return element[2];
                                 }
                             });
@@ -100,7 +106,7 @@ var GameScene = new Phaser.Class({
                             if (!isOnBlock || (objects[isOnBlock[2]].type === "road" && objects[scene.curPlacedBlock].type === "road")) {
                                 scene.tmpSprite.alpha = 1;
                                 scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                                scene.mapData.push([point.x, point.y, scene.curPlacedBlock]);
+                                scene.mapData.push([scene.tmpSprite.x, scene.tmpSprite.y, scene.curPlacedBlock]);
                             }
 
                         }
@@ -114,8 +120,7 @@ var GameScene = new Phaser.Class({
                 let point = new Phaser.Geom.Point();
                 point.x = curData[0];
                 point.y = curData[1];
-                let isoPoint = fromCartToIso(point);
-                let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, curData[2], false).setOrigin(0.5, 1);
+                let sprite = scene.add.sprite(point.x, point.y, curData[2], false).setOrigin(0.5, 1);
                 sprite.depth = sprite.y + windowWidth;
             });
 
@@ -185,6 +190,12 @@ var GameScene = new Phaser.Class({
                     scene.tmpSprite = scene.add.sprite(scene.tmpSprite.x, scene.tmpSprite.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
                     scene.tmpArrow = scene.add.sprite(scene.tmpSprite.x, scene.tmpSprite.y, "arrow"+scene.orientation, false).setOrigin(0.5, 1);
                     scene.tmpSprite.alpha = 0.7;
+                    let isoPoint = {
+                        x: scene.tmpSprite.x,
+                        y: scene.tmpSprite.y
+                    };
+                    console.log(scene.tmpSprite);
+                    setTmpSpriteTint(isoPoint, 0xf44250);
                     scene.tmpSprite.depth = scene.tmpSprite.y + windowWidth;
                 }
             }
