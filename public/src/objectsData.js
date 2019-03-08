@@ -50,18 +50,138 @@ let objects = {
     riverNS: {type: undefined, width: 1, height: 1, isIcon: false},
     riverNW: {type: undefined, width: 1, height: 1, isIcon: false},
     riverSW: {type: undefined, width: 1, height: 1, isIcon: false},
-    road: {type: 'road', width: 1, height: 1, isIcon: true, north: false, south: false, east: false, west: false},
-    roadES: {type: 'road', width: 1, height: 1, isIcon: true, north: false, south: true, east: true, west: false},
-    roadEW: {type: 'road', width: 1, height: 1, isIcon: true, north: false, south: false, east: true, west: true},
-    roadNE: {type: 'road', width: 1, height: 1, isIcon: true, north: true, south: false, east: true, west: false},
-    roadNEW: {type: 'road', width: 1, height: 1, isIcon: true, north: true, south: false, east: true, west: true},
-    roadNS: {type: 'road', width: 1, height: 1, isIcon: true, north: true, south: true, east: false, west: false},
-    roadNSE: {type: 'road', width: 1, height: 1, isIcon: true, north: true, south: true, east: true, west: false},
-    roadNSEW: {type: 'road', width: 1, height: 1, isIcon: true, north: true, south: true, east: true, west: true},
-    roadNSW: {type: 'road', width: 1, height: 1, isIcon: true, north: true, south: true, east: false, west: true},
-    roadNW: {type: 'road', width: 1, height: 1, isIcon: true, north: true, south: false, east: false, west: true},
-    roadSEW: {type: 'road', width: 1, height: 1, isIcon: true, north: false, south: true, east: true, west: true},
-    roadSW: {type: 'road', width: 1, height: 1, isIcon: true, north: false, south: true, east: false, west: true},
+    road:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: false,
+            south: false,
+            east: false,
+            west: false
+        },
+    roadES:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: false,
+            south: true,
+            east: true,
+            west: false
+        },
+    roadEW:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: false,
+            south: false,
+            east: true,
+            west: true
+        },
+    roadNE:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: true,
+            south: false,
+            east: true,
+            west: false
+        },
+    roadNEW:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: true,
+            south: false,
+            east: true,
+            west: true
+        },
+    roadNS:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: true,
+            south: true,
+            east: false,
+            west: false
+        },
+    roadNSE:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: true,
+            south: true,
+            east: true,
+            west: false
+        },
+    roadNSEW:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: true,
+            south: true,
+            east: true,
+            west: true
+        },
+    roadNSW:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: true,
+            south: true,
+            east: false,
+            west: true
+        },
+    roadNW:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: true,
+            south: false,
+            east: false,
+            west: true
+        },
+    roadSEW:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: false,
+            south: true,
+            east: true,
+            west: true
+        },
+    roadSW:
+        {
+            type: 'road',
+            width: 1,
+            height: 1,
+            isIcon: true,
+            north: false,
+            south: true,
+            east: false,
+            west: true
+        },
     tree1: {type: undefined, width: 1, height: 1, isIcon: false},
     treeAltShort: {type: undefined, width: 1, height: 1, isIcon: false},
     treeAltTall: {type: undefined, width: 1, height: 1, isIcon: false},
@@ -81,8 +201,7 @@ let objects = {
     waterSW: {type: undefined, width: 1, height: 1, isIcon: false},
     waterW: {type: undefined, width: 1, height: 1, isIcon: false},
     arrows: {type: 'building', isIcon: false, width: 1, height: 1},
-    'building2-E': {type: 'building', isIcon: false, width: 1, height: 1},
-    'building2-N': {type: 'building', isIcon: false, width: 1, height: 1},
-    'building2-S': {type: 'building', isIcon: false, width: 1, height: 1},
-    'building2-W': {type: 'building', isIcon: true, width: 1, height: 1}
-}
+    'factory1-W': {type: 'building', isIcon: true, width: 3, height: 2},
+    'building2-S': {type: 'building', isIcon: true, width: 1, height: 1},
+    invisible: {type: 'building', isIcon: false, width: 1, height: 1},
+};
