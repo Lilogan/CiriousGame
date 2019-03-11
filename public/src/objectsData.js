@@ -1,4 +1,5 @@
 let objects = {
+    "invisible": {type: 'other', isIcon: false, width: 1, height: 1},
     beach: {type: undefined, width: 1, height: 1, isIcon: false},
     beachCornerES: {type: undefined, width: 1, height: 1, isIcon: false},
     beachCornerNE: {type: undefined, width: 1, height: 1, isIcon: false},
@@ -201,7 +202,15 @@ let objects = {
     waterSW: {type: undefined, width: 1, height: 1, isIcon: false},
     waterW: {type: undefined, width: 1, height: 1, isIcon: false},
     arrows: {type: 'building', isIcon: false, width: 1, height: 1},
+    'factory1-N': {type: 'building', isIcon: false, width: 3, height: 2},
+    'factory1-E': {type: 'building', isIcon: false, width: 3, height: 2},
+    'factory1-S': {type: 'building', isIcon: false, width: 3, height: 2},
     'factory1-W': {type: 'building', isIcon: true, width: 3, height: 2},
+
+    'CityHall-N': {type: 'building', isIcon: false, width: 4, height: 4},
+    'CityHall-E': {type: 'building', isIcon: false, width: 4, height: 4},
+    'CityHall-S': {type: 'building', isIcon: false, width: 4, height: 4},
+    'CityHall-W': {type: 'building', isIcon: true, width: 4, height: 4},
+
     'building2-S': {type: 'building', isIcon: true, width: 1, height: 1},
-    invisible: {type: 'building', isIcon: false, width: 1, height: 1},
 };
