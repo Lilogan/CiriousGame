@@ -34,9 +34,9 @@ function getCoordsFromObject(obj, x, y) {
 function setTmpSpriteTint(coord, color) {
     //change the color of an object tanks to it coordinates
     scene.mapData.find((element) => {
-        if (element[0] === coord.x && element[1] === coord.y) {
+        if (element.x === coord.x && element.y === coord.y) {
             console.log("a");
-            if (objects[scene.curPlacedBlock] !== "road" || objects[element[2]] !== "road") {
+            if (objects[scene.curPlacedBlock] !== "road" || objects[element.name] !== "road") {
                 scene.tmpSprite.tint = color;
             }
         }
@@ -46,9 +46,24 @@ function setTmpSpriteTint(coord, color) {
 let scene;
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
-let spriteSize = 50;
+let spriteSize = 51;
 let mapSize = 80; //size of map (square)
 let borderOffset = new Phaser.Geom.Point(windowWidth / 2, spriteSize / 2 + windowHeight / 2 - spriteSize * Math.floor(mapSize / 2)); //offset to center the map
+let prevSecond = -1;
+let toProduce = {
+    energy: 0,
+    water: 0,
+    citizens: 0,
+    money: 0,
+    pollution: 0
+};
+let storageMax = {
+    energy: 0,
+    water: 0,
+    citizens: 0,
+    money: 0,
+    pollution: 0
+};
 
 //limit of camera
 let minPosCamX = -spriteSize * mapSize + borderOffset.x;
@@ -69,90 +84,28 @@ var GameScene = new Phaser.Class({
         //initialisation of useful variables
         scene = this;
         scene.orientation = "W";
-        scene.mapData = [
-            [
-                -100,
-                2000,
-                "CityHall-W"
-            ],
-            [
-                -150,
-                1975,
-                "invisible"
-            ],
-            [
-                -200,
-                1950,
-                "invisible"
-            ],
-            [
-                -250,
-                1925,
-                "invisible"
-            ],
-            [
-                -50,
-                1975,
-                "invisible"
-            ],
-            [
-                -100,
-                1950,
-                "invisible"
-            ],
-            [
-                -150,
-                1925,
-                "invisible"
-            ],
-            [
-                -200,
-                1900,
-                "invisible"
-            ],
-            [
-                0,
-                1950,
-                "invisible"
-            ],
-            [
-                -50,
-                1925,
-                "invisible"
-            ],
-            [
-                -100,
-                1900,
-                "invisible"
-            ],
-            [
-                -150,
-                1875,
-                "invisible"
-            ],
-            [
-                50,
-                1925,
-                "invisible"
-            ],
-            [
-                0,
-                1900,
-                "invisible"
-            ],
-            [
-                -50,
-                1875,
-                "invisible"
-            ],
-            [
-                -100,
-                1850,
-                "invisible"
-            ]
-        ];
         scene.pointer = this.input.activePointer;
         scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S,Q, D, R');
+        scene.mapData = [];
+        scene.mapData.push({
+            name: "data",
+            energy: 0,
+            water: 0,
+            citizens: 0,
+            money: 0,
+            pollution: 0,
+        });
+
+        scene.mapData.push(
+            {
+                "name": "data",
+                "energy": 0,
+                "water": 0,
+                "citizens": 0,
+                "money": 0,
+                "pollution": 0
+            }
+        );
 
 
         scene.curPlacedBlock = undefined; //object to place
@@ -201,8 +154,8 @@ var GameScene = new Phaser.Class({
 
                             objCoords.forEach((curCoord) => {
                                 scene.mapData.find((element) => {
-                                    if (element[0] === curCoord.x && element[1] === curCoord.y) {
-                                        if (objects[scene.curPlacedBlock] !== "road" || objects[element[2]] !== "road") {
+                                    if (element.x === curCoord.x && element.y === curCoord.y) {
+                                        if (objects[scene.curPlacedBlock] !== "road" || objects[element.name] !== "road") {
                                             scene.tmpSprite.tint = 0xe20000;
                                         }
                                     }
@@ -232,8 +185,8 @@ var GameScene = new Phaser.Class({
 
                         objCoords.forEach((curCoord) => {
                             scene.mapData.find((element) => {
-                                if (element[0] === curCoord.x && element[1] === curCoord.y) {
-                                    if (objects[scene.curPlacedBlock] !== "road" || objects[element[2]] !== "road") {
+                                if (element.x === curCoord.x && element.y === curCoord.y) {
+                                    if (objects[scene.curPlacedBlock] !== "road" || objects[element.name] !== "road") {
                                         console.log("yes putain");
                                         isOnBlock = true;
                                     }
@@ -260,12 +213,32 @@ var GameScene = new Phaser.Class({
 
                             objCoords.forEach((curCoord, n) => {
                                 if (n === 0) {
-                                    scene.mapData.push([curCoord.x, curCoord.y, scene.curPlacedBlock]);
+                                    scene.mapData.push({
+                                        name: scene.curPlacedBlock,
+                                        x: curCoord.x,
+                                        y: curCoord.y
+                                    });
                                 } else {
-                                    scene.mapData.push([curCoord.x, curCoord.y, "invisible"]);
+                                    scene.mapData.push({
+                                        name: "invisible",
+                                        x: curCoord.x,
+                                        y: curCoord.y
+                                    });
 
                                 }
                             });
+                            toProduce.energy += objects[scene.curPlacedBlock].production.energy;
+                            toProduce.water += objects[scene.curPlacedBlock].production.water;
+                            toProduce.citizens += objects[scene.curPlacedBlock].production.citizens;
+                            toProduce.money += objects[scene.curPlacedBlock].production.money;
+                            toProduce.pollution += objects[scene.curPlacedBlock].production.pollution;
+
+                            storageMax.energy += objects[scene.curPlacedBlock].storage.energy;
+                            storageMax.water += objects[scene.curPlacedBlock].storage.water;
+                            storageMax.citizens += objects[scene.curPlacedBlock].storage.citizens;
+                            storageMax.money += objects[scene.curPlacedBlock].storage.money;
+                            storageMax.pollution += objects[scene.curPlacedBlock].storage.pollution;
+
                             console.log(scene.mapData);
                         }
                     }, this);
@@ -274,15 +247,30 @@ var GameScene = new Phaser.Class({
 
             //display map
             scene.mapData.forEach((curData) => {
-                if (curData[2] !== undefined && objects[curData[2]].type !== "other") {
-                    let object = objects[curData[2]];
+                console.log(curData);
+                if (curData.name !== undefined && objects[curData.name].type !== "other") {
+                    let object = objects[curData.name];
                     let point = new Phaser.Geom.Point();
 
 
-                    point.x = curData[0];
-                    point.y = curData[1];
-                    let sprite = scene.add.sprite(point.x + borderOffset.x + 100 / 4 * (object.width - object.height), point.y + borderOffset.y, curData[2], false).setOrigin(0.5, 1);
+                    point.x = curData.x;
+                    point.y = curData.y;
+                    let sprite = scene.add.sprite(point.x + borderOffset.x + 100 / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
                     sprite.depth = sprite.y - 50 * object.height + mapSize * 100;
+
+
+                    toProduce.energy += objects[curData.name].production.energy;
+                    toProduce.water += objects[curData.name].production.water;
+                    toProduce.citizens += objects[curData.name].production.citizens;
+                    toProduce.money += objects[curData.name].production.money;
+                    toProduce.pollution += objects[curData.name].production.pollution;
+
+                    storageMax.energy += objects[curData.name].storage.energy;
+                    storageMax.water += objects[curData.name].storage.water;
+                    storageMax.citizens += objects[curData.name].storage.citizens;
+                    storageMax.money += objects[curData.name].storage.money;
+                    storageMax.pollution += objects[curData.name].storage.pollution;
+
                 }
             });
 
@@ -303,7 +291,7 @@ var GameScene = new Phaser.Class({
 
     ,
 
-    update: function () {
+    update: function (timer) {
         //move camera
         if (scene.pointer.isDown && scene.pointer.justMoved && scene.pointer.buttons === 1) {
             scene.cameras.main.scrollX -= (scene.pointer.x - scene.pointer.prevPosition.x) / scene.cameras.main.zoom;
@@ -375,6 +363,44 @@ var GameScene = new Phaser.Class({
                     scene.tmpSprite.depth = scene.tmpSprite.y - 50 * object.height + mapSize * 100;
                 }
             }
+        }
+
+
+        if (Math.round(timer / 1000) !== prevSecond) {
+            prevSecond = Math.round(timer / 1000);
+
+            if (scene.mapData[0].energy + toProduce.energy <= storageMax.energy) {
+                scene.mapData[0].energy += toProduce.energy
+            } else if (scene.mapData[0].energy + toProduce.energy > storageMax.energy && scene.mapData[0].energy < storageMax.energy) {
+                scene.mapData[0].energy = storageMax.energy;
+            }
+
+            if (scene.mapData[0].water + toProduce.water <= storageMax.water) {
+                scene.mapData[0].water += toProduce.water
+            } else if (scene.mapData[0].water + toProduce.water > storageMax.water && scene.mapData[0].water < storageMax.water) {
+                scene.mapData[0].water = storageMax.water;
+            }
+
+            if (scene.mapData[0].citizens + toProduce.citizens <= storageMax.citizens) {
+                scene.mapData[0].citizens += toProduce.citizens
+            } else if (scene.mapData[0].citizens + toProduce.citizens > storageMax.citizens && scene.mapData[0].citizens < storageMax.citizens) {
+                scene.mapData[0].citizens = storageMax.citizens;
+            }
+
+            if (scene.mapData[0].money + toProduce.money <= storageMax.money) {
+                scene.mapData[0].money += toProduce.money
+            } else if (scene.mapData[0].money + toProduce.money > storageMax.money && scene.mapData[0].money < storageMax.money) {
+                scene.mapData[0].money = storageMax.money;
+            }
+
+            if (scene.mapData[0].pollution + toProduce.pollution <= storageMax.pollution) {
+                scene.mapData[0].pollution += toProduce.pollution
+            } else if (scene.mapData[0].pollution + toProduce.pollution > storageMax.pollution && scene.mapData[0].pollution < storageMax.pollution) {
+                scene.mapData[0].pollution = storageMax.pollution;
+            }
+            console.log("storage: " + JSON.stringify(scene.mapData[0]));
+            console.log("prod: " + JSON.stringify(toProduce));
+
         }
 
 

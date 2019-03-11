@@ -10,6 +10,9 @@ var serveur = app.listen(80, ()=>{
 
 app.use(express.static('public'))
 let objects = {};
+objects["invisible"] = {type: "other", width: 1, height: 1, isIcon: false, cityHallLink: false};
+
+
 fs.readdir("./public/assets/roads/", function(err, items) {
     items.forEach((curItem) => {
         var objectToAdd = {};
@@ -18,6 +21,7 @@ fs.readdir("./public/assets/roads/", function(err, items) {
         objectToAdd.width = 1;
         objectToAdd.height = 1;
         objectToAdd.isIcon = false;
+        objectToAdd.cityHallLink = false;
         if(curItem.indexOf("road") !== -1){
             objectToAdd.type = "road";
             objectToAdd.isIcon = true;
@@ -37,11 +41,39 @@ fs.readdir("./public/assets/roads/", function(err, items) {
             if(curItem[curItem.length - 1] === "W"){
                 objectToAdd.isIcon = true;
             }
+            objectToAdd.cityHallLink = false;
             objectToAdd.width = 1;
             objectToAdd.height = 1;
+            objectToAdd.storage = {
+                energy: 0,
+                water: 0,
+                citizen: 0,
+                money: 0,
+                pollution: 0,
+            };
+            objectToAdd.production = {
+                energy: 0,
+                water: 0,
+                citizen: 0,
+                money: 0,
+                pollution: 0,
+            };
+
             objects[curItem] = objectToAdd;
+
+
         });
-        console.log(objects);
+
+        fs.writeFile("public/src/objectsData.js", "let objects = " + JSON.stringify(objects), (err) => {
+            if(err) {
+                console.log("error: "+err);
+                return console.log(err);
+            }else{
+                console.log("it works");
+            }
+        })
     });
+
+
 });
 
