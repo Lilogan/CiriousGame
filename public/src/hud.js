@@ -37,6 +37,7 @@ function buildHud(begin, buildType) {
             scene.sprite.setScale(0.6);
             scene.sprite.setInteractive();
             scene.sprite.on("pointerdown", () => {
+                gameScene.orientation = "W";
                 gameScene.curPlacedBlock = index;
                 hudBuildGroup.destroy(true);
             });

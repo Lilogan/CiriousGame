@@ -3,6 +3,6 @@
 - Réfléchir au hud, les infos qu'on va montrer ...
 - Voir pour le design du menu principal
 - Faire de nouveaux batiments (usine, grands logement 2x2, ect)
-- Gestion des paliers (batiment déblocable à X ressource, ect)
-- Système d'évenement aléatoire (+ t'as de pollution + t'as de risque)
+- Gestion des paliers (batiment déblocable à X ressources, ect)
+- Système d'évenements aléatoires (+ t'as de pollution + t'as de risque)
 -
