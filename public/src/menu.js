@@ -44,8 +44,8 @@ var MenuScene = new Phaser.Class({
 
         });
         //in game menu
-        this.load.image("buildRoad", "assets/hudIcons/buildRoad.png");
-        this.load.image("buildBuilding", "assets/hudIcons/buildBuilding.png");
+        this.load.image("deleteBuilding", "/assets/hudIcons/deleteBuilding.png");
+        this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
         this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
 
         //main menu
