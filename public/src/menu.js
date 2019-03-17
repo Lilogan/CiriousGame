@@ -36,7 +36,9 @@ var MenuScene = new Phaser.Class({
         $.each(objects, function (index, values) {
             if(values.type === "building"){
                 scene.load.image(index, "/assets/buildings/" + index+".png");
-                scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + ".png");
+                if(index.substr(index.indexOf("-"), index.length) === "-W"){
+                    scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + ".png");
+                }
             }else if(values.type === "road"){
                 scene.load.image(index, "/assets/roads/" + index + ".png");
                 scene.load.image(index+"Icon", "/assets/hudIcons/roads/" + index + ".png");

@@ -172,16 +172,6 @@ let objects = {
         "east": false,
         "west": true
     },
-    "roadSW2": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "isIcon": true,
-        "north": false,
-        "south": true,
-        "east": false,
-        "west": true
-    },
     "tree1": {
         "type": "road",
         "width": 1, "height": 1, "isIcon": false
@@ -237,24 +227,13 @@ let objects = {
     "waterSW": {"width": 1, "height": 1, "isIcon": false},
     "waterW": {"width": 1, "height": 1, "isIcon": false},
     "arrows": {
-        "type": "building",
+        "type": "other",
         "isIcon": false,
         "width": 1,
         "height": 1,
         "storage": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0},
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
-
-    "building2-S": {
-        "type": "building",
-        "isIcon": true,
-        "width": 1,
-        "height": 1,
-        "storage": {"energy": 0, "water": 0, "citizens": 10, "money": 0, "pollution": 0},
-        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
-    },
-
-
     "CityHall-E": {
         "type": "building",
         "isIcon": false,
