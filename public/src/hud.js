@@ -5,7 +5,7 @@ let buildingWindowWidth = 300; // build hud height
 let buildingWindowHeight = 400; // build hud height
 let scene; // The scene
 let roadHudState = false; //is road hud displayed
-let buildingHudState = false; //is building hud displayed
+let buildHudState = false; //is building hud displayed
 let hudBuildGroup; //group of all elements of current displayed hud
 let isLast = false; //check if page in hud menu is the last one
 let gameScene; // ??
@@ -136,23 +136,26 @@ var HudScene = new Phaser.Class({
 
         // Ouvre le build hud quand on clique sur l'icon "tourne vis et mollette"
         scene.buildBuildingIcon.on("pointerdown", () => {
-            if (!buildingHudState) {
-                buildingHudState = true;
+            if (!buildHudState) {
+                buildHudState = true;
                 roadHudState = true;
                 gameScene.curPlacedBlock = undefined;
                 buildHud(0, "road");
             } else {
-                buildingHudState = false;
+                buildHudState = false;
                 hudBuildGroup.destroy(true);
             }
         }, this);
 
         // Change d'onglet quand on clique sur "building" ou "road" dans le build hud
         scene.input.on('pointerdown', function (pointer) {
-            if (pointer.x > 138 && pointer.x < 275 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && hudBuildGroup !== undefined){
-                buildHud(0, "building");
-            } else if (pointer.x > 0 && pointer.x < 137 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && hudBuildGroup !== undefined){
+            if (pointer.x > 0 && pointer.x < 137 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && buildHudState === true){
                 buildHud(0, "road");
+            } else if (pointer.x > 138 && pointer.x < 275 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && buildHudState === true){
+                buildHud(0, "building");
+            } else if (pointer.x > 275 && pointer.x < 300 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && buildHudState === true){
+                buildHudState = false;
+                hudBuildGroup.destroy(true);
             }
         });
     }
