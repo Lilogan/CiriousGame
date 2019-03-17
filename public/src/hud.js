@@ -76,7 +76,7 @@ function buildHud(begin, buildType, curPage) {
             scene.sprite.on("pointerdown", () => {
                 gameScene.orientation = "W";
                 gameScene.curPlacedBlock = index;
-                hudBuildGroup.destroy();
+                hudBuildGroup.destroy(true);
             });
             if (nbElementSet % 3 === 2) {
                 curLine += 1;
