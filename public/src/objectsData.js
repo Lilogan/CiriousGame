@@ -62,7 +62,7 @@ let objects = {
         "east": false,
         "west": false
     },
-    "roadES": {
+    "roadSE": {
         "type": "road",
         "width": 1,
         "height": 1,
@@ -172,19 +172,65 @@ let objects = {
         "east": false,
         "west": true
     },
-    "tree1": {"width": 1, "height": 1, "isIcon": false},
-    "treeAltShort": {"width": 1, "height": 1, "isIcon": false},
-    "treeAltTall": {"width": 1, "height": 1, "isIcon": false},
-    "treeShort": {"width": 1, "height": 1, "isIcon": false},
-    "treeTall": {"width": 1, "height": 1, "isIcon": false},
+    "roadSW2": {
+        "type": "road",
+        "width": 1,
+        "height": 1,
+        "isIcon": true,
+        "north": false,
+        "south": true,
+        "east": false,
+        "west": true
+    },
+    "tree1": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "treeAltShort": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "treeAltTall": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "treeShort": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "treeTall": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
     "water": {"width": 1, "height": 1, "isIcon": false},
-    "waterCornerES": {"width": 1, "height": 1, "isIcon": false},
-    "waterCornerNE": {"width": 1, "height": 1, "isIcon": false},
-    "waterCornerNW": {"width": 1, "height": 1, "isIcon": false},
-    "waterCornerSW": {"width": 1, "height": 1, "isIcon": false},
-    "waterE": {"width": 1, "height": 1, "isIcon": false},
-    "waterES": {"width": 1, "height": 1, "isIcon": false},
-    "waterN": {"width": 1, "height": 1, "isIcon": false},
+    "waterCornerES": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "waterCornerNE": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "waterCornerNW": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "waterCornerSW": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "waterE": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "waterES": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
+    "waterN": {
+        "type": "road",
+        "width": 1, "height": 1, "isIcon": false
+    },
     "waterNE": {"width": 1, "height": 1, "isIcon": false},
     "waterNW": {"width": 1, "height": 1, "isIcon": false},
     "waterS": {"width": 1, "height": 1, "isIcon": false},

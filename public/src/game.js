@@ -106,7 +106,7 @@ function checkRoad(nInMapData) {
 
             if (curElem.connectedToCityHall === false && object.connectedToCityHall === true && (objects[curElem.name].type === "road" || objects[object.name].type === "road" || object.nthElement === curElem.nthElement)) {
                 let objectOrientation = curElem.name.split("-")[1];
-                if(curElem.name === "invisible"){
+                if (curElem.name === "invisible") {
                     objectOrientation = curElem.nameLinkedElement.split("-")[1];
                 }
 
@@ -148,7 +148,7 @@ function checkRoad(nInMapData) {
                     }
                     checkRoad(n);
                 }
-                if (curElemCart.x === objectCart.x - spriteSize && curElemCart.y === objectCart.y && (objectOrientation === "S" || objectOrientation === undefined|| object.nthElement === curElem.nthElement)) {
+                if (curElemCart.x === objectCart.x - spriteSize && curElemCart.y === objectCart.y && (objectOrientation === "S" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
                     scene.mapData[n].connectedToCityHall = true;
                     if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
                         scene.mapData[n].isAddedToData = true;
@@ -167,7 +167,7 @@ function checkRoad(nInMapData) {
                     }
                     checkRoad(n);
                 }
-                if (curElemCart.x === objectCart.x + spriteSize && curElemCart.y === objectCart.y && (objectOrientation === "N" || objectOrientation === undefined|| object.nthElement === curElem.nthElement)) {
+                if (curElemCart.x === objectCart.x + spriteSize && curElemCart.y === objectCart.y && (objectOrientation === "N" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
                     scene.mapData[n].connectedToCityHall = true;
                     if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
                         scene.mapData[n].isAddedToData = true;
@@ -186,7 +186,6 @@ function checkRoad(nInMapData) {
                     }
                     checkRoad(n);
                 }
-
 
 
             }
@@ -234,7 +233,6 @@ var GameScene = new Phaser.Class({
             money: 0,
             pollution: 0,
         });
-
 
 
         scene.curPlacedBlock = undefined; //object to place
@@ -305,138 +303,142 @@ var GameScene = new Phaser.Class({
 
                     //create a building if necessary space on map is free
                     sprite.on("pointerdown", () => {
-                        let obj = objects[scene.curPlacedBlock];
-                        let objCoords = getCoordsFromObject(obj, j, i);
-                        let isOnBlock = false;
-                        let curPlacedBlockCopy = scene.curPlacedBlock;
+                        if (scene.curPlacedBlock !== undefined) {
+                            let obj = objects[scene.curPlacedBlock];
+                            let objCoords = getCoordsFromObject(obj, j, i);
+                            let isOnBlock = false;
+                            let curPlacedBlockCopy = scene.curPlacedBlock;
 
-                        objCoords.forEach((curCoord) => {
-                            scene.mapData.find((element) => {
-                                if (element.x === curCoord.x && element.y === curCoord.y) {
-                                    if (objects[scene.curPlacedBlock].type !== "road" || objects[element.name].type !== "road") {
-                                        isOnBlock = true;
-                                    }
-                                }
-                            });
-                        });
-
-
-                        if (!isOnBlock) {
-                            if (obj.type === "road") {
-                                let newRoadOrientation = scene.curPlacedBlock.substr(4, scene.curPlacedBlock.length);
-                                for (let k = -1; k <= 1; k++) {
-                                    for (let l = -1; l <= 1; l++) {
-                                        if (k !== 0 || l !== 0) {
-                                            scene.mapData.forEach((curData, n) => {
-                                                let correctedBlockOrientation = curData.name.substr(4, curData.name.length);
-                                                let coord = {
-                                                    x: curData.x,
-                                                    y: curData.y
-                                                };
-                                                let coordCart = fromIsoToCart(coord);
-                                                if (coordCart.x === point.x + k * spriteSize && coordCart.y === point.y + l * spriteSize) {
-                                                    if (objects[curData.name].type === 'road') {
-                                                        if (k === 0 && l === -1) {
-                                                            if (newRoadOrientation.indexOf("E") === -1) {
-                                                                newRoadOrientation += "E";
-                                                            }
-                                                            if (correctedBlockOrientation.indexOf("W") === -1) {
-                                                                correctedBlockOrientation += "W";
-                                                            }
-                                                        } else if (k === 0 && l === 1) {
-                                                            if (newRoadOrientation.indexOf("W") === -1) {
-                                                                newRoadOrientation += "W";
-                                                            }
-                                                            if (correctedBlockOrientation.indexOf("E") === -1) {
-                                                                correctedBlockOrientation += "E";
-                                                            }
-                                                        } else if (k === -1 && l === 0) {
-                                                            if (newRoadOrientation.indexOf("N") === -1) {
-                                                                newRoadOrientation += "N";
-                                                            }
-                                                            if (correctedBlockOrientation.indexOf("S") === -1) {
-                                                                correctedBlockOrientation += "S";
-                                                            }
-                                                        } else if (k === 1 && l === 0) {
-                                                            if (newRoadOrientation.indexOf("S") === -1) {
-                                                                newRoadOrientation += "S";
-                                                            }
-                                                            if (correctedBlockOrientation.indexOf("N") === -1) {
-                                                                correctedBlockOrientation += "N";
-                                                            }
-                                                        }
-                                                        correctedBlockOrientation = roadNameInOrder(correctedBlockOrientation);
-                                                        sprite = scene.add.sprite(curData.x + borderOffset.x, curData.y + borderOffset.y, correctedBlockOrientation, false).setOrigin(0.5, 1);
-                                                        sprite.depth = sprite.y - 50 * obj.height + mapSize * 100;
-                                                        scene.mapData[n].name = correctedBlockOrientation;
-                                                    }
-                                                }
-                                            });
-
+                            objCoords.forEach((curCoord) => {
+                                scene.mapData.find((element) => {
+                                    if (element.x === curCoord.x && element.y === curCoord.y) {
+                                        if (objects[scene.curPlacedBlock].type !== "road" || objects[element.name].type !== "road") {
+                                            isOnBlock = true;
                                         }
                                     }
-                                }
-                                newRoadOrientation = roadNameInOrder(newRoadOrientation);
-                                scene.curPlacedBlock = newRoadOrientation;
-
-                            }
-
-                            let objToPush = {};
-                            let nthInMapData = scene.mapData.length;
-                            objCoords.forEach((curCoord, n) => {
-                                if (n === 0) {
-                                    objToPush = {
-                                        name: scene.curPlacedBlock,
-                                        nthElement: nthInMapData,
-                                        x: curCoord.x,
-                                        y: curCoord.y,
-                                        isAddedToData: false,
-                                        connectedToCityHall: false,
-                                    };
-                                } else {
-                                    objToPush = {
-                                        name: "invisible",
-                                        nthElement: nthInMapData,
-                                        nameLinkedElement: scene.curPlacedBlock,
-                                        x: curCoord.x,
-                                        y: curCoord.y,
-                                        isAddedToData: false,
-                                        connectedToCityHall: false,
-                                    };
-                                }
-
-                                if (objToPush.name.substr(0, objToPush.name.length - 2) === "CityHall") {
-                                    objToPush.connectedToCityHall = true;
-                                    scene.toProduce.energy += objects[objToPush.name].production.energy;
-                                    scene.toProduce.water += objects[objToPush.name].production.water;
-                                    scene.toProduce.citizens += objects[objToPush.name].production.citizens;
-                                    scene.toProduce.money += objects[objToPush.name].production.money;
-                                    scene.toProduce.pollution += objects[objToPush.name].production.pollution;
-                                    scene.storageMax.energy += objects[objToPush.name].storage.energy;
-
-                                    scene.storageMax.water += objects[objToPush.name].storage.water;
-                                    scene.storageMax.citizens += objects[objToPush.name].storage.citizens;
-                                    scene.storageMax.money += objects[objToPush.name].storage.money;
-                                    scene.storageMax.pollution += objects[objToPush.name].storage.pollution;
-                                }
-                                scene.mapData.push(objToPush);
+                                });
                             });
 
-                            if (scene.orientation === "N" || scene.orientation === "S") {
+
+                            if (!isOnBlock) {
+                                if (obj.type === "road") {
+                                    let newRoadOrientation = scene.curPlacedBlock.substr(4, scene.curPlacedBlock.length);
+                                    for (let k = -1; k <= 1; k++) {
+                                        for (let l = -1; l <= 1; l++) {
+                                            if (k !== 0 || l !== 0) {
+                                                scene.mapData.forEach((curData, n) => {
+                                                    let correctedBlockOrientation = curData.name.substr(4, curData.name.length);
+                                                    let coord = {
+                                                        x: curData.x,
+                                                        y: curData.y
+                                                    };
+                                                    let coordCart = fromIsoToCart(coord);
+                                                    if (coordCart.x === point.x + k * spriteSize && coordCart.y === point.y + l * spriteSize) {
+                                                        if (objects[curData.name].type === 'road') {
+                                                            if (k === 0 && l === -1) {
+                                                                if (newRoadOrientation.indexOf("E") === -1) {
+                                                                    newRoadOrientation += "E";
+                                                                }
+                                                                if (correctedBlockOrientation.indexOf("W") === -1) {
+                                                                    correctedBlockOrientation += "W";
+                                                                }
+                                                            } else if (k === 0 && l === 1) {
+                                                                if (newRoadOrientation.indexOf("W") === -1) {
+                                                                    newRoadOrientation += "W";
+                                                                }
+                                                                if (correctedBlockOrientation.indexOf("E") === -1) {
+                                                                    correctedBlockOrientation += "E";
+                                                                }
+                                                            } else if (k === -1 && l === 0) {
+                                                                if (newRoadOrientation.indexOf("N") === -1) {
+                                                                    newRoadOrientation += "N";
+                                                                }
+                                                                if (correctedBlockOrientation.indexOf("S") === -1) {
+                                                                    correctedBlockOrientation += "S";
+                                                                }
+                                                            } else if (k === 1 && l === 0) {
+                                                                if (newRoadOrientation.indexOf("S") === -1) {
+                                                                    newRoadOrientation += "S";
+                                                                }
+                                                                if (correctedBlockOrientation.indexOf("N") === -1) {
+                                                                    correctedBlockOrientation += "N";
+                                                                }
+                                                            }
+                                                            correctedBlockOrientation = roadNameInOrder(correctedBlockOrientation);
+                                                            sprite = scene.add.sprite(curData.x + borderOffset.x, curData.y + borderOffset.y, correctedBlockOrientation, false).setOrigin(0.5, 1);
+                                                            sprite.depth = sprite.y - 50 * obj.height + mapSize * 100;
+                                                            scene.mapData[n].name = correctedBlockOrientation;
+                                                        }
+                                                    }
+                                                });
+
+                                            }
+                                        }
+                                    }
+                                    newRoadOrientation = roadNameInOrder(newRoadOrientation);
+                                    scene.curPlacedBlock = newRoadOrientation;
+
+                                }
+
+                                let objToPush = {};
+                                let nthInMapData = scene.mapData.length;
+                                objCoords.forEach((curCoord, n) => {
+                                    if (n === 0) {
+                                        objToPush = {
+                                            name: scene.curPlacedBlock,
+                                            nthElement: nthInMapData,
+                                            x: curCoord.x,
+                                            y: curCoord.y,
+                                            isAddedToData: false,
+                                            connectedToCityHall: false,
+                                        };
+                                    } else {
+                                        objToPush = {
+                                            name: "invisible",
+                                            nthElement: nthInMapData,
+                                            nameLinkedElement: scene.curPlacedBlock,
+                                            x: curCoord.x,
+                                            y: curCoord.y,
+                                            isAddedToData: false,
+                                            connectedToCityHall: false,
+                                        };
+                                    }
+
+                                    if (objToPush.name.substr(0, objToPush.name.length - 2) === "CityHall") {
+                                        objToPush.connectedToCityHall = true;
+                                        scene.toProduce.energy += objects[objToPush.name].production.energy;
+                                        scene.toProduce.water += objects[objToPush.name].production.water;
+                                        scene.toProduce.citizens += objects[objToPush.name].production.citizens;
+                                        scene.toProduce.money += objects[objToPush.name].production.money;
+                                        scene.toProduce.pollution += objects[objToPush.name].production.pollution;
+                                        scene.storageMax.energy += objects[objToPush.name].storage.energy;
+
+                                        scene.storageMax.water += objects[objToPush.name].storage.water;
+                                        scene.storageMax.citizens += objects[objToPush.name].storage.citizens;
+                                        scene.storageMax.money += objects[objToPush.name].storage.money;
+                                        scene.storageMax.pollution += objects[objToPush.name].storage.pollution;
+                                    }
+                                    scene.mapData.push(objToPush);
+                                });
+
+                                if (scene.orientation === "N" || scene.orientation === "S") {
+                                    scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + 100 / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                                } else {
+                                    scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x - 100 / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                                }
+
+                                scene.tmpSprite.alpha = 1;
+                                scene.tmpSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
                                 scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + 100 / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                            } else {
-                                scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x - 100 / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                            }
-                            scene.tmpSprite.alpha = 1;
-                            scene.tmpSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
-                            scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + 100 / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
 
-                            scene.curPlacedBlock = curPlacedBlockCopy;
+                                scene.curPlacedBlock = curPlacedBlockCopy;
 
-                            if (scene.tmpArrow !== undefined) {
-                                scene.tmpArrow.destroy();
+                                if (scene.tmpArrow !== undefined) {
+                                    scene.tmpArrow.destroy();
+                                }
                             }
                         }
+
                     }, this);
                 }
             }
@@ -453,7 +455,7 @@ var GameScene = new Phaser.Class({
                     let sprite = scene.add.sprite(point.x + borderOffset.x + 100 / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
                     sprite.depth = sprite.y - 50 * object.height + mapSize * 100;
 
-                    if(objects[curData.name].type === "building"){
+                    if (objects[curData.name].type === "building") {
                         scene.toProduce.energy += objects[curData.name].production.energy;
                         scene.toProduce.water += objects[curData.name].production.water;
                         scene.toProduce.citizens += objects[curData.name].production.citizens;
@@ -521,8 +523,6 @@ var GameScene = new Phaser.Class({
         if (Phaser.Input.Keyboard.JustDown(scene.keys.ESC)) {
             if (scene.curPlacedBlock !== undefined) {
                 scene.curPlacedBlock = undefined;
-            } else {
-                scene.scene.start("MenuScene");
             }
         }
 

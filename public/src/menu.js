@@ -37,7 +37,7 @@ var MenuScene = new Phaser.Class({
             if(values.type === "building"){
                 scene.load.image(index, "/assets/buildings/" + index+".png");
                 scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + ".png");
-            }else{
+            }else if(values.type === "road"){
                 scene.load.image(index, "/assets/roads/" + index + ".png");
                 scene.load.image(index+"Icon", "/assets/hudIcons/roads/" + index + ".png");
             }
@@ -47,6 +47,7 @@ var MenuScene = new Phaser.Class({
         this.load.image("deleteBuilding", "/assets/hudIcons/deleteBuilding.png");
         this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
         this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
+        this.load.image("nextPage", "/assets/hudIcons/nextPage.png");
 
         //main menu
         this.load.image('jouer', '/assets/menu/jouer.png');
@@ -54,6 +55,7 @@ var MenuScene = new Phaser.Class({
         this.load.image('quitter', '/assets/menu/quitter.png');
 
         //others
+        this.load.image('grass', '/assets/roads/grass.png');
         this.load.image('arrowN', '/assets/buildings/arrows/arrowN.png');
         this.load.image('arrowS', '/assets/buildings/arrows/arrowS.png');
         this.load.image('arrowE', '/assets/buildings/arrows/arrowE.png');

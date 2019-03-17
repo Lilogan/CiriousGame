@@ -1,8 +1,9 @@
 var game;
 
-import GameScene from "./game.js";
 import HudScene from "./hud.js";
 import MenuScene from "./menu.js";
+import GameScene from "./game.js";
+
 
 let windowWidth = $(window).width();
 let windowHeight = $(window).height();
