@@ -1,3 +1,12 @@
+// Type : Type of the sprites (road, building, other)
+// Width : number of tiles of width
+// Height : number of tiles of height
+// IsIcon : is the sprite the icon on the build hud
+// For roads :
+// W/N/E/S : where the road connect with
+// For building :
+// Storage : number of resources the building may store
+// production : number of resources the building produce
 let objects = {
     "invisible": {"type": "other", "width": 1, "height": 1, "isIcon": false, "cityHallLink": false},
     "data": {"type": "other", "width": 1, "height": 1, "isIcon": false, "cityHallLink": false},
@@ -52,16 +61,6 @@ let objects = {
     "riverNS": {"width": 1, "height": 1, "isIcon": false},
     "riverNW": {"width": 1, "height": 1, "isIcon": false},
     "riverSW": {"width": 1, "height": 1, "isIcon": false},
-    "road": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "isIcon": true,
-        "north": false,
-        "south": false,
-        "east": false,
-        "west": false
-    },
     "roadSE": {
         "type": "road",
         "width": 1,

@@ -1,20 +1,20 @@
-let scene;
-let windowWidth = $(window).width();
-let windowHeight = $(window).height();
-let spriteSize = 51;
-let mapSize = 80; //size of map (square)
+let scene; // The scene
+let windowWidth = $(window).width(); // window width
+let windowHeight = $(window).height(); // window height
+let spriteSize = 51; // sprite size (50) + space between sprites (1)
+let mapSize = 80; // size of map (square)
 let borderOffset = new Phaser.Geom.Point(windowWidth / 2, spriteSize / 2 + windowHeight / 2 - spriteSize * Math.floor(mapSize / 2)); //offset to center the map
-let prevSecond = -1;
+let prevSecond = -1; // ??
 
-//limit of camera
+// limit of camera
 let minPosCamX = -spriteSize * mapSize + borderOffset.x;
 let minPosCamY = -spriteSize * mapSize - borderOffset.y + windowHeight;
 
+// Set the notation for the orientation of sprites
 let orientations = ["W", "N", "E", "S"];
 
-
+// get isometric coordinates from cartesian
 function fromCartToIso(point) {
-    //get isometric coordinates from cartesian
     let isoPoint = new Phaser.Geom.Point;
     isoPoint.x = point.x - point.y;
     isoPoint.y = (point.x + point.y) / 2;
@@ -22,6 +22,7 @@ function fromCartToIso(point) {
     return isoPoint;
 }
 
+// get cartesian coordinates from isometric
 function fromIsoToCart(point) {
     //get cartesian coordinates from isometric
     let cartPoint = new Phaser.Geom.Point;
@@ -31,6 +32,7 @@ function fromIsoToCart(point) {
     return cartPoint;
 }
 
+// Make the road name in order
 function roadNameInOrder(name) {
     let returned = "road";
 
@@ -50,6 +52,7 @@ function roadNameInOrder(name) {
     return returned;
 }
 
+// Get all the points of an object
 function getCoordsFromObject(obj, x, y) {
     //get all places occupied by an object
     let kMax = obj.width;
@@ -74,8 +77,8 @@ function getCoordsFromObject(obj, x, y) {
     return coords;
 }
 
+// change the color of an object thanks to it coordinates
 function setTmpSpriteTint(coord, color) {
-    //change the color of an object tanks to it coordinates
     scene.mapData.find((element) => {
         if (element.x === coord.x && element.y === coord.y) {
             if (objects[scene.curPlacedBlock] !== "road" || objects[element.name] !== "road") {
@@ -85,8 +88,8 @@ function setTmpSpriteTint(coord, color) {
     });
 }
 
-
-function checkRoad(nInMapData) {
+// Check if a sprite is connected to the city hall throught the road
+function isSpritConnectedToRoad(nInMapData) {
     let object = scene.mapData[nInMapData];
     let objectCoord = {
         x: object.x,
@@ -94,6 +97,7 @@ function checkRoad(nInMapData) {
     };
     let objectCart = fromIsoToCart(objectCoord);
 
+    // Add recources needed for each elements
     scene.mapData.forEach((curElem, n) => {
         let curElemCoord = {
             x: curElem.x,
@@ -111,105 +115,62 @@ function checkRoad(nInMapData) {
                 }
 
                 if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y - spriteSize && (objectOrientation === "W" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
-                    scene.mapData[n].connectedToCityHall = true;
-                    if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
-                        scene.mapData[n].isAddedToData = true;
-
-                        scene.toProduce.energy += objects[curElem.name].production.energy;
-                        scene.toProduce.water += objects[curElem.name].production.water;
-                        scene.toProduce.citizens += objects[curElem.name].production.citizens;
-                        scene.toProduce.money += objects[curElem.name].production.money;
-                        scene.toProduce.pollution += objects[curElem.name].production.pollution;
-                        scene.storageMax.energy += objects[curElem.name].storage.energy;
-
-                        scene.storageMax.water += objects[curElem.name].storage.water;
-                        scene.storageMax.citizens += objects[curElem.name].storage.citizens;
-                        scene.storageMax.money += objects[curElem.name].storage.money;
-                        scene.storageMax.pollution += objects[curElem.name].storage.pollution;
-                    }
-                    checkRoad(n);
+                    addDataToRessources(curElem, n);
+                    isSpritConnectedToRoad(n);
                 }
                 if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y + spriteSize && (objectOrientation === "E" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
-                    scene.mapData[n].connectedToCityHall = true;
-                    if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
-                        scene.mapData[n].isAddedToData = true;
-
-                        scene.toProduce.energy += objects[curElem.name].production.energy;
-                        scene.toProduce.water += objects[curElem.name].production.water;
-                        scene.toProduce.citizens += objects[curElem.name].production.citizens;
-                        scene.toProduce.money += objects[curElem.name].production.money;
-                        scene.toProduce.pollution += objects[curElem.name].production.pollution;
-                        scene.storageMax.energy += objects[curElem.name].storage.energy;
-
-                        scene.storageMax.water += objects[curElem.name].storage.water;
-                        scene.storageMax.citizens += objects[curElem.name].storage.citizens;
-                        scene.storageMax.money += objects[curElem.name].storage.money;
-                        scene.storageMax.pollution += objects[curElem.name].storage.pollution;
-                    }
-                    checkRoad(n);
+                    addDataToRessources(curElem, n);
+                    isSpritConnectedToRoad(n);
                 }
                 if (curElemCart.x === objectCart.x - spriteSize && curElemCart.y === objectCart.y && (objectOrientation === "S" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
-                    scene.mapData[n].connectedToCityHall = true;
-                    if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
-                        scene.mapData[n].isAddedToData = true;
-
-                        scene.toProduce.energy += objects[curElem.name].production.energy;
-                        scene.toProduce.water += objects[curElem.name].production.water;
-                        scene.toProduce.citizens += objects[curElem.name].production.citizens;
-                        scene.toProduce.money += objects[curElem.name].production.money;
-                        scene.toProduce.pollution += objects[curElem.name].production.pollution;
-                        scene.storageMax.energy += objects[curElem.name].storage.energy;
-
-                        scene.storageMax.water += objects[curElem.name].storage.water;
-                        scene.storageMax.citizens += objects[curElem.name].storage.citizens;
-                        scene.storageMax.money += objects[curElem.name].storage.money;
-                        scene.storageMax.pollution += objects[curElem.name].storage.pollution;
-                    }
-                    checkRoad(n);
+                    addDataToRessources(curElem, n);
+                    isSpritConnectedToRoad(n);
                 }
                 if (curElemCart.x === objectCart.x + spriteSize && curElemCart.y === objectCart.y && (objectOrientation === "N" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
-                    scene.mapData[n].connectedToCityHall = true;
-                    if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
-                        scene.mapData[n].isAddedToData = true;
-
-                        scene.toProduce.energy += objects[curElem.name].production.energy;
-                        scene.toProduce.water += objects[curElem.name].production.water;
-                        scene.toProduce.citizens += objects[curElem.name].production.citizens;
-                        scene.toProduce.money += objects[curElem.name].production.money;
-                        scene.toProduce.pollution += objects[curElem.name].production.pollution;
-                        scene.storageMax.energy += objects[curElem.name].storage.energy;
-
-                        scene.storageMax.water += objects[curElem.name].storage.water;
-                        scene.storageMax.citizens += objects[curElem.name].storage.citizens;
-                        scene.storageMax.money += objects[curElem.name].storage.money;
-                        scene.storageMax.pollution += objects[curElem.name].storage.pollution;
-                    }
-                    checkRoad(n);
+                    addDataToRessources(curElem, n);
+                    isSpritConnectedToRoad(n);
                 }
-
-
             }
         }
 
     })
 }
 
+// Add all the ressources every seconds
+function addDataToRessources(curElem, n){
+    scene.mapData[n].connectedToCityHall = true;
+    if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
+        scene.mapData[n].isAddedToData = true;
 
-var GameScene = new Phaser.Class({
+        scene.toProduce.energy += objects[curElem.name].production.energy;
+        scene.toProduce.water += objects[curElem.name].production.water;
+        scene.toProduce.citizens += objects[curElem.name].production.citizens;
+        scene.toProduce.money += objects[curElem.name].production.money;
+        scene.toProduce.pollution += objects[curElem.name].production.pollution;
+        scene.storageMax.energy += objects[curElem.name].storage.energy;
+
+        scene.storageMax.water += objects[curElem.name].storage.water;
+        scene.storageMax.citizens += objects[curElem.name].storage.citizens;
+        scene.storageMax.money += objects[curElem.name].storage.money;
+        scene.storageMax.pollution += objects[curElem.name].storage.pollution;
+    }
+}
+
+let GameScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
-
         function GameScene() {
             Phaser.Scene.call(this, {key: "GameScene"});
         },
+
     preload: function () {
         //initialisation of useful variables
-        scene = this;
-        scene.orientation = "W";
-        scene.pointer = this.input.activePointer;
-        scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S,Q, D, R');
+        scene = this; // The scene
+        scene.orientation = "W"; // Default orrientation
+        scene.pointer = this.input.activePointer; // Our cursor
+        scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S, Q, D, R');
         scene.toProduce = {
             energy: 0,
             water: 0,
@@ -236,7 +197,7 @@ var GameScene = new Phaser.Class({
 
 
         scene.curPlacedBlock = undefined; //object to place
-        scene.scene.sendToBack();
+        scene.scene.sendToBack(); // Put the scene behind the hud
 
         scene.load.crossOrigin = 'Anonymous';
     }
@@ -256,6 +217,7 @@ var GameScene = new Phaser.Class({
                     let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 14, "grass", false).setOrigin(0.5, 1);
                     // preview a building with mouse and change tint if necessary space on map is not free
                     sprite.setInteractive({pixelPerfect: true});
+
                     sprite.on("pointerover", () => {
                         if (scene.curPlacedBlock !== undefined) {
                             let obj = objects[scene.curPlacedBlock];
@@ -586,7 +548,7 @@ var GameScene = new Phaser.Class({
 
 
             if (scene.mapData.length > 1) {
-                checkRoad(1);
+                isSpritConnectedToRoad(1);
             }
 
             if (scene.mapData[0].energy + scene.toProduce.energy <= scene.storageMax.energy) {
@@ -615,11 +577,7 @@ var GameScene = new Phaser.Class({
             }
 
             scene.mapData[0].pollution += scene.toProduce.pollution;
-
-
         }
-
-
     }
 });
 

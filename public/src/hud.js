@@ -22,32 +22,42 @@ function buildHud(begin, buildType, curPage) {
     gameScene = scene.scene.get("GameScene");
     let nbElementOfGoodType  = 0;
 
-    // Add to the hud groupe every Geom and Text
+    // Add to the hud groupe every Geom and Text for the build hud
     let hudBackgroundRec= new Phaser.Geom.Rectangle(0, windowHeight - buildingWindowHeight - hudHeight, buildingWindowWidth, buildingWindowHeight);
     let hudBackground = scene.add.graphics({key: "graph", fillStyle: {color: 0xffffff}});
     hudBuildGroup.add(hudBackground);
     hudBackground.fillRectShape(hudBackgroundRec);
 
-    let buildMenuRoadsRec = new Phaser.Geom.Rectangle(0, windowHeight - hudHeight - buildingWindowHeight, 137, 25);
-    let buildMenuRoads = scene.add.graphics({key: "graph", fillStyle: {color: 0x293133}});
-    hudBuildGroup.add(buildMenuRoads);
-    buildMenuRoads.fillRectShape(buildMenuRoadsRec);
+    let buildMenuRoadRec = scene.add.sprite(0, windowHeight - hudHeight - buildingWindowHeight, "tabHud");
+    buildMenuRoadRec.setOrigin(0, 0);
+    hudBuildGroup.add(buildMenuRoadRec);
+    buildMenuRoadRec.setInteractive();
+    buildMenuRoadRec.on('pointerdown', function (pointer) {
+        buildHud(0, "road", 0);
+    });
 
     let buildMenuRoadsText = scene.add.text(42.5, windowHeight - hudHeight - buildingWindowHeight + 5, "Roads");
     hudBuildGroup.add(buildMenuRoadsText);
 
-    let buildMenuBuildingRec = new Phaser.Geom.Rectangle(138, windowHeight - hudHeight - buildingWindowHeight, 137, 25);
-    let buildMenuBuilding = scene.add.graphics({key: "graph", fillStyle: {color: 0x293133}});
-    hudBuildGroup.add(buildMenuBuilding);
-    buildMenuBuilding.fillRectShape(buildMenuBuildingRec);
+    let buildMenuBuildingRec = scene.add.sprite(138, windowHeight - hudHeight - buildingWindowHeight, "tabHud");
+    buildMenuBuildingRec.setOrigin(0, 0);
+    hudBuildGroup.add(buildMenuBuildingRec);
+    buildMenuBuildingRec.setInteractive();
+    buildMenuBuildingRec.on('pointerdown', function(pointer){
+       buildHud(0, "building", 0)
+    });
 
     let buildMenuBuildingText = scene.add.text(170, windowHeight - hudHeight - buildingWindowHeight + 5, "Building");
     hudBuildGroup.add(buildMenuBuildingText);
 
-    let buildMenuEchapRec = new Phaser.Geom.Rectangle(275, windowHeight - hudHeight - buildingWindowHeight, 25, 25);
-    let buildMenuEchap = scene.add.graphics({key: "graph", fillStyle: {color: 0xFF0000}});
-    hudBuildGroup.add(buildMenuEchap);
-    buildMenuEchap.fillRectShape(buildMenuEchapRec);
+    let buildMenuEchapRec = scene.add.sprite(275, windowHeight - hudHeight - buildingWindowHeight, "closeHud");
+    buildMenuEchapRec.setOrigin(0, 0);
+    hudBuildGroup.add(buildMenuEchapRec);
+    buildMenuEchapRec.setInteractive();
+    buildMenuEchapRec.on('pointerdown', function(pointer){
+        buildHudState = false;
+        hudBuildGroup.destroy(true);
+    });
 
 
     // ???
@@ -71,7 +81,6 @@ function buildHud(begin, buildType, curPage) {
             scene.sprite = hudBuildGroup.create(60 - (3 * curLine - nbElementSet) * 90, windowHeight - hudHeight - buildingWindowHeight + 125 + curLine * 75, index+"Icon");
             scene.sprite.setOrigin(0.5,1);
             scene.sprite.setDisplaySize(70, 70);
-            // scene.sprite.setScale(0.6);
             scene.sprite.setInteractive();
             scene.sprite.on("pointerdown", () => {
                 gameScene.orientation = "W";
@@ -89,6 +98,7 @@ function buildHud(begin, buildType, curPage) {
         curPos++;
     }
 
+    // ?? (ça marche tjrs pas :( )
     if (!isLast) {
         scene.nextPage = hudBuildGroup.create(250, windowHeight - hudHeight - 20, "nextPage");
         scene.nextPage.setInteractive();
@@ -138,21 +148,19 @@ var HudScene = new Phaser.Class({
         scene.pointer = scene.input.activePointer;
         gameScene = scene.scene.get("GameScene");
 
-
+        // Add the bottom white rectangle for the hud
         scene.hud = new Phaser.Geom.Rectangle(0, windowHeight - hudHeight, windowWidth, hudHeight);
         scene.graphics = scene.add.graphics({fillStyle: {color: 0xffffff}});
-        scene.graphics.setAlpha(0.8);
-
-        scene.deleteBuildingIcon = scene.add.sprite(50, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding");
-        scene.buildBuildingIcon = scene.add.sprite(120, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
-
-        scene.deleteBuildingIcon.setDisplaySize(45, 45);
-        scene.buildBuildingIcon.setDisplaySize(45, 45);
         scene.graphics.fillRectShape(scene.hud);
 
+        // Add hud's sprites and display them
+        scene.deleteBuildingIcon = scene.add.sprite(50, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding");
+        scene.buildBuildingIcon = scene.add.sprite(120, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
+        scene.deleteBuildingIcon.setDisplaySize(45, 45);
+        scene.buildBuildingIcon.setDisplaySize(45, 45);
         scene.buildBuildingIcon.setInteractive({pixelPerfect: false});
 
-        // Ouvre le build hud quand on clique sur l'icon "tourne vis et mollette"
+        // Open the build hud when we click on the "wrench and hammer" icon
         scene.buildBuildingIcon.on("pointerdown", () => {
             if (!buildHudState) {
                 buildHudState = true;
@@ -164,18 +172,6 @@ var HudScene = new Phaser.Class({
                 hudBuildGroup.destroy(true);
             }
         }, this);
-
-        // Change d'onglet quand on clique sur "building" ou "road" dans le build hud
-        scene.input.on('pointerdown', function (pointer) {
-            if (pointer.x > 0 && pointer.x < 137 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && buildHudState === true){
-                buildHud(0, "road");
-            } else if (pointer.x > 138 && pointer.x < 275 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && buildHudState === true){
-                buildHud(0, "building");
-            } else if (pointer.x > 275 && pointer.x < 300 && pointer.y > windowHeight - hudHeight - buildingWindowHeight && pointer.y < windowHeight - hudHeight - buildingWindowHeight + 25 && buildHudState === true){
-                buildHudState = false;
-                hudBuildGroup.destroy(true);
-            }
-        });
     }
 });
 
