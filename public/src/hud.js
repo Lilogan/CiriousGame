@@ -76,8 +76,7 @@ function buildHud(begin, buildType, curPage) {
     while(nbElementSet < 12 && values !== undefined) {
         values = Object.values(objects)[begin+curPos];
         let index = Object.keys(objects)[begin+curPos];
-
-        if (index !== undefined && values.type === buildType && values.isIcon === true) {
+        if (index !== undefined && values.type === buildType && values.isIcon === true && values !== undefined) {
             scene.sprite = hudBuildGroup.create(60 - (3 * curLine - nbElementSet) * 90, windowHeight - hudHeight - buildingWindowHeight + 125 + curLine * 75, index+"Icon");
             scene.sprite.setOrigin(0.5,1);
             scene.sprite.setDisplaySize(70, 70);
@@ -92,25 +91,25 @@ function buildHud(begin, buildType, curPage) {
             }
             nbElementSet++;
         }
-        if(nbElementOfGoodType === nbElementSet + 12*curPage){
+
+        if(nbElementOfGoodType === nbElementSet + 12*curPage && values !== undefined && values.isIcon === true){
             isLast = true;
         }
         curPos++;
     }
-
-    // ?? (ça marche tjrs pas :( )
     if (!isLast) {
-        scene.nextPage = hudBuildGroup.create(250, windowHeight - hudHeight - 20, "nextPage");
-        scene.nextPage.setInteractive();
-        scene.nextPage.on("pointerdown", () => {
+        scene.sprite = hudBuildGroup.create(250, windowHeight - hudHeight - 20, "nextPage");
+        scene.sprite.setInteractive();
+        scene.sprite.on("pointerdown", () => {
             hudBuildGroup.destroy(true);
+            console.log(curPos);
             buildHud(curPos, buildType, curPage+1);
         });
     }
     if (begin !== 0) {
-        scene.prevPage = hudBuildGroup.create(50, windowHeight - hudHeight - 20, "previousPage");
-        scene.prevPage.setInteractive();
-        scene.prevPage.on("pointerdown", () => {
+        scene.sprite = hudBuildGroup.create(50, windowHeight - hudHeight - 20, "previousPage");
+        scene.sprite.setInteractive();
+        scene.sprite.on("pointerdown", () => {
             let nbFind = 12;
             let newBegin = curPos;
             for(let i = curPos; i > 0; i--){
@@ -121,7 +120,6 @@ function buildHud(begin, buildType, curPage) {
                     newBegin--;
                 }
             }
-            isLast = false;
             hudBuildGroup.destroy(true);
             buildHud(newBegin, buildType, curPage-1);
         });

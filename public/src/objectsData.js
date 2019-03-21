@@ -233,37 +233,37 @@ let objects = {
         "storage": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0},
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
-    "CityHall-E": {
+    "cityhall-E": {
         "type": "building",
         "isIcon": false,
         "width": 4,
         "height": 4,
         "storage": {"energy": 1000, "water": 1000, "citizens": 0, "money": 1000, "pollution": 0},
-        "production": {"energy": 0, "water": 0, "citizens": 200, "money": 0, "pollution": 0}
+        "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 0}
     },
-    "CityHall-N": {
+    "cityhall-N": {
         "type": "building",
         "isIcon": false,
-        "width": 4,
-        "height": 4,
+        "width": 3,
+        "height": 3,
         "storage": {"energy": 1000, "water": 1000, "citizens": 0, "money": 1000, "pollution": 1000},
-        "production": {"energy": 0, "water": 0, "citizens": 200, "money": 0, "pollution": 0}
+        "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 0}
     },
-    "CityHall-S": {
+    "cityhall-S": {
         "type": "building",
         "isIcon": false,
-        "width": 4,
-        "height": 4,
+        "width": 3,
+        "height": 3,
         "storage": {"energy": 1000, "water": 1000, "citizens": 0, "money": 1000, "pollution": 1000},
-        "production": {"energy": 0, "water": 0, "citizens": 200, "money": 0, "pollution": 0}
+        "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 0}
     },
-    "CityHall-W": {
+    "cityhall-W": {
         "type": "building",
         "isIcon": true,
-        "width": 4,
-        "height": 4,
+        "width": 3,
+        "height": 3,
         "storage": {"energy": 1000, "water": 1000, "citizens": 0, "money": 1000, "pollution": 1000},
-        "production": {"energy": 0, "water": 0, "citizens": 200, "money": 0, "pollution": 0}
+        "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 0}
     },
 
 
@@ -298,7 +298,141 @@ let objects = {
         "height": 2,
         "storage": {"energy": 0, "water": 0, "citizens": 0, "money": 100, "pollution": 0},
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 10, "pollution": 11}
-    }
+    },
+
+
+    "habitation1-E": {
+        "type": "building",
+        "isIcon": false,
+        "width": 1,
+        "height": 1,
+        "storage": {"energy": 0, "water": 0, "citizens": 5, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation1-N": {
+        "type": "building",
+        "isIcon": false,
+        "width": 1,
+        "height": 1,
+        "storage": {"energy": 0, "water": 0, "citizens": 5, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation1-S": {
+        "type": "building",
+        "isIcon": false,
+        "width": 1,
+        "height": 1,
+        "storage": {"energy": 0, "water": 0, "citizens": 5, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation1-W": {
+        "type": "building",
+        "isIcon": true,
+        "width": 1,
+        "height": 1,
+        "storage": {"energy": 0, "water": 0, "citizens": 5, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+
+    "habitation2-E": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 10, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation2-N": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 10, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation2-S": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 10, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation2-W": {
+        "type": "building",
+        "isIcon": true,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 10, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+
+
+    "habitation3-E": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 15, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation3-N": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 15, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation3-S": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 15, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation3-W": {
+        "type": "building",
+        "isIcon": true,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 15, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+
+    "habitation4-E": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 25, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation4-N": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 25, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation4-S": {
+        "type": "building",
+        "isIcon": false,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 25, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
+    "habitation4-W": {
+        "type": "building",
+        "isIcon": true,
+        "width": 2,
+        "height": 2,
+        "storage": {"energy": 0, "water": 0, "citizens": 25, "money": 0, "pollution": 0},
+        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
+    },
 
 
 }
