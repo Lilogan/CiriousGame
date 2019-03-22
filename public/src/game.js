@@ -25,8 +25,8 @@ function addDataToRessources(curElem, n){
         scene.toProduce.citizens += objects[curElem.name].production.citizens;
         scene.toProduce.money += objects[curElem.name].production.money;
         scene.toProduce.pollution += objects[curElem.name].production.pollution;
-        scene.storageMax.energy += objects[curElem.name].storage.energy;
 
+        scene.storageMax.energy += objects[curElem.name].storage.energy;
         scene.storageMax.water += objects[curElem.name].storage.water;
         scene.storageMax.citizens += objects[curElem.name].storage.citizens;
         scene.storageMax.money += objects[curElem.name].storage.money;
@@ -134,12 +134,6 @@ function isSpriteConnectedToRoad(nInMapData) {
                 if (curElem.name === "invisible") {
                     objectOrientation = curElem.nameLinkedElement.split("-")[1];
                 }
-
-
-
-
-
-
                 if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y - spriteSize/2 && (objectOrientation === "W" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
                     addDataToRessources(curElem, n);
                     isSpriteConnectedToRoad(n);
@@ -272,7 +266,7 @@ let GameScene = new Phaser.Class({
 
                     //create a building if necessary space on map is free
                     sprite.on("pointerdown", () => {
-                        if (scene.curPlacedBlock !== undefined) {
+                        if (scene.curPlacedBlock !== undefined && scene.pointer.buttons === 1) {
                             let obj = objects[scene.curPlacedBlock];
                             let objCoords = getCoordsFromObject(obj, j, i);
                             let isOnBlock = false;
@@ -382,8 +376,8 @@ let GameScene = new Phaser.Class({
                                         scene.toProduce.citizens += objects[objToPush.name].production.citizens;
                                         scene.toProduce.money += objects[objToPush.name].production.money;
                                         scene.toProduce.pollution += objects[objToPush.name].production.pollution;
-                                        scene.storageMax.energy += objects[objToPush.name].storage.energy;
 
+                                        scene.storageMax.energy += objects[objToPush.name].storage.energy;
                                         scene.storageMax.water += objects[objToPush.name].storage.water;
                                         scene.storageMax.citizens += objects[objToPush.name].storage.citizens;
                                         scene.storageMax.money += objects[objToPush.name].storage.money;
@@ -490,7 +484,7 @@ let GameScene = new Phaser.Class({
 
 
         //rotate building
-        if (scene.pointer.buttons === 2 && !scene.pointer.justMoved && scene.pointer.isDown) {
+        if (scene.pointer.buttons === 2 && !scene.pointer.justMoved && scene.pointer.justDown) {
             if (scene.curPlacedBlock !== undefined) {
                 let object = objects[scene.curPlacedBlock];
                 if (object.type === "building") {
@@ -533,8 +527,8 @@ let GameScene = new Phaser.Class({
                     scene.toProduce.water -= objects[scene.mapData[i].name].production.water;
                     scene.toProduce.citizens -= objects[scene.mapData[i].name].production.citizens;
                     scene.toProduce.money -= objects[scene.mapData[i].name].production.money;
-
                     scene.toProduce.pollution -= objects[scene.mapData[i].name].production.pollution;
+
                     scene.storageMax.energy -= objects[scene.mapData[i].name].storage.energy;
                     scene.storageMax.water -= objects[scene.mapData[i].name].storage.water;
                     scene.storageMax.citizens -= objects[scene.mapData[i].name].storage.citizens;

@@ -272,32 +272,32 @@ let objects = {
         "isIcon": false,
         "width": 3,
         "height": 2,
-        "storage": {"energy": 0, "water": 0, "citizens": 0, "money": 100, "pollution": 0},
-        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 10, "pollution": 11}
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "money": 100, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11}
     },
     "factory1-N": {
         "type": "building",
         "isIcon": false,
         "width": 3,
         "height": 2,
-        "storage": {"energy": 0, "water": 0, "citizens": 0, "money": 100, "pollution": 0},
-        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 10, "pollution": 11}
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "money": 100, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11}
     },
     "factory1-S": {
         "type": "building",
         "isIcon": false,
         "width": 3,
         "height": 2,
-        "storage": {"energy": 0, "water": 0, "citizens": 0, "money": 100, "pollution": 0},
-        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 10, "pollution": 11}
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "money": 100, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11}
     },
     "factory1-W": {
         "type": "building",
         "isIcon": true,
         "width": 3,
         "height": 2,
-        "storage": {"energy": 0, "water": 0, "citizens": 0, "money": 100, "pollution": 0},
-        "production": {"energy": 0, "water": 0, "citizens": 0, "money": 10, "pollution": 11}
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "money": 100, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11}
     },
 
 

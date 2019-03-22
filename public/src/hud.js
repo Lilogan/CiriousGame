@@ -1,14 +1,15 @@
 let windowWidth = $(window).width(); // window width
 let windowHeight = $(window).height(); // window height
-let hudHeight = 50; // bottom hud height
+let hudHeight = 80; // bottom hud height
 let buildingWindowWidth = 300; // build hud height
 let buildingWindowHeight = 400; // build hud height
-let scene; // The scene
-let roadHudState = false; //is road hud displayed
+let scene; // This scene
 let buildHudState = false; //is building hud displayed
 let hudBuildGroup; //group of all elements of current displayed hud
+let testGroup; //group of all elements of current displayed hud
 let isLast = false; //check if page in hud menu is the last one
-let gameScene; // ??
+let gameScene; // The game scene
+let prevSecond = -1;
 
 function buildHud(begin, buildType, curPage) {
     //reset the hud
@@ -19,11 +20,10 @@ function buildHud(begin, buildType, curPage) {
     // ??
     isLast = false;
     hudBuildGroup = scene.add.group("buildHud");
-    gameScene = scene.scene.get("GameScene");
     let nbElementOfGoodType  = 0;
 
     // Add to the hud groupe every Geom and Text for the build hud
-    let hudBackgroundRec= new Phaser.Geom.Rectangle(0, windowHeight - buildingWindowHeight - hudHeight, buildingWindowWidth, buildingWindowHeight);
+    let hudBackgroundRec = new Phaser.Geom.Rectangle(0, windowHeight - buildingWindowHeight - hudHeight, buildingWindowWidth, buildingWindowHeight);
     let hudBackground = scene.add.graphics({key: "graph", fillStyle: {color: 0xffffff}});
     hudBuildGroup.add(hudBackground);
     hudBackground.fillRectShape(hudBackgroundRec);
@@ -32,7 +32,7 @@ function buildHud(begin, buildType, curPage) {
     buildMenuRoadRec.setOrigin(0, 0);
     hudBuildGroup.add(buildMenuRoadRec);
     buildMenuRoadRec.setInteractive();
-    buildMenuRoadRec.on('pointerdown', function (pointer) {
+    buildMenuRoadRec.on('pointerdown', function () {
         buildHud(0, "road", 0);
     });
 
@@ -43,7 +43,7 @@ function buildHud(begin, buildType, curPage) {
     buildMenuBuildingRec.setOrigin(0, 0);
     hudBuildGroup.add(buildMenuBuildingRec);
     buildMenuBuildingRec.setInteractive();
-    buildMenuBuildingRec.on('pointerdown', function(pointer){
+    buildMenuBuildingRec.on('pointerdown', function(){
        buildHud(0, "building", 0)
     });
 
@@ -54,7 +54,7 @@ function buildHud(begin, buildType, curPage) {
     buildMenuEchapRec.setOrigin(0, 0);
     hudBuildGroup.add(buildMenuEchapRec);
     buildMenuEchapRec.setInteractive();
-    buildMenuEchapRec.on('pointerdown', function(pointer){
+    buildMenuEchapRec.on('pointerdown', function(){
         buildHudState = false;
         hudBuildGroup.destroy(true);
     });
@@ -126,7 +126,56 @@ function buildHud(begin, buildType, curPage) {
     }
 }
 
-var HudScene = new Phaser.Class({
+function showResources(){
+    if (testGroup !== undefined) {
+        testGroup.destroy(true);
+    }
+
+    testGroup = scene.add.group("testGroup");
+
+    let hudWaterIcon = scene.add.sprite(200, windowHeight - 35, "waterIcon");
+    hudWaterIcon.setOrigin(0, 0);
+    hudWaterIcon.setDisplaySize(23, 23);
+    testGroup.add(hudWaterIcon);
+
+    let testRec = new Phaser.Geom.Rectangle(230, windowHeight - 31, 250, 15);
+    let testGraph1 = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
+    testGroup.add(testGraph1);
+    testGraph1.fillRectShape(testRec);
+
+    let testRec2 = new Phaser.Geom.Rectangle(230, windowHeight - 31, gameScene.mapData[0].water * 250 / gameScene.storageMax.water, 15);
+    let testGraph2 = scene.add.graphics({key: "graph", fillStyle: {color: 0x008acf}});
+    testGroup.add(testGraph2);
+    testGraph2.fillRectShape(testRec2);
+
+    let testText = scene.add.text(260, windowHeight - 30, ""+ gameScene.mapData[0].water +"/"+ gameScene.storageMax.water +"(+"+ gameScene.toProduce.water +"/sec)");
+    testText.setColor("white");
+    testText.setFontSize(12);
+    testGroup.add(testText);
+
+
+    let hudEnergyIcon = scene.add.sprite(200, windowHeight - 70, "energyIcon");
+    hudEnergyIcon.setOrigin(0, 0);
+    hudEnergyIcon.setDisplaySize(23, 23);
+    testGroup.add(hudEnergyIcon);
+
+    let testRec11 = new Phaser.Geom.Rectangle(230, windowHeight - 66, 250, 15);
+    let testGraph11 = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
+    testGroup.add(testGraph11);
+    testGraph11.fillRectShape(testRec11);
+
+    let testRec12 = new Phaser.Geom.Rectangle(230, windowHeight - 66, gameScene.mapData[0].energy * 250 / gameScene.storageMax.energy, 15);
+    let testGraph12 = scene.add.graphics({key: "graph", fillStyle: {color: 0xffcc00}});
+    testGroup.add(testGraph12);
+    testGraph12.fillRectShape(testRec12);
+
+    let testText10 = scene.add.text(260, windowHeight - 65, ""+ gameScene.mapData[0].energy +"/"+ gameScene.storageMax.energy +"(+"+ gameScene.toProduce.energy +"/sec de bite de mort)");
+    testText10.setColor("white");
+    testText10.setFontSize(12);
+    testGroup.add(testText10);
+}
+
+let HudScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
@@ -138,31 +187,35 @@ var HudScene = new Phaser.Class({
         },
     preload: function () {
         scene = this;
+        gameScene = scene.scene.get("GameScene");
         scene.scene.bringToTop();
     },
 
     create: function () {
         isLast = false;
         scene.pointer = scene.input.activePointer;
-        gameScene = scene.scene.get("GameScene");
+
+        // Add the bottom black rectangle for top border
+        scene.hudBorder = new Phaser.Geom.Rectangle(0, windowHeight - hudHeight, windowWidth, hudHeight);
+        scene.graphicsBorder = scene.add.graphics({fillStyle: {color: 0x000000}});
+        scene.graphicsBorder.fillRectShape(scene.hudBorder);
 
         // Add the bottom white rectangle for the hud
-        scene.hud = new Phaser.Geom.Rectangle(0, windowHeight - hudHeight, windowWidth, hudHeight);
+        scene.hud = new Phaser.Geom.Rectangle(0, windowHeight - hudHeight + 1, windowWidth, hudHeight - 1);
         scene.graphics = scene.add.graphics({fillStyle: {color: 0xffffff}});
         scene.graphics.fillRectShape(scene.hud);
 
         // Add hud's sprites and display them
         scene.deleteBuildingIcon = scene.add.sprite(50, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding");
-        scene.buildBuildingIcon = scene.add.sprite(120, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
-        scene.deleteBuildingIcon.setDisplaySize(45, 45);
-        scene.buildBuildingIcon.setDisplaySize(45, 45);
+        scene.buildBuildingIcon = scene.add.sprite(130, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
+        scene.deleteBuildingIcon.setDisplaySize(60, 60);
+        scene.buildBuildingIcon.setDisplaySize(60, 60);
         scene.buildBuildingIcon.setInteractive({pixelPerfect: false});
 
         // Open the build hud when we click on the "wrench and hammer" icon
         scene.buildBuildingIcon.on("pointerdown", () => {
             if (!buildHudState) {
                 buildHudState = true;
-                roadHudState = true;
                 gameScene.curPlacedBlock = undefined;
                 buildHud(0, "road",0);
             } else {
@@ -170,7 +223,12 @@ var HudScene = new Phaser.Class({
                 hudBuildGroup.destroy(true);
             }
         }, this);
-    }
-});
+    },
+    update: function (timer) {
+        if (Math.round(timer / 1000)+0.5 !== prevSecond) {
+            prevSecond = Math.round(timer / 1000)+0.5;
+            showResources();
+        }
+    }});
 
 export default HudScene;
