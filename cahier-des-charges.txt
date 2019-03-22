@@ -1,8 +1,10 @@
-- Réfléchir aux types de batiments et leurs fonctions (logement, usine, gestion des déchets?, gestion de l'eau? ...)
-- Réfléchir aux types de ressources et leurs variations
-- Réfléchir au hud, les infos qu'on va montrer ...
-- Voir pour le design du menu principal
-- Faire de nouveaux batiments (usine, grands logement 2x2, ect)
-- Gestion des paliers (batiment déblocable à X ressources, ect)
-- Système d'évenements aléatoires (+ t'as de pollution + t'as de risque)
--
+Destruction des bâtiments (!!!)
+Modes (classique + rotation + menu contextuel (nom + prod + bandeau de couleur))
+Gestion de la pollution (Usine prod par sec + prod max + fin de partie en fonction du taux par hbt)
+Batiments (coût/stockage/ect)
+Sauvegarde et chargement des maps (Mode histoire)
+Palier de pop
+Menu simplifié
+Musique et son
+Menu option + Menu "easter egg"
+Particules

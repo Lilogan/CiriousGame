@@ -169,7 +169,7 @@ function showResources(){
     testGroup.add(testGraph12);
     testGraph12.fillRectShape(testRec12);
 
-    let testText10 = scene.add.text(260, windowHeight - 65, ""+ gameScene.mapData[0].energy +"/"+ gameScene.storageMax.energy +"(+"+ gameScene.toProduce.energy +"/sec de bite de mort)");
+    let testText10 = scene.add.text(260, windowHeight - 65, ""+ gameScene.mapData[0].energy +"/"+ gameScene.storageMax.energy +"(+"+ gameScene.toProduce.energy +"/sec)");
     testText10.setColor("white");
     testText10.setFontSize(12);
     testGroup.add(testText10);
