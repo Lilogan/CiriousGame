@@ -208,7 +208,10 @@ let HudScene = new Phaser.Class({
         // Add hud's sprites and display them
         scene.deleteBuildingIcon = scene.add.sprite(50, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding");
         scene.buildBuildingIcon = scene.add.sprite(130, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
+
         scene.deleteBuildingIcon.setDisplaySize(60, 60);
+        scene.deleteBuildingIcon.setInteractive({pixelPerfect: false});
+
         scene.buildBuildingIcon.setDisplaySize(60, 60);
         scene.buildBuildingIcon.setInteractive({pixelPerfect: false});
 
@@ -223,6 +226,14 @@ let HudScene = new Phaser.Class({
                 hudBuildGroup.destroy(true);
             }
         }, this);
+
+        scene.deleteBuildingIcon.on("pointerdown", () => {
+            if(gameScene.curPlacedBlock !== "destroy"){
+                gameScene.curPlacedBlock = "destroy";
+            }else{
+                gameScene.curPlacedBlock = undefined;
+            }
+        });
     },
     update: function (timer) {
         if (Math.round(timer / 1000)+0.5 !== prevSecond) {

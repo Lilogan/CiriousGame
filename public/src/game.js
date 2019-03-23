@@ -3,19 +3,244 @@ let windowWidth = $(window).width(); // window width
 let windowHeight = $(window).height(); // window height
 let spriteSize = 200; // sprite size (50) + space between sprites (1)
 let mapSize = 50; // size of map (square)
-let borderOffset = new Phaser.Geom.Point(windowWidth / 2, windowHeight / 2 + 119 - mapSize/2 * 119); //offset to center the map
-// let borderOffset = new Phaser.Geom.Point(0,0); //offset to center the map
+let borderOffset = new Phaser.Geom.Point(windowWidth / 2, windowHeight / 2 + 119 - mapSize / 2 * 119); //offset to center the map
 let prevSecond = -1; // ??
 
 //limit of camera
-let minPosCamX = -spriteSize/2 * mapSize + borderOffset.x;
-let minPosCamY = -spriteSize/2 * mapSize - borderOffset.y + windowHeight;
+let minPosCamX = -spriteSize / 2 * mapSize + borderOffset.x;
+let minPosCamY = -spriteSize / 2 * mapSize - borderOffset.y + windowHeight;
 
 // Set the notation for the orientation of sprites
 let orientations = ["W", "N", "E", "S"];
 
+function spriteOver(isoPoint, i, j) {
+    if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
+        let obj = objects[scene.curPlacedBlock];
+        let objCoords = getCoordsFromObject(obj, j, i);
+        if (scene.orientation === "N" || scene.orientation === "S") {
+            scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+        } else {
+            scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+        }
+        if (obj.type === "building") {
+
+
+            scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
+        }
+        scene.tmpSprite.alpha = 0.7;
+
+
+        scene.tmpSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
+        objCoords.forEach((curCoord) => {
+            scene.mapData.forEach((element) => {
+                if (element.x === curCoord.x && element.y === curCoord.y) {
+                    if (objects[scene.curPlacedBlock].type !== "road" || objects[element.name].type !== "road") {
+                        scene.tmpSprite.tint = 0xe20000;
+                        scene.tint = 0xe20000;
+                    }
+                }
+            });
+        });
+    }
+}
+
+function spriteOut() {
+    scene.tint = undefined;
+    if (scene.tmpSprite !== undefined) {
+        scene.tmpSprite.destroy();
+    }
+    if (scene.tmpArrow !== undefined) {
+        scene.tmpArrow.destroy();
+    }
+}
+
+function spriteDown(point, isoPoint, i, j, sprite) {
+    if (scene.curPlacedBlock !== undefined && scene.pointer.buttons === 1 && scene.curPlacedBlock !== "destroy") {
+        let obj = objects[scene.curPlacedBlock];
+        let objCoords = getCoordsFromObject(obj, j, i);
+        let isOnBlock = false;
+        let curPlacedBlockCopy = scene.curPlacedBlock;
+
+        objCoords.forEach((curCoord) => {
+            scene.mapData.find((element) => {
+                if (element.x === curCoord.x && element.y === curCoord.y) {
+                    if ((objects[scene.curPlacedBlock].type !== "road" || objects[element.name].type !== "road")) {
+                        isOnBlock = true;
+                    }
+                    if ((objects[scene.curPlacedBlock].type === "road" && objects[element.name].type === "road")) {
+                        removeSprite(element.nthElement, false);
+                        scene.tmpSprite.destroy();
+                        isOnBlock = false;
+                    }
+                }
+            });
+        });
+
+
+        if (!isOnBlock) {
+            let nthInMapData = scene.mapData.length;
+            if (obj.type === "road") {
+                let newRoadOrientation = scene.curPlacedBlock.substr(4, scene.curPlacedBlock.length);
+                for (let k = -1; k <= 1; k++) {
+                    for (let l = -1; l <= 1; l++) {
+                        if (k !== 0 || l !== 0) {
+                            scene.mapData.forEach((curData, n) => {
+                                let correctedBlockOrientation = curData.name.substr(4, curData.name.length);
+                                let coord = {
+                                    x: curData.x,
+                                    y: curData.y
+                                };
+                                let coordCart = fromIsoToCart(coord);
+                                if (coordCart.x === point.x + k * spriteSize / 2 && coordCart.y === point.y + l * spriteSize / 2) {
+                                    if (objects[curData.name].type === 'road') {
+                                        if (k === 0 && l === -1) {
+                                            if (newRoadOrientation.indexOf("E") === -1) {
+                                                newRoadOrientation += "E";
+                                            }
+                                            if (correctedBlockOrientation.indexOf("W") === -1) {
+                                                correctedBlockOrientation += "W";
+                                            }
+                                        } else if (k === 0 && l === 1) {
+                                            if (newRoadOrientation.indexOf("W") === -1) {
+                                                newRoadOrientation += "W";
+                                            }
+                                            if (correctedBlockOrientation.indexOf("E") === -1) {
+                                                correctedBlockOrientation += "E";
+                                            }
+                                        } else if (k === -1 && l === 0) {
+                                            if (newRoadOrientation.indexOf("N") === -1) {
+                                                newRoadOrientation += "N";
+                                            }
+                                            if (correctedBlockOrientation.indexOf("S") === -1) {
+                                                correctedBlockOrientation += "S";
+                                            }
+                                        } else if (k === 1 && l === 0) {
+                                            if (newRoadOrientation.indexOf("S") === -1) {
+                                                newRoadOrientation += "S";
+                                            }
+                                            if (correctedBlockOrientation.indexOf("N") === -1) {
+                                                correctedBlockOrientation += "N";
+                                            }
+                                        }
+                                        correctedBlockOrientation = roadNameInOrder(correctedBlockOrientation);
+                                        removeSprite(curData.nthElement, false);
+                                        curData.name = correctedBlockOrientation;
+                                        scene.mapData.push(curData);
+                                        let newRoad = scene.spritesGroup.create(curData.x + borderOffset.x, curData.y + borderOffset.y, correctedBlockOrientation, false).setOrigin(0.5, 1);
+                                        newRoad.depth = sprite.y - 50 * obj.height + mapSize * 100;
+                                        newRoad.setInteractive({pixelPerfect: true});
+                                        newRoad.on("pointerdown", () => {
+                                            if (scene.curPlacedBlock === "destroy") {
+                                                removeSprite(curData.nthElement, false);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+                        }
+                    }
+                }
+                newRoadOrientation = roadNameInOrder(newRoadOrientation);
+                scene.curPlacedBlock = newRoadOrientation;
+
+            }
+
+            let objToPush = {};
+            objCoords.forEach((curCoord, n) => {
+                if (n === 0) {
+                    objToPush = {
+                        name: scene.curPlacedBlock,
+                        nthElement: nthInMapData,
+                        nameLinkedElement: scene.curPlacedBlock,
+                        x: curCoord.x,
+                        y: curCoord.y,
+                        isAddedToData: false,
+                        connectedToCityHall: false,
+                    };
+                } else {
+                    objToPush = {
+                        name: "invisible",
+                        nthElement: nthInMapData,
+                        nameLinkedElement: scene.curPlacedBlock,
+                        x: curCoord.x,
+                        y: curCoord.y,
+                        isAddedToData: false,
+                        connectedToCityHall: false,
+                    };
+                }
+
+                if (objToPush.name.substr(0, objToPush.name.length - 2) === "cityhall") {
+                    objToPush.connectedToCityHall = true;
+                    scene.toProduce.energy += objects[objToPush.name].production.energy;
+                    scene.toProduce.water += objects[objToPush.name].production.water;
+                    scene.toProduce.citizens += objects[objToPush.name].production.citizens;
+                    scene.toProduce.money += objects[objToPush.name].production.money;
+                    scene.toProduce.pollution += objects[objToPush.name].production.pollution;
+
+                    scene.storageMax.energy += objects[objToPush.name].storage.energy;
+                    scene.storageMax.water += objects[objToPush.name].storage.water;
+                    scene.storageMax.citizens += objects[objToPush.name].storage.citizens;
+                    scene.storageMax.money += objects[objToPush.name].storage.money;
+                    scene.storageMax.pollution += objects[objToPush.name].storage.pollution;
+                }
+                scene.mapData.push(objToPush);
+            });
+            let defSprite;
+            if (scene.orientation === "N" || scene.orientation === "S") {
+                defSprite = scene.spritesGroup.create(isoPoint.x + borderOffset.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+            } else {
+                defSprite = scene.spritesGroup.create(isoPoint.x + borderOffset.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+            }
+
+            defSprite.alpha = 1;
+            defSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
+            defSprite.setInteractive({pixelPerfect: true});
+
+            defSprite.on("pointerdown", () => {
+                if (scene.curPlacedBlock === "destroy") {
+                    removeSprite(objToPush.nthElement, false);
+                } else if (scene.curPlacedBlock !== undefined && obj.type === "building") {
+                    // menu contextuel
+                } else if (scene.curPlacedBlock !== undefined) {
+                    spriteDown(point, isoPoint, i, j, defSprite);
+                }
+            });
+            defSprite.on("pointerover", () => {
+                spriteOver(isoPoint, i, j);
+            });
+            defSprite.on("pointerout", () => {
+                spriteOut();
+            });
+            scene.curPlacedBlock = curPlacedBlockCopy;
+
+            if (scene.tmpArrow !== undefined) {
+                scene.tmpArrow.destroy();
+            }
+        }
+    }
+}
+
+function removeSprite(nth, keepInMapData) {
+    let nthElement = -1;
+    let curN = 0;
+    scene.mapData.forEach((curData) => {
+        if (curData.name !== "invisible" && curData.nthElement === nth) {
+            scene.spritesGroup.getChildren()[nthElement].destroy();
+        }
+        if (curData.nthElement === nth && keepInMapData === false) {
+            scene.mapData.splice(curN, objects[curData.name].width * objects[curData.name].height);
+            curN--;
+        }
+        if (curData.name !== "invisible") {
+            ++nthElement;
+        }
+        curN++;
+    });
+}
+
 // Add all the ressources every seconds
-function addDataToRessources(curElem, n){
+function addDataToRessources(curElem, n) {
     scene.mapData[n].connectedToCityHall = true;
     if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
         scene.mapData[n].isAddedToData = true;
@@ -87,8 +312,8 @@ function getCoordsFromObject(obj, x, y) {
     for (let k = 0; k < kMax; k++) {
         for (let l = 0; l < lMax; l++) {
             let tmpPoint = {
-                x: (x - l) * spriteSize/2,
-                y: (y - k) * spriteSize/2
+                x: (x - l) * spriteSize / 2,
+                y: (y - k) * spriteSize / 2
             };
             let tmpIsoPoint = fromCartToIso(tmpPoint);
             coords.push(tmpIsoPoint);
@@ -98,18 +323,8 @@ function getCoordsFromObject(obj, x, y) {
     return coords;
 }
 
-// change the color of an object thanks to it coordinates
-function setTmpSpriteTint(coord, color) {
-    scene.mapData.find((element) => {
-        if (element.x === coord.x && element.y === coord.y) {
-            if (objects[scene.curPlacedBlock] !== "road" || objects[element.name] !== "road") {
-                scene.tmpSprite.tint = color;
-            }
-        }
-    });
-}
 
-// Check if a sprite is connected to the city hall throught the road
+// Check if a sprite is connected to the city hall through the road
 function isSpriteConnectedToRoad(nInMapData) {
     let object = scene.mapData[nInMapData];
     let objectCoord = {
@@ -134,20 +349,20 @@ function isSpriteConnectedToRoad(nInMapData) {
                 if (curElem.name === "invisible") {
                     objectOrientation = curElem.nameLinkedElement.split("-")[1];
                 }
-                if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y - spriteSize/2 && (objectOrientation === "W" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
+                if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y - spriteSize / 2 && (objectOrientation === "W" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
                     addDataToRessources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
-                if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y + spriteSize/2 && (objectOrientation === "E" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
+                if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y + spriteSize / 2 && (objectOrientation === "E" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
                     addDataToRessources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
-                if (curElemCart.x === objectCart.x - spriteSize/2 && curElemCart.y === objectCart.y && (objectOrientation === "S" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
+                if (curElemCart.x === objectCart.x - spriteSize / 2 && curElemCart.y === objectCart.y && (objectOrientation === "S" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
 
                     addDataToRessources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
-                if (curElemCart.x === objectCart.x + spriteSize/2 && curElemCart.y === objectCart.y && (objectOrientation === "N" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
+                if (curElemCart.x === objectCart.x + spriteSize / 2 && curElemCart.y === objectCart.y && (objectOrientation === "N" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
                     addDataToRessources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
@@ -172,6 +387,7 @@ let GameScene = new Phaser.Class({
         scene.orientation = "W"; // Default orrientation
         scene.pointer = this.input.activePointer; // Our cursor
         scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S, Q, D, R');
+        scene.spritesGroup = scene.add.group("spritesGroup");
         scene.toProduce = {
             energy: 0,
             water: 0,
@@ -212,205 +428,34 @@ let GameScene = new Phaser.Class({
             for (let i = 0; i < mapSize; i++) {
                 for (let j = 0; j < mapSize; j++) {
                     let point = new Phaser.Geom.Point();
-                    point.x = j * spriteSize/2;
-                    point.y = i * spriteSize/2;
+                    point.x = j * spriteSize / 2;
+                    point.y = i * spriteSize / 2;
                     let isoPoint = fromCartToIso(point);
                     let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 18, "grass", false).setOrigin(0.5, 1);
                     // preview a building with mouse and change tint if necessary space on map is not free
                     sprite.setInteractive({pixelPerfect: true});
 
                     sprite.on("pointerover", () => {
-                        if (scene.curPlacedBlock !== undefined) {
-                            let obj = objects[scene.curPlacedBlock];
-                            let objCoords = getCoordsFromObject(obj, j, i);
-
-                            if (scene.orientation === "N" || scene.orientation === "S") {
-                                scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                            } else {
-                                scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                            }
-
-
-                            if (obj.type === "building") {
-                                scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
-                            }
-
-
-                            scene.tmpSprite.alpha = 0.7;
-                            scene.tmpSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
-
-
-                            objCoords.forEach((curCoord) => {
-                                scene.mapData.find((element) => {
-                                    if (element.x === curCoord.x && element.y === curCoord.y) {
-                                        if (objects[scene.curPlacedBlock].type !== "road" || objects[element.name].type !== "road") {
-                                            scene.tmpSprite.tint = 0xe20000;
-                                        }
-                                    }
-                                });
-                            });
-                        }
+                        spriteOver(isoPoint, i, j);
                     }, this);
 
 
                     //destroy previewed building
                     sprite.on("pointerout", () => {
-                        if (scene.tmpSprite !== undefined) {
-                            scene.tmpSprite.destroy();
-                        }
-                        if (scene.tmpArrow !== undefined) {
-                            scene.tmpArrow.destroy();
-                        }
+                        spriteOut();
                     }, this);
 
 
                     //create a building if necessary space on map is free
                     sprite.on("pointerdown", () => {
-                        if (scene.curPlacedBlock !== undefined && scene.pointer.buttons === 1) {
-                            let obj = objects[scene.curPlacedBlock];
-                            let objCoords = getCoordsFromObject(obj, j, i);
-                            let isOnBlock = false;
-                            let curPlacedBlockCopy = scene.curPlacedBlock;
-
-                            objCoords.forEach((curCoord) => {
-                                scene.mapData.find((element) => {
-                                    if (element.x === curCoord.x && element.y === curCoord.y) {
-                                        if (objects[scene.curPlacedBlock].type !== "road" || objects[element.name].type !== "road") {
-                                            isOnBlock = true;
-                                        }
-                                    }
-                                });
-                            });
-
-
-                            if (!isOnBlock) {
-                                if (obj.type === "road") {
-                                    let newRoadOrientation = scene.curPlacedBlock.substr(4, scene.curPlacedBlock.length);
-                                    for (let k = -1; k <= 1; k++) {
-                                        for (let l = -1; l <= 1; l++) {
-                                            if (k !== 0 || l !== 0) {
-                                                scene.mapData.forEach((curData, n) => {
-                                                    let correctedBlockOrientation = curData.name.substr(4, curData.name.length);
-                                                    let coord = {
-                                                        x: curData.x,
-                                                        y: curData.y
-                                                    };
-                                                    let coordCart = fromIsoToCart(coord);
-                                                    if (coordCart.x === point.x + k * spriteSize/2 && coordCart.y === point.y + l * spriteSize/2) {
-                                                        if (objects[curData.name].type === 'road') {
-                                                            if (k === 0 && l === -1) {
-                                                                if (newRoadOrientation.indexOf("E") === -1) {
-                                                                    newRoadOrientation += "E";
-                                                                }
-                                                                if (correctedBlockOrientation.indexOf("W") === -1) {
-                                                                    correctedBlockOrientation += "W";
-                                                                }
-                                                            } else if (k === 0 && l === 1) {
-                                                                if (newRoadOrientation.indexOf("W") === -1) {
-                                                                    newRoadOrientation += "W";
-                                                                }
-                                                                if (correctedBlockOrientation.indexOf("E") === -1) {
-                                                                    correctedBlockOrientation += "E";
-                                                                }
-                                                            } else if (k === -1 && l === 0) {
-                                                                if (newRoadOrientation.indexOf("N") === -1) {
-                                                                    newRoadOrientation += "N";
-                                                                }
-                                                                if (correctedBlockOrientation.indexOf("S") === -1) {
-                                                                    correctedBlockOrientation += "S";
-                                                                }
-                                                            } else if (k === 1 && l === 0) {
-                                                                if (newRoadOrientation.indexOf("S") === -1) {
-                                                                    newRoadOrientation += "S";
-                                                                }
-                                                                if (correctedBlockOrientation.indexOf("N") === -1) {
-                                                                    correctedBlockOrientation += "N";
-                                                                }
-                                                            }
-                                                            correctedBlockOrientation = roadNameInOrder(correctedBlockOrientation);
-                                                            sprite = scene.add.sprite(curData.x + borderOffset.x, curData.y + borderOffset.y, correctedBlockOrientation, false).setOrigin(0.5, 1);
-                                                            sprite.depth = sprite.y - 50 * obj.height + mapSize * 100;
-                                                            scene.mapData[n].name = correctedBlockOrientation;
-                                                        }
-                                                    }
-                                                });
-
-                                            }
-                                        }
-                                    }
-                                    newRoadOrientation = roadNameInOrder(newRoadOrientation);
-                                    scene.curPlacedBlock = newRoadOrientation;
-
-                                }
-
-                                let objToPush = {};
-                                let nthInMapData = scene.mapData.length;
-                                objCoords.forEach((curCoord, n) => {
-                                    if (n === 0) {
-                                        objToPush = {
-                                            name: scene.curPlacedBlock,
-                                            nthElement: nthInMapData,
-                                            nameLinkedElement: scene.curPlacedBlock,
-                                            x: curCoord.x,
-                                            y: curCoord.y,
-                                            isAddedToData: false,
-                                            connectedToCityHall: false,
-                                        };
-                                    } else {
-                                        objToPush = {
-                                            name: "invisible",
-                                            nthElement: nthInMapData,
-                                            nameLinkedElement: scene.curPlacedBlock,
-                                            x: curCoord.x,
-                                            y: curCoord.y,
-                                            isAddedToData: false,
-                                            connectedToCityHall: false,
-                                        };
-                                    }
-
-                                    // console.log(objToPush.nameLinkedElement.substr(0, objToPush.nameLinkedElement.length - 2));
-                                    if (objToPush.name.substr(0, objToPush.name.length - 2) === "cityhall") {
-                                        objToPush.connectedToCityHall = true;
-                                        scene.toProduce.energy += objects[objToPush.name].production.energy;
-                                        scene.toProduce.water += objects[objToPush.name].production.water;
-                                        scene.toProduce.citizens += objects[objToPush.name].production.citizens;
-                                        scene.toProduce.money += objects[objToPush.name].production.money;
-                                        scene.toProduce.pollution += objects[objToPush.name].production.pollution;
-
-                                        scene.storageMax.energy += objects[objToPush.name].storage.energy;
-                                        scene.storageMax.water += objects[objToPush.name].storage.water;
-                                        scene.storageMax.citizens += objects[objToPush.name].storage.citizens;
-                                        scene.storageMax.money += objects[objToPush.name].storage.money;
-                                        scene.storageMax.pollution += objects[objToPush.name].storage.pollution;
-                                    }
-                                    scene.mapData.push(objToPush);
-                                });
-
-                                if (scene.orientation === "N" || scene.orientation === "S") {
-                                    scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                                } else {
-                                    scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-                                }
-
-                                scene.tmpSprite.alpha = 1;
-                                scene.tmpSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
-                                scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-
-                                scene.curPlacedBlock = curPlacedBlockCopy;
-
-                                if (scene.tmpArrow !== undefined) {
-                                    scene.tmpArrow.destroy();
-                                }
-                            }
-                        }
-
+                        spriteDown(point, isoPoint, i, j, sprite);
                     }, this);
                 }
             }
 
             //display map
             scene.mapData.forEach((curData) => {
-                if(curData.name === "data"){
+                if (curData.name === "data") {
                     scene.mapData[0].energy = curData.energy;
                     scene.mapData[0].water = curData.water;
                     scene.mapData[0].citizens = curData.citizens;
@@ -432,7 +477,7 @@ let GameScene = new Phaser.Class({
             // Zoom camera
             window.addEventListener("wheel", (e) => {
                 minPosCamX = -50 * mapSize + borderOffset.x / scene.cameras.main.zoom - 50;
-                minPosCamY = -spriteSize/2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
+                minPosCamY = -spriteSize / 2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
 
 
                 if (e.deltaY < 0 && scene.cameras.main.zoom < 2) {
@@ -485,32 +530,30 @@ let GameScene = new Phaser.Class({
 
         //rotate building
         if (scene.pointer.buttons === 2 && !scene.pointer.justMoved && scene.pointer.justDown) {
+            console.log(scene.mapData);
             if (scene.curPlacedBlock !== undefined) {
                 let object = objects[scene.curPlacedBlock];
                 if (object.type === "building") {
                     scene.orientation = orientations[(orientations.indexOf(scene.orientation) + 1) % 4];
+
+                    scene.curPlacedBlock = scene.curPlacedBlock.replace(/.$/, scene.orientation);
                     scene.tmpSprite.destroy();
                     scene.tmpArrow.destroy();
-                    scene.curPlacedBlock = scene.curPlacedBlock.replace(/.$/, scene.orientation);
 
 
                     if (scene.orientation === "N" || scene.orientation === "S") {
-                        scene.tmpSprite = scene.add.sprite(scene.tmpSprite.x + 200 / 4 * (object.width - object.height), scene.tmpSprite.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                        scene.tmpSprite = scene.add.sprite(scene.tmpSprite.x + spriteSize / 2 * (object.width - object.height), scene.tmpSprite.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
                     } else {
-                        scene.tmpSprite = scene.add.sprite(scene.tmpSprite.x - 200 / 4 * (object.width - object.height), scene.tmpSprite.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                        scene.tmpSprite = scene.add.sprite(scene.tmpSprite.x - spriteSize / 2 * (object.width - object.height), scene.tmpSprite.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
                     }
 
 
                     scene.tmpArrow = scene.add.sprite(scene.tmpSprite.x, scene.tmpSprite.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
                     scene.tmpSprite.alpha = 0.7;
+                    if (scene.tint !== undefined) {
+                        scene.tmpSprite.tint = scene.tint;
+                    }
 
-
-                    let isoPoint = {
-                        x: scene.tmpSprite.x,
-                        y: scene.tmpSprite.y
-                    };
-
-                    setTmpSpriteTint(isoPoint, 0xf44250);
                     scene.tmpSprite.depth = scene.tmpSprite.y - 50 * object.height + mapSize * 100;
                 }
             }
