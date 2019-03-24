@@ -1,3 +1,4 @@
+
 let scene; // The scene
 let windowWidth = $(window).width(); // window width
 let windowHeight = $(window).height(); // window height
@@ -157,6 +158,7 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                         y: curCoord.y,
                         isAddedToData: false,
                         connectedToCityHall: false,
+                        yetProduced: 0
                     };
                 } else {
                     objToPush = {
@@ -167,6 +169,7 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                         y: curCoord.y,
                         isAddedToData: false,
                         connectedToCityHall: false,
+                        yetProduced: 0
                     };
                 }
 
@@ -249,7 +252,11 @@ function addDataToRessources(curElem, n) {
         scene.toProduce.water += objects[curElem.name].production.water;
         scene.toProduce.citizens += objects[curElem.name].production.citizens;
         scene.toProduce.money += objects[curElem.name].production.money;
-        scene.toProduce.pollution += objects[curElem.name].production.pollution;
+        if(scene.mapData[n].yetProduced < objects[curElem.name].pollutionMax) {
+            scene.toProduce.pollution += objects[curElem.name].production.pollution;
+            scene.mapData[n].yetProduced += objects[curElem.name].production.pollution;
+        }
+
 
         scene.storageMax.energy += objects[curElem.name].storage.energy;
         scene.storageMax.water += objects[curElem.name].storage.water;
@@ -566,11 +573,12 @@ let GameScene = new Phaser.Class({
                 scene.mapData[i].connectedToCityHall = false;
                 if (objects[scene.mapData[i].name].type === "building" && scene.mapData[i].isAddedToData === true) {
                     scene.mapData[i].isAddedToData = false;
-                    scene.toProduce.energy -= objects[scene.mapData[i].name].production.energy;
-                    scene.toProduce.water -= objects[scene.mapData[i].name].production.water;
-                    scene.toProduce.citizens -= objects[scene.mapData[i].name].production.citizens;
-                    scene.toProduce.money -= objects[scene.mapData[i].name].production.money;
-                    scene.toProduce.pollution -= objects[scene.mapData[i].name].production.pollution;
+                    scene.toProduce.energy = 0;
+                    scene.toProduce.water = 0;
+                    scene.toProduce.citizens = objects["cityhall-S"].production.citizens;
+                    scene.toProduce.money = 0;
+                    scene.toProduce.pollution = 0;
+
 
                     scene.storageMax.energy -= objects[scene.mapData[i].name].storage.energy;
                     scene.storageMax.water -= objects[scene.mapData[i].name].storage.water;
@@ -611,6 +619,7 @@ let GameScene = new Phaser.Class({
             }
 
             scene.mapData[0].pollution += scene.toProduce.pollution;
+            console.log(scene.mapData[0].pollution);
         }
     }
 });

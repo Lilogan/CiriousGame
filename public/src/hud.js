@@ -173,6 +173,22 @@ function showResources(){
     testText10.setColor("white");
     testText10.setFontSize(12);
     testGroup.add(testText10);
+
+    let hudPollutionIcon = scene.add.sprite(500, windowHeight - 70, "pollutionIcon");
+    hudPollutionIcon.setOrigin(0, 0);
+    hudPollutionIcon.setDisplaySize(23, 23);
+    testGroup.add(hudPollutionIcon);
+
+    let testRec21 = new Phaser.Geom.Rectangle(530, windowHeight - 66, 250, 15);
+    let testGraph21 = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
+    testGroup.add(testGraph21);
+    testGraph21.fillRectShape(testRec21);
+
+    //à terminer
+    let testRec22 = new Phaser.Geom.Rectangle(530, windowHeight - 66, gameScene.mapData[0].pollution/gameScene.mapData[0].citizens * 250 / gameScene.storageMax.pollution, 15);
+    let testGraph22 = scene.add.graphics({key: "graph", fillStyle: {color: 0x5b4d19}});
+    testGroup.add(testGraph22);
+    testGraph22.fillRectShape(testRec22);
 }
 
 let HudScene = new Phaser.Class({
