@@ -6,7 +6,7 @@ let buildingWindowHeight = 400; // build hud height
 let scene; // This scene
 let buildHudState = false; //is building hud displayed
 let hudBuildGroup; //group of all elements of current displayed hud
-let testGroup; //group of all elements of current displayed hud
+let resourcesGroup; //group of all elements of current displayed hud
 let isLast = false; //check if page in hud menu is the last one
 let gameScene; // The game scene
 let prevSecond = -1;
@@ -20,7 +20,7 @@ function buildHud(begin, buildType, curPage) {
     // ??
     isLast = false;
     hudBuildGroup = scene.add.group("buildHud");
-    let nbElementOfGoodType  = 0;
+    let nbElementOfGoodType = 0;
 
     // Add to the hud groupe every Geom and Text for the build hud
     let hudBackgroundRec = new Phaser.Geom.Rectangle(0, windowHeight - buildingWindowHeight - hudHeight, buildingWindowWidth, buildingWindowHeight);
@@ -43,8 +43,8 @@ function buildHud(begin, buildType, curPage) {
     buildMenuBuildingRec.setOrigin(0, 0);
     hudBuildGroup.add(buildMenuBuildingRec);
     buildMenuBuildingRec.setInteractive();
-    buildMenuBuildingRec.on('pointerdown', function(){
-       buildHud(0, "building", 0)
+    buildMenuBuildingRec.on('pointerdown', function () {
+        buildHud(0, "building", 0)
     });
 
     let buildMenuBuildingText = scene.add.text(170, windowHeight - hudHeight - buildingWindowHeight + 5, "Building");
@@ -54,7 +54,7 @@ function buildHud(begin, buildType, curPage) {
     buildMenuEchapRec.setOrigin(0, 0);
     hudBuildGroup.add(buildMenuEchapRec);
     buildMenuEchapRec.setInteractive();
-    buildMenuEchapRec.on('pointerdown', function(){
+    buildMenuEchapRec.on('pointerdown', function () {
         buildHudState = false;
         hudBuildGroup.destroy(true);
     });
@@ -66,19 +66,19 @@ function buildHud(begin, buildType, curPage) {
     let nbElementSet = 0;
     let values = 1;
 
-    for(let i = 0; i < Object.values(objects).length; i++){
+    for (let i = 0; i < Object.values(objects).length; i++) {
         let curObject = Object.values(objects)[i];
-        if(curObject.type === buildType && curObject.isIcon === true){
+        if (curObject.type === buildType && curObject.isIcon === true) {
             nbElementOfGoodType++;
         }
     }
     //get 12 elements from begin and display them
-    while(nbElementSet < 12 && values !== undefined) {
-        values = Object.values(objects)[begin+curPos];
-        let index = Object.keys(objects)[begin+curPos];
+    while (nbElementSet < 12 && values !== undefined) {
+        values = Object.values(objects)[begin + curPos];
+        let index = Object.keys(objects)[begin + curPos];
         if (index !== undefined && values.type === buildType && values.isIcon === true && values !== undefined) {
-            scene.sprite = hudBuildGroup.create(60 - (3 * curLine - nbElementSet) * 90, windowHeight - hudHeight - buildingWindowHeight + 125 + curLine * 75, index+"Icon");
-            scene.sprite.setOrigin(0.5,1);
+            scene.sprite = hudBuildGroup.create(60 - (3 * curLine - nbElementSet) * 90, windowHeight - hudHeight - buildingWindowHeight + 125 + curLine * 75, index + "Icon");
+            scene.sprite.setOrigin(0.5, 1);
             scene.sprite.setDisplaySize(70, 70);
             scene.sprite.setInteractive();
             scene.sprite.on("pointerdown", () => {
@@ -92,7 +92,7 @@ function buildHud(begin, buildType, curPage) {
             nbElementSet++;
         }
 
-        if(nbElementOfGoodType === nbElementSet + 12*curPage && values !== undefined && values.isIcon === true){
+        if (nbElementOfGoodType === nbElementSet + 12 * curPage && values !== undefined && values.isIcon === true) {
             isLast = true;
         }
         curPos++;
@@ -103,7 +103,7 @@ function buildHud(begin, buildType, curPage) {
         scene.sprite.on("pointerdown", () => {
             hudBuildGroup.destroy(true);
             console.log(curPos);
-            buildHud(curPos, buildType, curPage+1);
+            buildHud(curPos, buildType, curPage + 1);
         });
     }
     if (begin !== 0) {
@@ -112,83 +112,117 @@ function buildHud(begin, buildType, curPage) {
         scene.sprite.on("pointerdown", () => {
             let nbFind = 12;
             let newBegin = curPos;
-            for(let i = curPos; i > 0; i--){
-                if(Object.values(objects)[i].type === buildType){
+            for (let i = curPos; i > 0; i--) {
+                if (Object.values(objects)[i].type === buildType) {
                     nbFind--;
                 }
-                if(nbFind > 0){
+                if (nbFind > 0) {
                     newBegin--;
                 }
             }
             hudBuildGroup.destroy(true);
-            buildHud(newBegin, buildType, curPage-1);
+            buildHud(newBegin, buildType, curPage - 1);
         });
     }
 }
 
-function showResources(){
-    if (testGroup !== undefined) {
-        testGroup.destroy(true);
+function showResources() {
+    if (resourcesGroup !== undefined) {
+        resourcesGroup.destroy(true);
     }
 
-    testGroup = scene.add.group("testGroup");
+    resourcesGroup = scene.add.group("resourcesGroup");
 
-    let hudWaterIcon = scene.add.sprite(200, windowHeight - 35, "waterIcon");
-    hudWaterIcon.setOrigin(0, 0);
-    hudWaterIcon.setDisplaySize(23, 23);
-    testGroup.add(hudWaterIcon);
+    // Show pollution progress bar
+    let maxRecPollution = new Phaser.Geom.Rectangle(windowWidth - 640, windowHeight - 70, 52, 40);
+    let colorMaxRecPollution = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
+    resourcesGroup.add(colorMaxRecPollution);
+    colorMaxRecPollution.fillRectShape(maxRecPollution);
 
-    let testRec = new Phaser.Geom.Rectangle(230, windowHeight - 31, 250, 15);
-    let testGraph1 = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
-    testGroup.add(testGraph1);
-    testGraph1.fillRectShape(testRec);
+    let currentRecPollution = new Phaser.Geom.Rectangle(windowWidth - 640, windowHeight - 30, 52, - Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 * 40 / 20);
+    let colorCurrentRecPollution = scene.add.graphics({key: "graph", fillStyle: {color: 0xb21a1a}});
+    resourcesGroup.add(colorCurrentRecPollution);
+    colorCurrentRecPollution.fillRectShape(currentRecPollution);
 
-    let testRec2 = new Phaser.Geom.Rectangle(230, windowHeight - 31, gameScene.mapData[0].water * 250 / gameScene.storageMax.water, 15);
-    let testGraph2 = scene.add.graphics({key: "graph", fillStyle: {color: 0x008acf}});
-    testGroup.add(testGraph2);
-    testGraph2.fillRectShape(testRec2);
+    let hudPollutionIcon = scene.add.sprite(windowWidth - 640, windowHeight - 70, "pollutionIcon");
+    hudPollutionIcon.setOrigin(0, 0);
+    hudPollutionIcon.setDisplaySize(52, 40);
 
-    let testText = scene.add.text(260, windowHeight - 30, ""+ gameScene.mapData[0].water +"/"+ gameScene.storageMax.water +"(+"+ gameScene.toProduce.water +"/sec)");
-    testText.setColor("white");
-    testText.setFontSize(12);
-    testGroup.add(testText);
+    let pollutionProgressBarText = scene.add.text(windowWidth - 640, windowHeight - 25, Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 + " g/hbt");
+    pollutionProgressBarText.setColor("black");
+    pollutionProgressBarText.setFontSize(15);
+    resourcesGroup.add(pollutionProgressBarText);
+
+    let pollutionProgressBarPercentage = scene.add.text(windowWidth - 580, windowHeight - 55, "(" +  Math.round(Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 / 20 * 100 * 100) / 100 + "%)");
+    pollutionProgressBarPercentage.setColor("black");
+    pollutionProgressBarPercentage.setFontSize(15);
+    resourcesGroup.add(pollutionProgressBarPercentage);
+
+    // Show citizens number
+    let hudCitizensIcon = scene.add.sprite(windowWidth - 480, windowHeight - 70, "citizensIcon");
+    hudCitizensIcon.setOrigin(0, 0);
+    hudCitizensIcon.setDisplaySize(23, 23);
+    resourcesGroup.add(hudCitizensIcon);
+
+    let citizensProgressBarText = scene.add.text(windowWidth - 450, windowHeight - 65, gameScene.mapData[0].citizens + "/" + gameScene.storageMax.citizens + "");
+    citizensProgressBarText.setColor("black");
+    citizensProgressBarText.setFontSize(15);
+    resourcesGroup.add(citizensProgressBarText);
+
+    // Show money progress bar
+    let hudMoneyIcon = scene.add.sprite(windowWidth - 480, windowHeight - 35, "moneyIcon");
+    hudMoneyIcon.setOrigin(0, 0);
+    hudMoneyIcon.setDisplaySize(23, 23);
+    resourcesGroup.add(hudMoneyIcon);
+
+    let moneyProgressBarText = scene.add.text(windowWidth - 450, windowHeight - 30, gameScene.mapData[0].money + "(+" + gameScene.toProduce.money + "/sec)");
+    moneyProgressBarText.setColor("black");
+    moneyProgressBarText.setFontSize(15);
+    resourcesGroup.add(moneyProgressBarText);
 
 
-    let hudEnergyIcon = scene.add.sprite(200, windowHeight - 70, "energyIcon");
+    // Show energy progress bar
+    let hudEnergyIcon = scene.add.sprite(windowWidth - 300, windowHeight - 70, "energyIcon");
     hudEnergyIcon.setOrigin(0, 0);
     hudEnergyIcon.setDisplaySize(23, 23);
-    testGroup.add(hudEnergyIcon);
+    resourcesGroup.add(hudEnergyIcon);
 
-    let testRec11 = new Phaser.Geom.Rectangle(230, windowHeight - 66, 250, 15);
-    let testGraph11 = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
-    testGroup.add(testGraph11);
-    testGraph11.fillRectShape(testRec11);
+    let maxRecEnergy = new Phaser.Geom.Rectangle(windowWidth - 270, windowHeight - 66, 250, 15);
+    let colorMaxRecEnergy = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
+    resourcesGroup.add(colorMaxRecEnergy);
+    colorMaxRecEnergy.fillRectShape(maxRecEnergy);
 
-    let testRec12 = new Phaser.Geom.Rectangle(230, windowHeight - 66, gameScene.mapData[0].energy * 250 / gameScene.storageMax.energy, 15);
-    let testGraph12 = scene.add.graphics({key: "graph", fillStyle: {color: 0xffcc00}});
-    testGroup.add(testGraph12);
-    testGraph12.fillRectShape(testRec12);
+    let currentRecEnergy = new Phaser.Geom.Rectangle(windowWidth - 270, windowHeight - 66, gameScene.mapData[0].energy * 250 / gameScene.storageMax.energy, 15);
+    let colorCurrentRecEnergy = scene.add.graphics({key: "graph", fillStyle: {color: 0xffcc00}});
+    resourcesGroup.add(colorCurrentRecEnergy);
+    colorCurrentRecEnergy.fillRectShape(currentRecEnergy);
 
-    let testText10 = scene.add.text(260, windowHeight - 65, ""+ gameScene.mapData[0].energy +"/"+ gameScene.storageMax.energy +"(+"+ gameScene.toProduce.energy +"/sec)");
-    testText10.setColor("white");
-    testText10.setFontSize(12);
-    testGroup.add(testText10);
+    let energyProgressBarText = scene.add.text(windowWidth - 240, windowHeight - 65, gameScene.mapData[0].energy + "/" + gameScene.storageMax.energy + "(+" + gameScene.toProduce.energy + "/sec)");
+    energyProgressBarText.setColor("white");
+    energyProgressBarText.setFontSize(12);
+    resourcesGroup.add(energyProgressBarText);
 
-    let hudPollutionIcon = scene.add.sprite(500, windowHeight - 70, "pollutionIcon");
-    hudPollutionIcon.setOrigin(0, 0);
-    hudPollutionIcon.setDisplaySize(23, 23);
-    testGroup.add(hudPollutionIcon);
 
-    let testRec21 = new Phaser.Geom.Rectangle(530, windowHeight - 66, 250, 15);
-    let testGraph21 = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
-    testGroup.add(testGraph21);
-    testGraph21.fillRectShape(testRec21);
+    // Show water progress bar
+    let hudWaterIcon = scene.add.sprite(windowWidth - 300, windowHeight - 35, "waterIcon");
+    hudWaterIcon.setOrigin(0, 0);
+    hudWaterIcon.setDisplaySize(23, 23);
+    resourcesGroup.add(hudWaterIcon);
 
-    //à terminer
-    let testRec22 = new Phaser.Geom.Rectangle(530, windowHeight - 66, gameScene.mapData[0].pollution/gameScene.mapData[0].citizens * 250 / gameScene.storageMax.pollution, 15);
-    let testGraph22 = scene.add.graphics({key: "graph", fillStyle: {color: 0x5b4d19}});
-    testGroup.add(testGraph22);
-    testGraph22.fillRectShape(testRec22);
+    let maxRecWater = new Phaser.Geom.Rectangle(windowWidth - 270, windowHeight - 31, 250, 15);
+    let colorMaxRecWater = scene.add.graphics({key: "graph", fillStyle: {color: 0x000000}});
+    resourcesGroup.add(colorMaxRecWater);
+    colorMaxRecWater.fillRectShape(maxRecWater);
+
+    let currentRecWater = new Phaser.Geom.Rectangle(windowWidth - 270, windowHeight - 31, gameScene.mapData[0].water * 250 / gameScene.storageMax.water, 15);
+    let colorCurrentRecWater = scene.add.graphics({key: "graph", fillStyle: {color: 0x008acf}});
+    resourcesGroup.add(colorCurrentRecWater);
+    colorCurrentRecWater.fillRectShape(currentRecWater);
+
+    let waterProgressBarText = scene.add.text(windowWidth - 240, windowHeight - 30, gameScene.mapData[0].water + "/" + gameScene.storageMax.water + "(+" + gameScene.toProduce.water + "/sec)");
+    waterProgressBarText.setColor("white");
+    waterProgressBarText.setFontSize(12);
+    resourcesGroup.add(waterProgressBarText);
 }
 
 let HudScene = new Phaser.Class({
@@ -236,7 +270,7 @@ let HudScene = new Phaser.Class({
             if (!buildHudState) {
                 buildHudState = true;
                 gameScene.curPlacedBlock = undefined;
-                buildHud(0, "road",0);
+                buildHud(0, "road", 0);
             } else {
                 buildHudState = false;
                 hudBuildGroup.destroy(true);
@@ -244,18 +278,19 @@ let HudScene = new Phaser.Class({
         }, this);
 
         scene.deleteBuildingIcon.on("pointerdown", () => {
-            if(gameScene.curPlacedBlock !== "destroy"){
+            if (gameScene.curPlacedBlock !== "destroy") {
                 gameScene.curPlacedBlock = "destroy";
-            }else{
+            } else {
                 gameScene.curPlacedBlock = undefined;
             }
         });
     },
     update: function (timer) {
-        if (Math.round(timer / 1000)+0.5 !== prevSecond) {
-            prevSecond = Math.round(timer / 1000)+0.5;
+        if (Math.round(timer / 1000) + 0.5 !== prevSecond) {
+            prevSecond = Math.round(timer / 1000) + 0.5;
             showResources();
         }
-    }});
+    }
+});
 
 export default HudScene;

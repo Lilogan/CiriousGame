@@ -24,8 +24,6 @@ function spriteOver(isoPoint, i, j) {
             scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
         }
         if (obj.type === "building") {
-
-
             scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
         }
         scene.tmpSprite.alpha = 0.7;
@@ -85,7 +83,7 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                 for (let k = -1; k <= 1; k++) {
                     for (let l = -1; l <= 1; l++) {
                         if (k !== 0 || l !== 0) {
-                            scene.mapData.forEach((curData, n) => {
+                            scene.mapData.forEach(curData => {
                                 let correctedBlockOrientation = curData.name.substr(4, curData.name.length);
                                 let coord = {
                                     x: curData.x,
@@ -184,7 +182,6 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                     scene.storageMax.energy += objects[objToPush.name].storage.energy;
                     scene.storageMax.water += objects[objToPush.name].storage.water;
                     scene.storageMax.citizens += objects[objToPush.name].storage.citizens;
-                    scene.storageMax.money += objects[objToPush.name].storage.money;
                     scene.storageMax.pollution += objects[objToPush.name].storage.pollution;
                 }
                 scene.mapData.push(objToPush);
@@ -242,8 +239,8 @@ function removeSprite(nth, keepInMapData) {
     });
 }
 
-// Add all the ressources every seconds
-function addDataToRessources(curElem, n) {
+// Add all the resources every seconds
+function addDataToResources(curElem, n) {
     scene.mapData[n].connectedToCityHall = true;
     if (curElem.isAddedToData === false && objects[curElem.name].type === "building") {
         scene.mapData[n].isAddedToData = true;
@@ -261,7 +258,6 @@ function addDataToRessources(curElem, n) {
         scene.storageMax.energy += objects[curElem.name].storage.energy;
         scene.storageMax.water += objects[curElem.name].storage.water;
         scene.storageMax.citizens += objects[curElem.name].storage.citizens;
-        scene.storageMax.money += objects[curElem.name].storage.money;
         scene.storageMax.pollution += objects[curElem.name].storage.pollution;
     }
 }
@@ -277,7 +273,6 @@ function fromCartToIso(point) {
 
 // get cartesian coordinates from isometric
 function fromIsoToCart(point) {
-    //get cartesian coordinates from isometric
     let cartPoint = new Phaser.Geom.Point;
     cartPoint.x = point.x + (2 * point.y - point.x) / 2;
     cartPoint.y = (2 * point.y - point.x) / 2;
@@ -357,20 +352,20 @@ function isSpriteConnectedToRoad(nInMapData) {
                     objectOrientation = curElem.nameLinkedElement.split("-")[1];
                 }
                 if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y - spriteSize / 2 && (objectOrientation === "W" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
-                    addDataToRessources(curElem, n);
+                    addDataToResources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
                 if (curElemCart.x === objectCart.x && curElemCart.y === objectCart.y + spriteSize / 2 && (objectOrientation === "E" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
-                    addDataToRessources(curElem, n);
+                    addDataToResources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
                 if (curElemCart.x === objectCart.x - spriteSize / 2 && curElemCart.y === objectCart.y && (objectOrientation === "S" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
 
-                    addDataToRessources(curElem, n);
+                    addDataToResources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
                 if (curElemCart.x === objectCart.x + spriteSize / 2 && curElemCart.y === objectCart.y && (objectOrientation === "N" || objectOrientation === undefined || object.nthElement === curElem.nthElement)) {
-                    addDataToRessources(curElem, n);
+                    addDataToResources(curElem, n);
                     isSpriteConnectedToRoad(n);
                 }
             }
@@ -424,79 +419,73 @@ let GameScene = new Phaser.Class({
         scene.scene.sendToBack(); // Put the scene behind the hud
 
         scene.load.crossOrigin = 'Anonymous';
-    }
-    ,
+    },
 
-    create:
+    create: function () {
 
-        function () {
+        //display the floor and prepare the map making
+        for (let i = 0; i < mapSize; i++) {
+            for (let j = 0; j < mapSize; j++) {
+                let point = new Phaser.Geom.Point();
+                point.x = j * spriteSize / 2;
+                point.y = i * spriteSize / 2;
+                let isoPoint = fromCartToIso(point);
+                let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 18, "grass", false).setOrigin(0.5, 1);
+                // preview a building with mouse and change tint if necessary space on map is not free
+                sprite.setInteractive({pixelPerfect: true});
 
-            //display the floor and prepare the map making
-            for (let i = 0; i < mapSize; i++) {
-                for (let j = 0; j < mapSize; j++) {
-                    let point = new Phaser.Geom.Point();
-                    point.x = j * spriteSize / 2;
-                    point.y = i * spriteSize / 2;
-                    let isoPoint = fromCartToIso(point);
-                    let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 18, "grass", false).setOrigin(0.5, 1);
-                    // preview a building with mouse and change tint if necessary space on map is not free
-                    sprite.setInteractive({pixelPerfect: true});
-
-                    sprite.on("pointerover", () => {
-                        spriteOver(isoPoint, i, j);
-                    }, this);
+                sprite.on("pointerover", () => {
+                    spriteOver(isoPoint, i, j);
+                }, this);
 
 
-                    //destroy previewed building
-                    sprite.on("pointerout", () => {
-                        spriteOut();
-                    }, this);
+                //destroy previewed building
+                sprite.on("pointerout", () => {
+                    spriteOut();
+                }, this);
 
 
-                    //create a building if necessary space on map is free
-                    sprite.on("pointerdown", () => {
-                        spriteDown(point, isoPoint, i, j, sprite);
-                    }, this);
-                }
+                //create a building if necessary space on map is free
+                sprite.on("pointerdown", () => {
+                    spriteDown(point, isoPoint, i, j, sprite);
+                }, this);
             }
-
-            //display map
-            scene.mapData.forEach((curData) => {
-                if (curData.name === "data") {
-                    scene.mapData[0].energy = curData.energy;
-                    scene.mapData[0].water = curData.water;
-                    scene.mapData[0].citizens = curData.citizens;
-                    scene.mapData[0].money = curData.money;
-                    scene.mapData[0].pollution = curData.pollution;
-                }
-                if (curData.name !== undefined && objects[curData.name].type !== "other") {
-                    let object = objects[curData.name];
-                    let point = new Phaser.Geom.Point();
-
-
-                    point.x = curData.x;
-                    point.y = curData.y;
-                    let sprite = scene.add.sprite(point.x + borderOffset.x + spriteSize / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
-                    sprite.depth = sprite.y - 50 * object.height + mapSize * 100;
-                }
-            });
-
-            // Zoom camera
-            window.addEventListener("wheel", (e) => {
-                minPosCamX = -50 * mapSize + borderOffset.x / scene.cameras.main.zoom - 50;
-                minPosCamY = -spriteSize / 2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
-
-
-                if (e.deltaY < 0 && scene.cameras.main.zoom < 2) {
-                    scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.5, 100);
-                } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.5) {
-                    scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.5, 100);
-                }
-            });
-
         }
 
-    ,
+        //display map
+        scene.mapData.forEach((curData) => {
+            if (curData.name === "data") {
+                scene.mapData[0].energy = curData.energy;
+                scene.mapData[0].water = curData.water;
+                scene.mapData[0].citizens = curData.citizens;
+                scene.mapData[0].money = curData.money;
+                scene.mapData[0].pollution = curData.pollution;
+            }
+            if (curData.name !== undefined && objects[curData.name].type !== "other") {
+                let object = objects[curData.name];
+                let point = new Phaser.Geom.Point();
+
+
+                point.x = curData.x;
+                point.y = curData.y;
+                let sprite = scene.add.sprite(point.x + borderOffset.x + spriteSize / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
+                sprite.depth = sprite.y - 50 * object.height + mapSize * 100;
+            }
+        });
+
+        // Zoom camera
+        window.addEventListener("wheel", (e) => {
+            minPosCamX = -50 * mapSize + borderOffset.x / scene.cameras.main.zoom - 50;
+            minPosCamY = -spriteSize / 2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
+
+
+            if (e.deltaY < 0 && scene.cameras.main.zoom < 2) {
+                scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.5, 100);
+            } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.5) {
+                scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.5, 100);
+            }
+        });
+    },
 
     update: function (timer) {
         //move camera
@@ -583,7 +572,6 @@ let GameScene = new Phaser.Class({
                     scene.storageMax.energy -= objects[scene.mapData[i].name].storage.energy;
                     scene.storageMax.water -= objects[scene.mapData[i].name].storage.water;
                     scene.storageMax.citizens -= objects[scene.mapData[i].name].storage.citizens;
-                    scene.storageMax.money -= objects[scene.mapData[i].name].storage.money;
                     scene.storageMax.pollution -= objects[scene.mapData[i].name].storage.pollution;
                 }
             }
@@ -612,14 +600,8 @@ let GameScene = new Phaser.Class({
                 scene.mapData[0].citizens = scene.storageMax.citizens;
             }
 
-            if (scene.mapData[0].money + scene.toProduce.money <= scene.storageMax.money) {
-                scene.mapData[0].money += scene.toProduce.money;
-            } else if (scene.mapData[0].money + scene.toProduce.money > scene.storageMax.money && scene.mapData[0].money < scene.storageMax.money) {
-                scene.mapData[0].money = scene.storageMax.money;
-            }
-
+            scene.mapData[0].money += scene.toProduce.money;
             scene.mapData[0].pollution += scene.toProduce.pollution;
-            console.log(scene.mapData[0].pollution);
         }
     }
 });

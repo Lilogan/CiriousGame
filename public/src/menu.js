@@ -50,6 +50,9 @@ var MenuScene = new Phaser.Class({
         this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
         this.load.image("energyIcon", "/assets/hudIcons/energyIcon.png");
         this.load.image("waterIcon", "/assets/hudIcons/waterIcon.png");
+        this.load.image("pollutionIcon", "/assets/hudIcons/pollutionIcon.png");
+        this.load.image("moneyIcon", "/assets/hudIcons/moneyIcon.png");
+        this.load.image("citizensIcon", "/assets/hudIcons/citizensIcon.png");
         this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
         this.load.image("nextPage", "/assets/hudIcons/nextPage.png");
         this.load.image("tabHud", "/assets/hudIcons/tabHud.png");
