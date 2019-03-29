@@ -10,9 +10,7 @@ var MenuScene = new Phaser.Class({
 
     preload: function(){
         scene = this;
-
         scene.scene.stop("HudScene");
-
         //progress bar
         var progressBar = scene.add.graphics();
         var progressBox = scene.add.graphics();
@@ -62,6 +60,7 @@ var MenuScene = new Phaser.Class({
 
         //others
         this.load.image('grass', '/assets/roads/grass.png');
+        this.load.image('fullscreen', '/assets/hudIcons/fullscreen.png');
         this.load.image('arrowN', '/assets/buildings/arrows/arrowN.png');
         this.load.image('arrowS', '/assets/buildings/arrows/arrowS.png');
         this.load.image('arrowE', '/assets/buildings/arrows/arrowE.png');
@@ -71,6 +70,7 @@ var MenuScene = new Phaser.Class({
 
     create: function () {
         scene.scene.bringToTop();
+
         let sprite = this.add.sprite(window.innerWidth/2, window.innerHeight/10 * 3.5, 'jouer', false).setOrigin(0.5, 0);
         scene.add.sprite(window.innerWidth/2, window.innerHeight/10 * 5, 'options', false).setOrigin(0.5, 0);
         scene.add.sprite(window.innerWidth/2, window.innerHeight/10 * 6.5, 'quitter', false).setOrigin(0.5, 0);
@@ -80,6 +80,36 @@ var MenuScene = new Phaser.Class({
             this.scene.start('HudScene');
             this.scene.stop('MenuScene');
         }, this);
+
+        let fullscreen = this.add.image(40,40,'fullscreen').setInteractive();
+        fullscreen.setDisplaySize(70,70);
+
+        fullscreen.on('pointerdown',()=>{
+            if(scene.scale.isFullscreen){
+                scene.scale.stopFullscreen();
+
+            }else{
+
+                scene.scale.startFullscreen();
+            }
+        });
+        fullscreen.on('pointerover',()=>{
+            if(scene.scale.isFullscreen){
+                fullscreen.setDisplaySize(70,70);
+
+            }else{
+
+                fullscreen.setDisplaySize(80,80);
+            }
+        })
+        fullscreen.on('pointerout',()=>{
+            if(scene.scale.isFullscreen){
+                fullscreen.setDisplaySize(80,80);
+
+            }else{
+                fullscreen.setDisplaySize(70,70);
+            }
+        })
     }
 });
 

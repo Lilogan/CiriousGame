@@ -1,11 +1,11 @@
-
 let scene; // The scene
 let windowWidth = $(window).width(); // window width
 let windowHeight = $(window).height(); // window height
 let spriteSize = 200; // sprite size (50) + space between sprites (1)
-let mapSize = 50; // size of map (square)
-let borderOffset = new Phaser.Geom.Point(windowWidth / 2, windowHeight / 2 + 119 - mapSize / 2 * 119); //offset to center the map
+let mapSize = 10; // size of map (square)
+let borderOffset = new Phaser.Geom.Point(0, -mapSize / 2 * 102 + 102 - 102 / 2); //offset to center the map
 let prevSecond = -1; // ??
+let justRotate = false;
 
 //limit of camera
 let minPosCamX = -spriteSize / 2 * mapSize + borderOffset.x;
@@ -19,13 +19,11 @@ function spriteOver(isoPoint, i, j) {
         let obj = objects[scene.curPlacedBlock];
         let objCoords = getCoordsFromObject(obj, j, i);
         if (scene.orientation === "N" || scene.orientation === "S") {
-            scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+            scene.tmpSprite = scene.add.sprite(isoPoint.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
         } else {
-            scene.tmpSprite = scene.add.sprite(isoPoint.x + borderOffset.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+            scene.tmpSprite = scene.add.sprite(isoPoint.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
         }
         if (obj.type === "building") {
-
-
             scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
         }
         scene.tmpSprite.alpha = 0.7;
@@ -252,7 +250,7 @@ function addDataToRessources(curElem, n) {
         scene.toProduce.water += objects[curElem.name].production.water;
         scene.toProduce.citizens += objects[curElem.name].production.citizens;
         scene.toProduce.money += objects[curElem.name].production.money;
-        if(scene.mapData[n].yetProduced < objects[curElem.name].pollutionMax) {
+        if (scene.mapData[n].yetProduced < objects[curElem.name].pollutionMax) {
             scene.toProduce.pollution += objects[curElem.name].production.pollution;
             scene.mapData[n].yetProduced += objects[curElem.name].production.pollution;
         }
@@ -389,8 +387,10 @@ let GameScene = new Phaser.Class({
         },
 
     preload: function () {
-        //initialisation of useful variables
         scene = this; // The scene
+        //initialisation of useful variables
+        console.log(scene)
+        scene.cameras.main.centerOn(0, 0);
         scene.orientation = "W"; // Default orrientation
         scene.pointer = this.input.activePointer; // Our cursor
         scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S, Q, D, R');
@@ -533,11 +533,10 @@ let GameScene = new Phaser.Class({
             }
         }
 
-
         //rotate building
-        if (scene.pointer.buttons === 2 && !scene.pointer.justMoved && scene.pointer.justDown) {
-            console.log(scene.mapData);
+        if (scene.pointer.buttons === 2 && !scene.pointer.justMoved && !justRotate) {
             if (scene.curPlacedBlock !== undefined) {
+                justRotate = true;
                 let object = objects[scene.curPlacedBlock];
                 if (object.type === "building") {
                     scene.orientation = orientations[(orientations.indexOf(scene.orientation) + 1) % 4];
@@ -563,6 +562,10 @@ let GameScene = new Phaser.Class({
                     scene.tmpSprite.depth = scene.tmpSprite.y - 50 * object.height + mapSize * 100;
                 }
             }
+        }
+
+        if (scene.pointer.justUp) {
+            justRotate = false;
         }
 
 
@@ -618,7 +621,6 @@ let GameScene = new Phaser.Class({
             }
 
             scene.mapData[0].pollution += scene.toProduce.pollution;
-            console.log(scene.mapData[0].pollution);
         }
     }
 });

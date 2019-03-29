@@ -1,6 +1,6 @@
-Destruction des bâtiments (!!!)
-Modes (classique + rotation + menu contextuel (nom + prod + bandeau de couleur))
-Gestion de la pollution (Usine prod par sec + prod max + fin de partie en fonction du taux par hbt)
+Done (maj ?) - Destruction des bâtiments
+En cour - Modes (classique + rotation + menu contextuel (nom + prod + bandeau de couleur))
+Done (Equilibrage à faire) - Gestion de la pollution (Usine prod par sec + prod max + fin de partie en fonction du taux par hbt)
 Batiments (coût/stockage/ect)
 Sauvegarde et chargement des maps (Mode histoire)
 Palier de pop
@@ -8,3 +8,13 @@ Menu simplifié
 Musique et son
 Menu option + Menu "easter egg"
 Particules
+
+/!\ régler le zoom
+/!\ régler les sprites qui passe au dessus des autres
+/!\ mettre la rotation des batiments sur une touche et utiliser le clique droit pour annuler
+/!\ faire des commentaires un peu partout
+/!\ mettre un peu tout en fonction et trier les fonctions par fichier
+/!\ refaire un bon zoom
+/!\ déplacement zqsd ne marche pas (on l'enlève ?)
+/!\ quand on passe en mode "destruction" fair en sorte que les batiment sur lesquels on passe deviennent rouge (qu'on comprenne quon va les détruires)
+/!\ faire en sorte qu'on puisse pas poser 2 mairies et qu'on puisse pas poser d'usine avant de maison (ou on peut attendre les palier de pop pour gérer ça)
