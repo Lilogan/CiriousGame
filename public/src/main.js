@@ -5,14 +5,16 @@ import MenuScene from "./menu.js";
 import GameScene from "./game.js";
 
 
-let windowWidth = $(window).width();
-let windowHeight = $(window).height();
+let windowWidth = window.outerWidth;
+let windowHeight = window.outerHeight;
 let config = {
     type: Phaser.AUTO,
-    parent: 'content',
     width: windowWidth,
     height: windowHeight,
-    autoResize: true,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     backgroundColor: 0x87CEEB,
     physics: {
         default: 'arcade',
@@ -22,6 +24,8 @@ let config = {
     },
     scene: [MenuScene, GameScene, HudScene]
 };
+
+
 
 
 game = new Phaser.Game(config);
