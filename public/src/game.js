@@ -424,6 +424,7 @@ let GameScene = new Phaser.Class({
         scene.scene.sendToBack(); // Put the scene behind the hud
 
         scene.load.crossOrigin = 'Anonymous';
+
     }
     ,
 
@@ -459,7 +460,6 @@ let GameScene = new Phaser.Class({
                     }, this);
                 }
             }
-
             //display map
             scene.mapData.forEach((curData) => {
                 if (curData.name === "data") {
@@ -493,7 +493,6 @@ let GameScene = new Phaser.Class({
                     scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.5, 100);
                 }
             });
-
         }
 
     ,
