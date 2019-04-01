@@ -12,8 +12,8 @@ let config = {
     width: windowWidth,
     height: windowHeight,
     scale: {
-        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
+        mode: Phaser.Scale.FIT,
     },
     backgroundColor: 0x87CEEB,
     physics: {

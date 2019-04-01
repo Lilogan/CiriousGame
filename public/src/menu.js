@@ -119,7 +119,7 @@ let MenuScene = new Phaser.Class({
 
     update: function(){
         if(Phaser.Input.Keyboard.JustDown(scene.keys.ESC)){
-            scene.scale.stopFullscreen();   
+            scene.scale.stopFullscreen();
         }
     }
 });

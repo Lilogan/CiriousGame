@@ -234,6 +234,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "cityhall-E": {
+        "name": "Mairie",
         "type": "building",
         "isIcon": false,
         "width": 4,
@@ -242,6 +243,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 100}
     },
     "cityhall-N": {
+        "name": "Mairie",
         "type": "building",
         "isIcon": false,
         "width": 3,
@@ -250,6 +252,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 0}
     },
     "cityhall-S": {
+        "name": "Mairie",
         "type": "building",
         "isIcon": false,
         "width": 3,
@@ -258,6 +261,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 0}
     },
     "cityhall-W": {
+        "name": "Mairie",
         "type": "building",
         "isIcon": true,
         "width": 3,
@@ -268,6 +272,7 @@ let objects = {
 
 
     "factory1-E": {
+        "name": "Usine 1",
         "type": "building",
         "isIcon": false,
         "width": 3,
@@ -277,6 +282,7 @@ let objects = {
         "pollutionMax" : 110
     },
     "factory1-N": {
+        "name": "Usine 1",
         "type": "building",
         "isIcon": false,
         "width": 3,
@@ -286,6 +292,7 @@ let objects = {
         "pollutionMax" : 110
     },
     "factory1-S": {
+        "name": "Usine 1",
         "type": "building",
         "isIcon": false,
         "width": 3,
@@ -295,6 +302,7 @@ let objects = {
         "pollutionMax" : 110
     },
     "factory1-W": {
+        "name": "Usine 1",
         "type": "building",
         "isIcon": true,
         "width": 3,
@@ -306,6 +314,7 @@ let objects = {
 
 
     "habitation1-E": {
+        "name": "Maison",
         "type": "building",
         "isIcon": false,
         "width": 1,
@@ -314,6 +323,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation1-N": {
+        "name": "Maison",
         "type": "building",
         "isIcon": false,
         "width": 1,
@@ -322,6 +332,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation1-S": {
+        "name": "Maison",
         "type": "building",
         "isIcon": false,
         "width": 1,
@@ -330,6 +341,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation1-W": {
+        "name": "Maison",
         "type": "building",
         "isIcon": true,
         "width": 1,
@@ -339,6 +351,7 @@ let objects = {
     },
 
     "habitation2-E": {
+        "name": "Appartement",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -347,6 +360,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation2-N": {
+        "name": "Appartement",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -355,6 +369,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation2-S": {
+        "name": "Appartement",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -363,6 +378,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation2-W": {
+        "name": "Appartement",
         "type": "building",
         "isIcon": true,
         "width": 2,
@@ -373,6 +389,7 @@ let objects = {
 
 
     "habitation3-E": {
+        "name": "Grand Appartement",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -381,6 +398,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation3-N": {
+        "name": "Grand Appartement",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -389,6 +407,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation3-S": {
+        "name": "Grand Appartement",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -397,6 +416,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation3-W": {
+        "name": "Grand Appartement",
         "type": "building",
         "isIcon": true,
         "width": 2,
@@ -406,6 +426,7 @@ let objects = {
     },
 
     "habitation4-E": {
+        "name": "Gratte Ciel",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -414,6 +435,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation4-N": {
+        "name": "Gratte Ciel",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -422,6 +444,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation4-S": {
+        "name": "Gratte Ciel",
         "type": "building",
         "isIcon": false,
         "width": 2,
@@ -430,6 +453,7 @@ let objects = {
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
     "habitation4-W": {
+        "name": "Gratte Ciel",
         "type": "building",
         "isIcon": true,
         "width": 2,

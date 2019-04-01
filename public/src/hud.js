@@ -1,5 +1,5 @@
-let windowWidth = $(window).width(); // window width
-let windowHeight = $(window).height(); // window height
+let windowWidth = window.screen.width; // window width
+let windowHeight = window.screen.height; // window height
 let hudHeight = 80; // bottom hud height
 let buildingWindowWidth = 300; // build hud height
 let buildingWindowHeight = 400; // build hud height
@@ -77,7 +77,7 @@ function buildHud(begin, buildType, curPage) {
         values = Object.values(objects)[begin + curPos];
         let index = Object.keys(objects)[begin + curPos];
         if (index !== undefined && values.type === buildType && values.isIcon === true && values !== undefined) {
-            scene.sprite = hudBuildGroup.create(60 - (3 * curLine - nbElementSet) * 90, windowHeight - hudHeight - buildingWindowHeight + 125 + curLine * 75, index + "Icon");
+            scene.sprite = hudBuildGroup.create(50 - (3 * curLine - nbElementSet) * 100, windowHeight - hudHeight - buildingWindowHeight + 110 + curLine * 90, index + "Icon");
             scene.sprite.setOrigin(0.5, 1);
             scene.sprite.setDisplaySize(70, 70);
             scene.sprite.setInteractive();
@@ -86,6 +86,14 @@ function buildHud(begin, buildType, curPage) {
                 gameScene.curPlacedBlock = index;
                 hudBuildGroup.destroy(true);
             });
+
+            let iconName = scene.add.text(50 - (3 * curLine - nbElementSet) * 100, windowHeight - hudHeight - buildingWindowHeight + 115 + curLine * 90, values.name);
+            iconName.setColor("black");
+            iconName.setOrigin(0.5, 0);
+            iconName.setFontSize(10);
+            hudBuildGroup.add(iconName);
+            console.log(values.name);
+
             if (nbElementSet % 3 === 2) {
                 curLine += 1;
             }
@@ -148,7 +156,7 @@ function showResources() {
     hudPollutionIcon.setOrigin(0, 0);
     hudPollutionIcon.setDisplaySize(52, 40);
 
-    let pollutionProgressBarText = scene.add.text(windowWidth - 640, windowHeight - 25, Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 + " g/hbt");
+    let pollutionProgressBarText = scene.add.text(windowWidth - 640, windowHeight - 25, Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 + " mg/hbt");
     pollutionProgressBarText.setColor("black");
     pollutionProgressBarText.setFontSize(15);
     resourcesGroup.add(pollutionProgressBarText);

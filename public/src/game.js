@@ -575,6 +575,10 @@ let GameScene = new Phaser.Class({
                 }
             }
         }
+        
+        if(Phaser.Input.Keyboard.JustDown(scene.keys.ESC)){
+            scene.scale.stopFullscreen();
+        }
 
         if(Phaser.Input.Keyboard.JustDown(scene.keys.ESC)){
             scene.scale.stopFullscreen();
