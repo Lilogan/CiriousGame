@@ -5,8 +5,8 @@ import MenuScene from "./menu.js";
 import GameScene from "./game.js";
 
 
-let windowWidth = window.outerWidth;
-let windowHeight = window.outerHeight;
+let windowWidth = window.screen.width;
+let windowHeight = window.screen.height;
 let config = {
     type: Phaser.AUTO,
     width: windowWidth,
@@ -24,8 +24,5 @@ let config = {
     },
     scene: [MenuScene, GameScene, HudScene]
 };
-
-
-
 
 game = new Phaser.Game(config);

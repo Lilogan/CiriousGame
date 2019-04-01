@@ -1,5 +1,6 @@
 let scene;
-var MenuScene = new Phaser.Class({
+let actualTimer;
+let MenuScene = new Phaser.Class({
     Extends: Phaser.Scene,
 
     initialize:
@@ -10,16 +11,19 @@ var MenuScene = new Phaser.Class({
 
     preload: function(){
         scene = this;
+
+        scene.keys = this.input.keyboard.addKeys('ESC');
+        // scene.scale.startFullscreen();
         scene.scene.stop("HudScene");
         //progress bar
-        var progressBar = scene.add.graphics();
-        var progressBox = scene.add.graphics();
+        let progressBar = scene.add.graphics();
+        let progressBox = scene.add.graphics();
         progressBox.fillStyle(0x222222, 0.8);
-        progressBox.fillRect(240, 270, 320, 50);
+        progressBox.fillRect(window.screen.width/2 - 320/2, window.screen.height/2 - 50/2, 320, 50);
         scene.load.on('progress', (value) => {
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
-            progressBar.fillRect(250, 280, 300 * value, 30);
+            progressBar.fillRect(window.screen.width/2 - 300/2, window.screen.height/2 - 30/2, 300 * value, 30);
         });
 
         scene.load.on("complete", () => {
@@ -48,6 +52,9 @@ var MenuScene = new Phaser.Class({
         this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
         this.load.image("energyIcon", "/assets/hudIcons/energyIcon.png");
         this.load.image("waterIcon", "/assets/hudIcons/waterIcon.png");
+        this.load.image("pollutionIcon", "/assets/hudIcons/pollutionIcon.png");
+        this.load.image("moneyIcon", "/assets/hudIcons/moneyIcon.png");
+        this.load.image("citizensIcon", "/assets/hudIcons/citizensIcon.png");
         this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
         this.load.image("nextPage", "/assets/hudIcons/nextPage.png");
         this.load.image("tabHud", "/assets/hudIcons/tabHud.png");
@@ -71,9 +78,9 @@ var MenuScene = new Phaser.Class({
     create: function () {
         scene.scene.bringToTop();
 
-        let sprite = this.add.sprite(window.innerWidth/2, window.innerHeight/10 * 3.5, 'jouer', false).setOrigin(0.5, 0);
-        scene.add.sprite(window.innerWidth/2, window.innerHeight/10 * 5, 'options', false).setOrigin(0.5, 0);
-        scene.add.sprite(window.innerWidth/2, window.innerHeight/10 * 6.5, 'quitter', false).setOrigin(0.5, 0);
+        let sprite = this.add.sprite(window.screen.width/2, window.screen.height/10 * 3.5, 'jouer', false).setOrigin(0.5, 0);
+        scene.add.sprite(window.screen.width/2, window.screen.height/10 * 5, 'options', false).setOrigin(0.5, 0);
+        scene.add.sprite(window.screen.width/2, window.screen.height/10 * 6.5, 'quitter', false).setOrigin(0.5, 0);
         sprite.setInteractive();
         sprite.on("pointerdown", () => {
             this.scene.start('GameScene');
@@ -82,7 +89,7 @@ var MenuScene = new Phaser.Class({
         }, this);
 
         let fullscreen = this.add.image(40,40,'fullscreen').setInteractive();
-        fullscreen.setDisplaySize(70,70);
+        fullscreen.setDisplaySize(50,50);
 
         fullscreen.on('pointerdown',()=>{
             if(scene.scale.isFullscreen){
@@ -93,23 +100,27 @@ var MenuScene = new Phaser.Class({
                 scene.scale.startFullscreen();
             }
         });
-        fullscreen.on('pointerover',()=>{
+        fullscreen.on('pointerover', ()=>{
             if(scene.scale.isFullscreen){
-                fullscreen.setDisplaySize(70,70);
-
+                fullscreen.setDisplaySize(50,50);
             }else{
-
-                fullscreen.setDisplaySize(80,80);
+                fullscreen.setDisplaySize(65,65);
             }
-        })
+        });
         fullscreen.on('pointerout',()=>{
             if(scene.scale.isFullscreen){
-                fullscreen.setDisplaySize(80,80);
+                fullscreen.setDisplaySize(65,65);
 
             }else{
-                fullscreen.setDisplaySize(70,70);
+                fullscreen.setDisplaySize(50,50);
             }
         })
+    },
+
+    update: function(){
+        if(Phaser.Input.Keyboard.JustDown(scene.keys.ESC)){
+            scene.scale.stopFullscreen();   
+        }
     }
 });
 
