@@ -1,5 +1,5 @@
 let scene;
-let actualTimer;
+
 let MenuScene = new Phaser.Class({
     Extends: Phaser.Scene,
 
@@ -45,20 +45,20 @@ let MenuScene = new Phaser.Class({
                 scene.load.image(index, "/assets/roads/" + index + ".png");
                 scene.load.image(index+"Icon", "/assets/hudIcons/roads/" + index + ".png");
             }
-
         });
+
         //in game menu
-        this.load.image("deleteBuilding", "/assets/hudIcons/deleteBuilding.png");
-        this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
-        this.load.image("energyIcon", "/assets/hudIcons/energyIcon.png");
-        this.load.image("waterIcon", "/assets/hudIcons/waterIcon.png");
-        this.load.image("pollutionIcon", "/assets/hudIcons/pollutionIcon.png");
-        this.load.image("moneyIcon", "/assets/hudIcons/moneyIcon.png");
-        this.load.image("citizensIcon", "/assets/hudIcons/citizensIcon.png");
-        this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
-        this.load.image("nextPage", "/assets/hudIcons/nextPage.png");
-        this.load.image("tabHud", "/assets/hudIcons/tabHud.png");
-        this.load.image("closeHud", "/assets/hudIcons/closeHud.png");
+        this.load.image("deleteBuilding", "/assets/hudIcons/icons/deleteBuilding.png");
+        this.load.image("buildBuilding", "/assets/hudIcons/icons/buildBuilding.png");
+        this.load.image("energyIcon", "/assets/hudIcons/icons/energyIcon.png");
+        this.load.image("waterIcon", "/assets/hudIcons/icons/waterIcon.png");
+        this.load.image("pollutionIcon", "/assets/hudIcons/icons/pollutionIcon.png");
+        this.load.image("moneyIcon", "/assets/hudIcons/icons/moneyIcon.png");
+        this.load.image("citizensIcon", "/assets/hudIcons/icons/citizensIcon.png");
+        this.load.image("previousPage", "/assets/hudIcons/icons/previousPage.png");
+        this.load.image("nextPage", "/assets/hudIcons/icons/nextPage.png");
+        this.load.image("tabHud", "/assets/hudIcons/icons/tabHud.png");
+        this.load.image("closeHud", "/assets/hudIcons/icons/closeHud.png");
 
         //main menu
         this.load.image('jouer', '/assets/menu/jouer.png');
@@ -67,7 +67,7 @@ let MenuScene = new Phaser.Class({
 
         //others
         this.load.image('grass', '/assets/roads/grass.png');
-        this.load.image('fullscreen', '/assets/hudIcons/fullscreen.png');
+        this.load.image('fullscreen', '/assets/hudIcons/icons/fullscreen.png');
         this.load.image('arrowN', '/assets/buildings/arrows/arrowN.png');
         this.load.image('arrowS', '/assets/buildings/arrows/arrowS.png');
         this.load.image('arrowE', '/assets/buildings/arrows/arrowE.png');

@@ -540,13 +540,13 @@ let GameScene = new Phaser.Class({
             }
         }
 
-        if (scene.pointer.buttons === 2 && !scene.pointer.justMoved && !justRotate) {
+        if (scene.pointer.buttons === 2) {
             if (scene.curPlacedBlock !== undefined) {
                 scene.curPlacedBlock = undefined;
             }
         }
 
-        if (Phaser.Input.Keyboard.JustDown(scene.keys.R)) {
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.R) && !justRotate) {
             if (scene.curPlacedBlock !== undefined) {
                 justRotate = true;
                 let object = objects[scene.curPlacedBlock];

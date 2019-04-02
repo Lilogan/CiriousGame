@@ -9,12 +9,12 @@ Musique et son
 Menu option + Menu "easter egg"
 Particules
 
+/!\ régler les flèches à la pose des batiments
+/!\ mettre une limite pour qu'on ne puisse pas poser hors de la map
+/!\ mettre une limite pour qu'on puisse pas sortir de la map avec la souris ?
 /!\ régler les sprites qui passent au dessus des autres
-/!\ mettre la rotation des batiments sur une touche et utiliser le clique droit pour annuler
 /!\ faire des commentaires un peu partout
 /!\ mettre un peu tout en fonction et trier les fonctions par fichier
-/!\ corriger un bon zoom
 /!\ déplacement zqsd ne marche pas (on l'enlève ?)
 /!\ quand on passe en mode "destruction" faire en sorte que les batiment sur lesquels on passe deviennent rouge (qu'on comprenne quon va les détruires)
 /!\ faire en sorte qu'on puisse pas poser 2 mairies et qu'on puisse pas poser d'usine avant de maison (ou on peut attendre les palier de pop pour gérer ça)
-/!\ Mettre les bon logo dans l'hud

@@ -79,7 +79,11 @@ function buildHud(begin, buildType, curPage) {
         if (index !== undefined && values.type === buildType && values.isIcon === true && values !== undefined) {
             scene.sprite = hudBuildGroup.create(50 - (3 * curLine - nbElementSet) * 100, windowHeight - hudHeight - buildingWindowHeight + 110 + curLine * 90, index + "Icon");
             scene.sprite.setOrigin(0.5, 1);
-            scene.sprite.setDisplaySize(70, 70);
+            if(values.type === "road"){
+                scene.sprite.setDisplaySize(80, 41);
+            } else {
+                scene.sprite.setDisplaySize(70, 70);
+            }
             scene.sprite.setInteractive();
             scene.sprite.on("pointerdown", () => {
                 gameScene.orientation = "W";
@@ -90,7 +94,7 @@ function buildHud(begin, buildType, curPage) {
             let iconName = scene.add.text(50 - (3 * curLine - nbElementSet) * 100, windowHeight - hudHeight - buildingWindowHeight + 115 + curLine * 90, values.name);
             iconName.setColor("black");
             iconName.setOrigin(0.5, 0);
-            iconName.setFontSize(10);
+            iconName.setFontSize(9);
             hudBuildGroup.add(iconName);
             console.log(values.name);
 
@@ -264,14 +268,14 @@ let HudScene = new Phaser.Class({
         scene.graphics.fillRectShape(scene.hud);
 
         // Add hud's sprites and display them
-        scene.deleteBuildingIcon = scene.add.sprite(50, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding");
-        scene.buildBuildingIcon = scene.add.sprite(130, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
-
-        scene.deleteBuildingIcon.setDisplaySize(60, 60);
-        scene.deleteBuildingIcon.setInteractive({pixelPerfect: false});
+        scene.buildBuildingIcon = scene.add.sprite(50, windowHeight - hudHeight + hudHeight / 2, "buildBuilding");
+        scene.deleteBuildingIcon = scene.add.sprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding");
 
         scene.buildBuildingIcon.setDisplaySize(60, 60);
         scene.buildBuildingIcon.setInteractive({pixelPerfect: false});
+
+        scene.deleteBuildingIcon.setDisplaySize(60, 60);
+        scene.deleteBuildingIcon.setInteractive({pixelPerfect: false});
 
         // Open the build hud when we click on the "wrench and hammer" icon
         scene.buildBuildingIcon.on("pointerdown", () => {

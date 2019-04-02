@@ -10,57 +10,6 @@
 let objects = {
     "invisible": {"type": "other", "width": 1, "height": 1, "isIcon": false, "cityHallLink": false},
     "data": {"type": "other", "width": 1, "height": 1, "isIcon": false, "cityHallLink": false},
-    "beach": {"width": 1, "height": 1, "isIcon": false},
-    "beachCornerES": {"width": 1, "height": 1, "isIcon": false},
-    "beachCornerNE": {"width": 1, "height": 1, "isIcon": false},
-    "beachCornerNW": {"width": 1, "height": 1, "isIcon": false},
-    "beachCornerSW": {"width": 1, "height": 1, "isIcon": false},
-    "beachE": {"width": 1, "height": 1, "isIcon": false},
-    "beachES": {"width": 1, "height": 1, "isIcon": false},
-    "beachN": {"width": 1, "height": 1, "isIcon": false},
-    "beachNE": {"width": 1, "height": 1, "isIcon": false},
-    "beachNW": {"width": 1, "height": 1, "isIcon": false},
-    "beachS": {"width": 1, "height": 1, "isIcon": false},
-    "beachSW": {"width": 1, "height": 1, "isIcon": false},
-    "beachW": {"width": 1, "height": 1, "isIcon": false},
-    "bridgeEW": {"width": 1, "height": 1, "isIcon": false},
-    "bridgeNS": {"width": 1, "height": 1, "isIcon": false},
-    "coniferAltShort": {"width": 1, "height": 1, "isIcon": false},
-    "coniferAltTall": {"width": 1, "height": 1, "isIcon": false},
-    "coniferShort": {"width": 1, "height": 1, "isIcon": false},
-    "coniferTall": {"width": 1, "height": 1, "isIcon": false},
-    "dirt": {"width": 1, "height": 1, "isIcon": false},
-    "dirtDouble": {"width": 1, "height": 1, "isIcon": false},
-    "endE": {"width": 1, "height": 1, "isIcon": false},
-    "endN": {"width": 1, "height": 1, "isIcon": false},
-    "endS": {"width": 1, "height": 1, "isIcon": false},
-    "endW": {"width": 1, "height": 1, "isIcon": false},
-    "exitE": {"width": 1, "height": 1, "isIcon": false},
-    "exitN": {"width": 1, "height": 1, "isIcon": false},
-    "exitS": {"width": 1, "height": 1, "isIcon": false},
-    "exitW": {"width": 1, "height": 1, "isIcon": false},
-    "grass": {"width": 1, "height": 1, "isIcon": false},
-    "grassWhole": {"width": 1, "height": 1, "isIcon": false},
-    "lotE": {"width": 1, "height": 1, "isIcon": false},
-    "lotES": {"width": 1, "height": 1, "isIcon": false},
-    "lotN": {"width": 1, "height": 1, "isIcon": false},
-    "lotNE": {"width": 1, "height": 1, "isIcon": false},
-    "lotNW": {"width": 1, "height": 1, "isIcon": false},
-    "lotS": {"width": 1, "height": 1, "isIcon": false},
-    "lotSW": {"width": 1, "height": 1, "isIcon": false},
-    "lotW": {"width": 1, "height": 1, "isIcon": false},
-    "riverBankedES": {"width": 1, "height": 1, "isIcon": false},
-    "riverBankedEW": {"width": 1, "height": 1, "isIcon": false},
-    "riverBankedNE": {"width": 1, "height": 1, "isIcon": false},
-    "riverBankedNS": {"width": 1, "height": 1, "isIcon": false},
-    "riverBankedNW": {"width": 1, "height": 1, "isIcon": false},
-    "riverBankedSW": {"width": 1, "height": 1, "isIcon": false},
-    "riverES": {"width": 1, "height": 1, "isIcon": false},
-    "riverEW": {"width": 1, "height": 1, "isIcon": false},
-    "riverNE": {"width": 1, "height": 1, "isIcon": false},
-    "riverNS": {"width": 1, "height": 1, "isIcon": false},
-    "riverNW": {"width": 1, "height": 1, "isIcon": false},
-    "riverSW": {"width": 1, "height": 1, "isIcon": false},
     "roadSE": {
         "type": "road",
         "width": 1,
@@ -191,40 +140,6 @@ let objects = {
         "type": "road",
         "width": 1, "height": 1, "isIcon": false
     },
-    "water": {"width": 1, "height": 1, "isIcon": false},
-    "waterCornerES": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "waterCornerNE": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "waterCornerNW": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "waterCornerSW": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "waterE": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "waterES": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "waterN": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "waterNE": {"width": 1, "height": 1, "isIcon": false},
-    "waterNW": {"width": 1, "height": 1, "isIcon": false},
-    "waterS": {"width": 1, "height": 1, "isIcon": false},
-    "waterSW": {"width": 1, "height": 1, "isIcon": false},
-    "waterW": {"width": 1, "height": 1, "isIcon": false},
     "arrows": {
         "type": "other",
         "isIcon": false,
@@ -269,8 +184,6 @@ let objects = {
         "storage": {"energy": 1000, "water": 1000, "citizens": 0, "pollution": 100},
         "production": {"energy": 0, "water": 0, "citizens": 1, "money": 0, "pollution": 0}
     },
-
-
     "factory1-E": {
         "name": "Usine 1",
         "type": "building",
@@ -311,8 +224,46 @@ let objects = {
         "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11},
         "pollutionMax" : 110
     },
-
-
+    "electricityfactory1-E": {
+        "name": "Petite Usine Electrique",
+        "type": "building",
+        "isIcon": false,
+        "width": 3,
+        "height": 2,
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 1000, "pollution": 11},
+        "pollutionMax" : 110
+    },
+    "electricityfactory1-N": {
+        "name": "Petite Usine Electrique",
+        "type": "building",
+        "isIcon": false,
+        "width": 3,
+        "height": 2,
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11},
+        "pollutionMax" : 110
+    },
+    "electricityfactory1-S": {
+        "name": "Petite Usine Electrique",
+        "type": "building",
+        "isIcon": false,
+        "width": 3,
+        "height": 2,
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11},
+        "pollutionMax" : 110
+    },
+    "electricityfactory1-W": {
+        "name": "Electricité niv 1",
+        "type": "building",
+        "isIcon": true,
+        "width": 3,
+        "height": 2,
+        "storage": {"energy": 100, "water": 520, "citizens": 0, "pollution": 0},
+        "production": {"energy": 10, "water": 25, "citizens": 0, "money": 10, "pollution": 11},
+        "pollutionMax" : 110
+    },
     "habitation1-E": {
         "name": "Maison",
         "type": "building",
@@ -349,7 +300,6 @@ let objects = {
         "storage": {"energy": 0, "water": 0, "citizens": 5, "pollution": 0},
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
-
     "habitation2-E": {
         "name": "Appartement",
         "type": "building",
@@ -386,8 +336,6 @@ let objects = {
         "storage": {"energy": 0, "water": 0, "citizens": 10, "pollution": 0},
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
-
-
     "habitation3-E": {
         "name": "Grand Appartement",
         "type": "building",
@@ -424,7 +372,6 @@ let objects = {
         "storage": {"energy": 0, "water": 0, "citizens": 15, "pollution": 0},
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
-
     "habitation4-E": {
         "name": "Gratte Ciel",
         "type": "building",
@@ -461,8 +408,6 @@ let objects = {
         "storage": {"energy": 0, "water": 0, "citizens": 25, "pollution": 0},
         "production": {"energy": 0, "water": 0, "citizens": 0, "money": 0, "pollution": 0}
     },
-
-
 };
 
 
