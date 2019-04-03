@@ -8,13 +8,12 @@
 // Storage : number of resources the building may store
 // production : number of resources the building produce
 let objects = {
-    "invisible": {"type": "other", "width": 1, "height": 1, "isIcon": false, "cityHallLink": false},
-    "data": {"type": "other", "width": 1, "height": 1, "isIcon": false, "cityHallLink": false},
+    "invisible": {"type": "other", "width": 1, "height": 1, "cityHallLink": false},
+    "data": {"type": "other", "width": 1, "height": 1, "cityHallLink": false},
     "roadSE": {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": false,
         "south": true,
         "east": true,
@@ -24,7 +23,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": false,
         "south": false,
         "east": true,
@@ -34,7 +32,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": true,
         "south": false,
         "east": true,
@@ -44,7 +41,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": true,
         "south": false,
         "east": true,
@@ -54,7 +50,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": true,
         "south": true,
         "east": false,
@@ -64,7 +59,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": true,
         "south": true,
         "east": true,
@@ -74,7 +68,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": true,
         "south": true,
         "east": true,
@@ -84,7 +77,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": true,
         "south": true,
         "east": false,
@@ -94,7 +86,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": true,
         "south": false,
         "east": false,
@@ -104,7 +95,6 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": false,
         "south": true,
         "east": true,
@@ -114,31 +104,10 @@ let objects = {
         "type": "road",
         "width": 1,
         "height": 1,
-        "isIcon": true,
         "north": false,
         "south": true,
         "east": false,
         "west": true
-    },
-    "tree1": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "treeAltShort": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "treeAltTall": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "treeShort": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
-    },
-    "treeTall": {
-        "type": "road",
-        "width": 1, "height": 1, "isIcon": false
     },
     "arrows": {
         "type": "other",
@@ -184,7 +153,6 @@ let objects = {
     "habitation2": {
         "name": "Appartement",
         "type": "building",
-        "isIcon": true,
         "width": 2,
         "height": 2,
         "storage": {"energy": 0, "water": 0, "citizens": 10},
@@ -193,7 +161,6 @@ let objects = {
     "habitation3": {
         "name": "Grand Appartement",
         "type": "building",
-        "isIcon": true,
         "width": 2,
         "height": 2,
         "storage": {"energy": 0, "water": 0, "citizens": 15},
@@ -202,7 +169,6 @@ let objects = {
     "habitation4": {
         "name": "Gratte Ciel",
         "type": "building",
-        "isIcon": true,
         "width": 2,
         "height": 2,
         "storage": {"energy": 0, "water": 0, "citizens": 25},

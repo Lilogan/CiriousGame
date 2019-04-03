@@ -50,26 +50,26 @@ let MenuScene = new Phaser.Class({
             });
 
             // Hud icons and interactive shapes
-            this.load.image("deleteBuilding", "/assets/hudIcons/deleteBuilding.png");
-            this.load.image("buildBuilding", "/assets/hudIcons/buildBuilding.png");
-            this.load.image("energyIcon", "/assets/hudIcons/energyIcon.png");
-            this.load.image("waterIcon", "/assets/hudIcons/waterIcon.png");
-            this.load.image("pollutionIcon", "/assets/hudIcons/pollutionIcon.png");
-            this.load.image("moneyIcon", "/assets/hudIcons/moneyIcon.png");
-            this.load.image("citizensIcon", "/assets/hudIcons/citizensIcon.png");
-            this.load.image("previousPage", "/assets/hudIcons/previousPage.png");
-            this.load.image("nextPage", "/assets/hudIcons/nextPage.png");
-            this.load.image("tabHud", "/assets/hudIcons/tabHud.png");
-            this.load.image("closeHud", "/assets/hudIcons/closeHud.png");
+            this.load.image("deleteBuilding", "/assets/hudIcons/icons/deleteBuilding.png");
+            this.load.image("buildBuilding", "/assets/hudIcons/icons/buildBuilding.png");
+            this.load.image("energyIcon", "/assets/hudIcons/icons/energyIcon.png");
+            this.load.image("waterIcon", "/assets/hudIcons/icons/waterIcon.png");
+            this.load.image("pollutionIcon", "/assets/hudIcons/icons/pollutionIcon.png");
+            this.load.image("moneyIcon", "/assets/hudIcons/icons/moneyIcon.png");
+            this.load.image("citizensIcon", "/assets/hudIcons/icons/citizensIcon.png");
+            this.load.image("previousPage", "/assets/hudIcons/icons/previousPage.png");
+            this.load.image("nextPage", "/assets/hudIcons/icons/nextPage.png");
+            this.load.image("tabHud", "/assets/hudIcons/icons/tabHud.png");
+            this.load.image("closeHud", "/assets/hudIcons/icons/closeHud.png");
 
             // Main menu texts
             this.load.image('jouer', '/assets/menu/jouer.png');
             this.load.image('options', '/assets/menu/options.png');
             this.load.image('quitter', '/assets/menu/quitter.png');
+            this.load.image('fullscreen', '/assets/menu/fullscreen.png');
 
             // Others
             this.load.image('grass', '/assets/roads/grass.png');
-            this.load.image('fullscreen', '/assets/hudIcons/fullscreen.png');
             this.load.image('arrowN', '/assets/buildings/arrows/arrowN.png');
             this.load.image('arrowS', '/assets/buildings/arrows/arrowS.png');
             this.load.image('arrowE', '/assets/buildings/arrows/arrowE.png');
@@ -94,8 +94,8 @@ let MenuScene = new Phaser.Class({
         let leaveSprite = scene.add.sprite(window.screen.width/2, window.screen.height/10 * 6.5, 'quitter', false).setOrigin(0.5, 0.5);
 
         // Add the fullscreen logo and make it interactive
-        let fullscreen = this.add.image(40,40,'fullscreen').setInteractive();
-        fullscreen.setDisplaySize(50,50);
+        let fullscreen = this.add.image(30, 30,'fullscreen').setInteractive();
+        fullscreen.setDisplaySize(30,30);
         fullscreen.on('pointerdown',()=>{
             if(scene.scale.isFullscreen){
                 scene.scale.stopFullscreen();
@@ -104,19 +104,10 @@ let MenuScene = new Phaser.Class({
             }
         });
         fullscreen.on('pointerover', ()=>{
-            if(scene.scale.isFullscreen){
-                fullscreen.setDisplaySize(50,50);
-            }else{
-                fullscreen.setDisplaySize(65,65);
-            }
+            fullscreen.setDisplaySize(45,45);
         });
         fullscreen.on('pointerout',()=>{
-            if(scene.scale.isFullscreen){
-                fullscreen.setDisplaySize(65,65);
-
-            }else{
-                fullscreen.setDisplaySize(50,50);
-            }
+            fullscreen.setDisplaySize(30,30);
         })
     },
 
