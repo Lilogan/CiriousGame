@@ -96,7 +96,6 @@ function buildHud(begin, buildType, curPage) {
             iconName.setOrigin(0.5, 0);
             iconName.setFontSize(9);
             hudBuildGroup.add(iconName);
-            console.log(values.name);
 
             if (nbElementSet % 3 === 2) {
                 curLine += 1;
@@ -114,7 +113,6 @@ function buildHud(begin, buildType, curPage) {
         scene.sprite.setInteractive();
         scene.sprite.on("pointerdown", () => {
             hudBuildGroup.destroy(true);
-            console.log(curPos);
             buildHud(curPos, buildType, curPage + 1);
         });
     }

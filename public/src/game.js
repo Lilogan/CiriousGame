@@ -23,6 +23,7 @@ function spriteOver(isoPoint, i, j) {
     if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
         let obj = objects[scene.curPlacedBlock];
         let objCoords = getCoordsFromObject(obj, j, i);
+
         if (scene.orientation === "N" || scene.orientation === "S") {
             scene.tmpSprite = scene.add.sprite(isoPoint.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
         } else {
@@ -34,7 +35,11 @@ function spriteOver(isoPoint, i, j) {
         scene.tmpSprite.alpha = 0.7;
 
 
-        scene.tmpSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
+        let vect = new Phaser.Geom.Point;
+        vect.x = (-obj.height * 100 + obj.width * 100);
+        vect.y = (-obj.height * 56 - obj.width * 56);
+        scene.tmpSprite.depth = -(scene.tmpSprite.y - Math.sqrt(vect.x**2 + vect.y**2)/2);
+
         objCoords.forEach((curCoord) => {
             scene.mapData.forEach((element) => {
                 if (element.x === curCoord.x && element.y === curCoord.y) {
@@ -129,15 +134,17 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                                         correctedBlockOrientation = roadNameInOrder(correctedBlockOrientation);
                                         removeSprite(curData.nthElement, false);
                                         curData.name = correctedBlockOrientation;
-                                        console.log(scene.mapData[scene.mapData.length-1].nthElement);
-                                        if(scene.mapData[scene.mapData.length-1].nthElement !== undefined){
-                                            curData.nthElement = scene.mapData[scene.mapData.length-1].nthElement + 1;
-                                        }else{
+                                        if (scene.mapData[scene.mapData.length - 1].nthElement !== undefined) {
+                                            curData.nthElement = scene.mapData[scene.mapData.length - 1].nthElement + 1;
+                                        } else {
                                             curData.nthElement = 1;
                                         }
                                         scene.mapData.push(curData);
                                         let newRoad = scene.spritesGroup.create(curData.x + borderOffset.x, curData.y + borderOffset.y, correctedBlockOrientation, false).setOrigin(0.5, 1);
-                                        newRoad.depth = sprite.y - 50 * obj.height + mapSize * 100;
+                                        let vect = new Phaser.Geom.Point;
+                                        vect.x = (-obj.height * 100 + obj.width * 100);
+                                        vect.y = (-obj.height * 56 - obj.width * 56);
+                                        newRoad.depth = -(sprite.y - Math.sqrt(vect.x**2 + vect.y**2)/2);
                                         newRoad.setInteractive({pixelPerfect: true});
                                         newRoad.on("pointerdown", () => {
                                             if (scene.curPlacedBlock === "destroy") {
@@ -196,6 +203,7 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                     scene.storageMax.pollution += objects[objToPush.name].storage.pollution;
                 }
                 scene.mapData.push(objToPush);
+
             });
             let defSprite;
             if (scene.orientation === "N" || scene.orientation === "S") {
@@ -205,7 +213,10 @@ function spriteDown(point, isoPoint, i, j, sprite) {
             }
 
             defSprite.alpha = 1;
-            defSprite.depth = scene.tmpSprite.y - 50 * obj.height + mapSize * 100;
+            let vect = new Phaser.Geom.Point;
+            vect.x = (-obj.height * 100 + obj.width * 100);
+            vect.y = (-obj.height * 55 - obj.width * 55);
+            defSprite.depth = defSprite.y - Math.sqrt(vect.x**2 + vect.y**2) / 2;
             defSprite.setInteractive({pixelPerfect: true});
 
             defSprite.on("pointerdown", () => {
@@ -243,8 +254,8 @@ function removeSprite(nth, keepInMapData) {
         if (curData.nthElement === nth && keepInMapData === false) {
             scene.mapData.splice(curN, objects[curData.name].width * objects[curData.name].height);
             let curNthElem = 0;
-            for(let i = 1; i < scene.mapData.length; i++){
-                if(scene.mapData[i].name !== "invisible"){
+            for (let i = 1; i < scene.mapData.length; i++) {
+                if (scene.mapData[i].name !== "invisible") {
                     curNthElem++;
                 }
                 scene.mapData[i].nthElement = curNthElem;
@@ -392,7 +403,7 @@ function isSpriteConnectedToRoad(nInMapData) {
     })
 }
 
-function openContextualMenu (obj){
+function openContextualMenu(obj) {
     if (contextualHudGroup !== undefined) {
         contextualHudGroup.destroy(true);
     }
@@ -404,8 +415,6 @@ function openContextualMenu (obj){
     let contextualMenuBackground = scene.add.graphics({key: "graph", fillStyle: {color: 0xffffff}});
     contextualHudGroup.add(contextualMenuBackground);
     contextualMenuBackground.fillRectShape(contextualMenuBackgroundRec);
-
-    console.log(obj);
 }
 
 let GameScene = new Phaser.Class({
@@ -458,70 +467,74 @@ let GameScene = new Phaser.Class({
 
     create: function () {
 
-            //display the floor and prepare the map making
-            for (let i = 0; i < mapSize; i++) {
-                for (let j = 0; j < mapSize; j++) {
-                    let point = new Phaser.Geom.Point();
-                    point.x = j * spriteSize / 2;
-                    point.y = i * spriteSize / 2;
-                    let isoPoint = fromCartToIso(point);
-                    let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 18, "grass", false).setOrigin(0.5, 1);
-                    // preview a building with mouse and change tint if necessary space on map is not free
-                    sprite.setInteractive({pixelPerfect: true});
+        //display the floor and prepare the map making
+        for (let i = 0; i < mapSize; i++) {
+            for (let j = 0; j < mapSize; j++) {
+                let point = new Phaser.Geom.Point();
+                point.x = j * spriteSize / 2;
+                point.y = i * spriteSize / 2;
+                let isoPoint = fromCartToIso(point);
+                let sprite = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y + 18, "grass", false).setOrigin(0.5, 1);
+                sprite.depth = -100 * mapSize;
+                // preview a building with mouse and change tint if necessary space on map is not free
+                sprite.setInteractive({pixelPerfect: true});
 
-                    sprite.on("pointerover", () => {
-                        spriteOver(isoPoint, i, j);
-                    }, this);
-
-
-                    //destroy previewed building
-                    sprite.on("pointerout", () => {
-                        spriteOut();
-                    }, this);
+                sprite.on("pointerover", () => {
+                    spriteOver(isoPoint, i, j);
+                }, this);
 
 
-                    //create a building if necessary space on map is free
-                    sprite.on("pointerdown", () => {
-                        spriteDown(point, isoPoint, i, j, sprite);
-                    }, this);
-                }
+                //destroy previewed building
+                sprite.on("pointerout", () => {
+                    spriteOut();
+                }, this);
+
+
+                //create a building if necessary space on map is free
+                sprite.on("pointerdown", () => {
+                    spriteDown(point, isoPoint, i, j, sprite);
+                }, this);
             }
+        }
 
-            //display map
-            scene.mapData.forEach((curData) => {
-                if (curData.name === "data") {
-                    scene.mapData[0].energy = curData.energy;
-                    scene.mapData[0].water = curData.water;
-                    scene.mapData[0].citizens = curData.citizens;
-                    scene.mapData[0].money = curData.money;
-                    scene.mapData[0].pollution = curData.pollution;
-                }
-                if (curData.name !== undefined && objects[curData.name].type !== "other") {
-                    let object = objects[curData.name];
-                    let point = new Phaser.Geom.Point();
-
-
-                    point.x = curData.x;
-                    point.y = curData.y;
-                    let sprite = scene.add.sprite(point.x + borderOffset.x + spriteSize / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
-                    sprite.depth = sprite.y - 50 * object.height + mapSize * 100;
-                }
-            });
-
-            // Zoom camera
-            window.addEventListener("wheel", (e) => {
-                minPosCamX = -50 * mapSize + borderOffset.x / scene.cameras.main.zoom - 50;
-                minPosCamY = -spriteSize / 2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
+        //display map
+        scene.mapData.forEach((curData) => {
+            if (curData.name === "data") {
+                scene.mapData[0].energy = curData.energy;
+                scene.mapData[0].water = curData.water;
+                scene.mapData[0].citizens = curData.citizens;
+                scene.mapData[0].money = curData.money;
+                scene.mapData[0].pollution = curData.pollution;
+            }
+            if (curData.name !== undefined && objects[curData.name].type !== "other") {
+                let object = objects[curData.name];
+                let point = new Phaser.Geom.Point();
 
 
-                if (e.deltaY < 0 && scene.cameras.main.zoom < 1) {
-                    scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.25, 100);
-                } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.25) {
-                    scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.25, 100);
-                }
-            });
+                point.x = curData.x;
+                point.y = curData.y;
+                let sprite = scene.add.sprite(point.x + borderOffset.x + spriteSize / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
+                let vect = new Phaser.Geom.Point;
+                vect.x = (-object.height * 100 + object.width * 100);
+                vect.y = (-object.height * 55 - object.width * 55);
+                sprite.depth = sprite.y - Math.sqrt(vect.x**2 + vect.y**2) / 2;
+            }
+        });
 
-        },
+        // Zoom camera
+        window.addEventListener("wheel", (e) => {
+            minPosCamX = -50 * mapSize + borderOffset.x / scene.cameras.main.zoom - 50;
+            minPosCamY = -spriteSize / 2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
+
+
+            if (e.deltaY < 0 && scene.cameras.main.zoom < 1) {
+                scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.25, 100);
+            } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.25) {
+                scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.25, 100);
+            }
+        });
+
+    },
 
     update: function (timer) {
         //move camera
@@ -582,16 +595,19 @@ let GameScene = new Phaser.Class({
                         scene.tmpSprite.tint = scene.tint;
                     }
 
-                    scene.tmpSprite.depth = scene.tmpSprite.y - 50 * object.height + mapSize * 100;
+                    let vect = new Phaser.Geom.Point;
+                    vect.x = (-object.height * 100 + object.width * 100);
+                    vect.y = (-object.height * 55 - object.width * 55);
+                    scene.tmpSprite.depth = scene.tmpSprite.y - Math.sqrt(vect.x**2 + vect.y**2) / 2;
                 }
             }
         }
-        
-        if(Phaser.Input.Keyboard.JustDown(scene.keys.ESC)){
+
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.ESC)) {
             scene.scale.stopFullscreen();
         }
 
-        if(Phaser.Input.Keyboard.JustDown(scene.keys.ESC)){
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.ESC)) {
             scene.scale.stopFullscreen();
         }
 

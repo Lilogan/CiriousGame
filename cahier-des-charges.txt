@@ -1,5 +1,5 @@
 Done (maj ?) - Destruction des bâtiments
-En cour - Modes (classique + rotation + menu contextuel (nom + prod + bandeau de couleur))
+En cours - Modes (classique + rotation + menu contextuel (nom + prod + bandeau de couleur))
 Done (Equilibrage à faire) - Gestion de la pollution (Usine prod par sec + prod max + fin de partie en fonction du taux par hbt)
 Batiments (coût/stockage/ect)
 Sauvegarde et chargement des maps (Mode histoire)
