@@ -2,7 +2,7 @@ let scene; // The scene
 let windowWidth = $(window).width(); // window width
 let windowHeight = $(window).height(); // window height
 let spriteSize = 200; // sprite size (50) + space between sprites (1)
-let mapSize = 50; // size of map (square)
+let mapSize = 20; // size of map (square)
 let borderOffset = new Phaser.Geom.Point(0, -mapSize / 2 * 102 + 102 - 102 / 2); //offset to center the map
 let prevSecond = -1; // ??
 let hudHeight = 80; // bottom hud height
@@ -527,12 +527,12 @@ let GameScene = new Phaser.Class({
             minPosCamY = -spriteSize / 2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
 
 
-            if (e.deltaY < 0 && scene.cameras.main.zoom < 1) {
-                scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.25, 100);
-            } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.25) {
-                scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.25, 100);
-            }
-        });
+                if (e.deltaY < 0 && scene.cameras.main.zoom < 1) {
+                    scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.35 * (scene.cameras.main.zoom), 100);
+                } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.25) {
+                    scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.35 * (scene.cameras.main.zoom), 100);
+                }
+            });
 
     },
 
