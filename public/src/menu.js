@@ -1,4 +1,6 @@
 let scene; // Global Variable for the scene
+let windowWidth = window.screen.width;
+let windowHeight = window.screen.height;
 
 let MenuScene = new Phaser.Class({
     Extends: Phaser.Scene,
@@ -21,11 +23,11 @@ let MenuScene = new Phaser.Class({
         let progressBar = scene.add.graphics();
         let progressBox = scene.add.graphics();
         progressBox.fillStyle(0x222222, 0.8);
-        progressBox.fillRect(window.screen.width/2 - 320/2, window.screen.height/2 - 50/2, 320, 50);
+        progressBox.fillRect(windowWidth/2 - 320/2, windowHeight/2 - 50/2, 320, 50);
         scene.load.on('progress', (value) => {
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
-            progressBar.fillRect(window.screen.width/2 - 300/2, window.screen.height/2 - 30/2, 300 * value, 30);
+            progressBar.fillRect(windowWidth/2 - 300/2, windowHeight/2 - 30/2, 300 * value, 30);
         });
         scene.load.on("complete", () => {
             progressBox.destroy();
