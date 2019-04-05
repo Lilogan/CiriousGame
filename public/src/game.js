@@ -558,7 +558,7 @@ let GameScene = new Phaser.Class({
             }
         }
 
-        if (Phaser.Input.Keyboard.JustDown(scene.keys.R)){
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.R)) {
             if (scene.curPlacedBlock !== undefined) {
                 let object = objects[scene.curPlacedBlock];
                 if (object.type === "building") {
@@ -594,8 +594,6 @@ let GameScene = new Phaser.Class({
         if(Phaser.Input.Keyboard.JustDown(scene.keys.ESC)){
             scene.scale.stopFullscreen();
         }
-
-
 
         if (Math.round(timer / 1000) !== prevSecond) {
             prevSecond = Math.round(timer / 1000);
