@@ -293,7 +293,7 @@ let HudScene = new Phaser.Class({
             if (gameScene.curPlacedBlock !== "destroy") {
                 gameScene.curPlacedBlock = "destroy";
             } else {
-                gameScene.curPlacedBlock = undefined;
+                gameScene.curPlacedBlock = "roadNSE";
             }
         });
     },

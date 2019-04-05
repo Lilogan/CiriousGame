@@ -5,7 +5,6 @@ let spriteSize = 200; // sprite size (50) + space between sprites (1)
 let mapSize = 50; // size of map (square)
 let borderOffset = new Phaser.Geom.Point(0, -mapSize / 2 * 102 + 102 - 102 / 2); //offset to center the map
 let prevSecond = -1; // ??
-let justRotate = false;
 let hudHeight = 80; // bottom hud height
 let contextualMenuWidth = 300;
 let contextualMenuHeight = 400; // build hud height
@@ -130,6 +129,12 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                                         correctedBlockOrientation = roadNameInOrder(correctedBlockOrientation);
                                         removeSprite(curData.nthElement, false);
                                         curData.name = correctedBlockOrientation;
+                                        console.log(scene.mapData[scene.mapData.length-1].nthElement);
+                                        if(scene.mapData[scene.mapData.length-1].nthElement !== undefined){
+                                            curData.nthElement = scene.mapData[scene.mapData.length-1].nthElement + 1;
+                                        }else{
+                                            curData.nthElement = 1;
+                                        }
                                         scene.mapData.push(curData);
                                         let newRoad = scene.spritesGroup.create(curData.x + borderOffset.x, curData.y + borderOffset.y, correctedBlockOrientation, false).setOrigin(0.5, 1);
                                         newRoad.depth = sprite.y - 50 * obj.height + mapSize * 100;
@@ -237,6 +242,13 @@ function removeSprite(nth, keepInMapData) {
         }
         if (curData.nthElement === nth && keepInMapData === false) {
             scene.mapData.splice(curN, objects[curData.name].width * objects[curData.name].height);
+            let curNthElem = 0;
+            for(let i = 1; i < scene.mapData.length; i++){
+                if(scene.mapData[i].name !== "invisible"){
+                    curNthElem++;
+                }
+                scene.mapData[i].nthElement = curNthElem;
+            }
             curN--;
         }
         if (curData.name !== "invisible") {
@@ -546,9 +558,8 @@ let GameScene = new Phaser.Class({
             }
         }
 
-        if (Phaser.Input.Keyboard.JustDown(scene.keys.R) && !justRotate) {
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.R)){
             if (scene.curPlacedBlock !== undefined) {
-                justRotate = true;
                 let object = objects[scene.curPlacedBlock];
                 if (object.type === "building") {
                     scene.orientation = orientations[(orientations.indexOf(scene.orientation) + 1) % 4];
@@ -584,9 +595,6 @@ let GameScene = new Phaser.Class({
             scene.scale.stopFullscreen();
         }
 
-        if (scene.pointer.justUp) {
-            justRotate = false;
-        }
 
 
         if (Math.round(timer / 1000) !== prevSecond) {
