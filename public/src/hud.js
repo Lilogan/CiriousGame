@@ -242,7 +242,7 @@ let HudScene = new Phaser.Class({
     initialize:
 
         function HudScene() {
-            Phaser.Scene.call(this, {key: "HudScene", active: true});
+            Phaser.Scene.call(this, {key: "HudScene", active: false});
 
         },
     preload: function () {

@@ -38,7 +38,7 @@ function spriteOver(isoPoint, i, j) {
         let vect = new Phaser.Geom.Point;
         vect.x = (-obj.height * 100 + obj.width * 100);
         vect.y = (-obj.height * 56 - obj.width * 56);
-        scene.tmpSprite.depth = -(scene.tmpSprite.y - Math.sqrt(vect.x**2 + vect.y**2)/2);
+        scene.tmpSprite.depth = scene.tmpSprite.y - Math.sqrt(vect.x ** 2 + vect.y ** 2) / 2;
 
         objCoords.forEach((curCoord) => {
             scene.mapData.forEach((element) => {
@@ -144,7 +144,7 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                                         let vect = new Phaser.Geom.Point;
                                         vect.x = (-obj.height * 100 + obj.width * 100);
                                         vect.y = (-obj.height * 56 - obj.width * 56);
-                                        newRoad.depth = -(sprite.y - Math.sqrt(vect.x**2 + vect.y**2)/2);
+                                        newRoad.depth = newRoad.y - Math.sqrt(vect.x ** 2 + vect.y ** 2) / 2;
                                         newRoad.setInteractive({pixelPerfect: true});
                                         newRoad.on("pointerdown", () => {
                                             if (scene.curPlacedBlock === "destroy") {
@@ -216,7 +216,8 @@ function spriteDown(point, isoPoint, i, j, sprite) {
             let vect = new Phaser.Geom.Point;
             vect.x = (-obj.height * 100 + obj.width * 100);
             vect.y = (-obj.height * 55 - obj.width * 55);
-            defSprite.depth = defSprite.y - Math.sqrt(vect.x**2 + vect.y**2) / 2;
+
+            defSprite.depth = defSprite.y - Math.sqrt(vect.x ** 2 + vect.y ** 2) / 2;
             defSprite.setInteractive({pixelPerfect: true});
 
             defSprite.on("pointerdown", () => {
@@ -432,7 +433,7 @@ let GameScene = new Phaser.Class({
         scene.cameras.main.centerOn(0, 0);
         scene.orientation = "W"; // Default orrientation
         scene.pointer = this.input.activePointer; // Our cursor
-        scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S, Q, D, R, C');
+        scene.keys = this.input.keyboard.addKeys('ESC, UP, DOWN, LEFT, RIGHT, Z, S, Q, D, R, M');
         scene.spritesGroup = scene.add.group("spritesGroup");
         scene.toProduce = {
             energy: 0,
@@ -448,15 +449,17 @@ let GameScene = new Phaser.Class({
             money: 0,
             pollution: 0
         };
-        scene.mapData = [];
-        scene.mapData.push({
-            name: "data",
-            energy: 0,
-            water: 0,
-            citizens: 0,
-            money: 0,
-            pollution: 0,
-        });
+        if (scene.mapData === undefined) {
+            scene.mapData = [];
+            scene.mapData.push({
+                name: "data",
+                energy: 0,
+                water: 0,
+                citizens: 0,
+                money: 0,
+                pollution: 0,
+            });
+        }
 
 
         scene.curPlacedBlock = undefined; //object to place
@@ -513,11 +516,16 @@ let GameScene = new Phaser.Class({
 
                 point.x = curData.x;
                 point.y = curData.y;
-                let sprite = scene.add.sprite(point.x + borderOffset.x + spriteSize / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
+                let sprite;
+                if (scene.orientation === "N" || scene.orientation === "S") {
+                    sprite = scene.spritesGroup.create(point.x + borderOffset.x + spriteSize / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
+                } else {
+                    sprite = scene.spritesGroup.create(point.x + borderOffset.x - spriteSize / 4 * (object.width - object.height), point.y + borderOffset.y, curData.name, false).setOrigin(0.5, 1);
+                }
                 let vect = new Phaser.Geom.Point;
                 vect.x = (-object.height * 100 + object.width * 100);
                 vect.y = (-object.height * 55 - object.width * 55);
-                sprite.depth = sprite.y - Math.sqrt(vect.x**2 + vect.y**2) / 2;
+                sprite.depth = sprite.y - Math.sqrt(vect.x ** 2 + vect.y ** 2) / 2;
             }
         });
 
@@ -527,12 +535,12 @@ let GameScene = new Phaser.Class({
             minPosCamY = -spriteSize / 2 * mapSize + (windowHeight - borderOffset.y) / scene.cameras.main.zoom;
 
 
-                if (e.deltaY < 0 && scene.cameras.main.zoom < 1) {
-                    scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.35 * (scene.cameras.main.zoom), 100);
-                } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.25) {
-                    scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.35 * (scene.cameras.main.zoom), 100);
-                }
-            });
+            if (e.deltaY < 0 && scene.cameras.main.zoom < 1) {
+                scene.cameras.main.zoomTo(scene.cameras.main.zoom + 0.35 * (scene.cameras.main.zoom), 100);
+            } else if (e.deltaY > 0 && scene.cameras.main.zoom > 0.25) {
+                scene.cameras.main.zoomTo(scene.cameras.main.zoom - 0.35 * (scene.cameras.main.zoom), 100);
+            }
+        });
 
     },
 
@@ -563,6 +571,11 @@ let GameScene = new Phaser.Class({
             for (let i = 0; i < 500; i++) {
                 scene.cameras.main.scrollX += 0.017;
             }
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(scene.keys.M)) {
+            scene.scene.pause("GameScene");
+            scene.scene.launch("InGameMenuScene");
         }
 
         if (scene.pointer.buttons === 2) {
@@ -598,7 +611,7 @@ let GameScene = new Phaser.Class({
                     let vect = new Phaser.Geom.Point;
                     vect.x = (-object.height * 100 + object.width * 100);
                     vect.y = (-object.height * 55 - object.width * 55);
-                    scene.tmpSprite.depth = scene.tmpSprite.y - Math.sqrt(vect.x**2 + vect.y**2) / 2;
+                    scene.tmpSprite.depth = scene.tmpSprite.y - Math.sqrt(vect.x ** 2 + vect.y ** 2) / 2;
                 }
             }
         }

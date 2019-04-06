@@ -2,6 +2,7 @@ var game;
 
 import HudScene from "./hud.js";
 import MenuScene from "./menu.js";
+import InGameMenuScene from "./inGameMenu.js";
 import GameScene from "./game.js";
 
 
@@ -22,7 +23,7 @@ let config = {
             gravity: {y: 0}
         }
     },
-    scene: [MenuScene, GameScene, HudScene]
+    scene: [MenuScene, GameScene, HudScene, InGameMenuScene]
 };
 
 game = new Phaser.Game(config);
