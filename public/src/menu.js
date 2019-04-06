@@ -15,8 +15,6 @@ let MenuScene = new Phaser.Class({
         // Add key ESC as usable key
         scene.keys = this.input.keyboard.addKeys('ESC');
 
-        // scene.scene.stop("HudScene"); // ??
-
         // Progress bar when you wait for every sprite to be preload
         let progressBar = scene.add.graphics();
         let progressBox = scene.add.graphics();
