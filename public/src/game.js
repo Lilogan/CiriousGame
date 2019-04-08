@@ -2,7 +2,7 @@ let scene; // The scene
 let windowWidth = $(window).width(); // window width
 let windowHeight = $(window).height(); // window height
 let spriteSize = 200; // sprite size (50) + space between sprites (1)
-let mapSize = 20; // size of map (square)
+let mapSize = 10; // size of map (square)
 let borderOffset = new Phaser.Geom.Point(0, -mapSize / 2 * 102 + 102 - 102 / 2); //offset to center the map
 let prevSecond = -1; // ??
 let hudHeight = 80; // bottom hud height
@@ -13,11 +13,16 @@ let contextualMenuHeight = 400; // build hud height
 let contextualHudGroup;
 
 //limit of camera
-let minPosCamX = -spriteSize / 2 * mapSize + borderOffset.x;
-let minPosCamY = -spriteSize / 2 * mapSize - borderOffset.y + windowHeight;
+let minPosCamX = 0;
+let maxPosCamX = 0;
+let minPosCamY = 0;
+let maxPosCamY = 0;
 
 // Set the notation for the orientation of sprites
 let orientations = ["W", "N", "E", "S"];
+
+
+
 
 function spriteOver(isoPoint, i, j) {
     if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
@@ -26,11 +31,14 @@ function spriteOver(isoPoint, i, j) {
 
         if (scene.orientation === "N" || scene.orientation === "S") {
             scene.tmpSprite = scene.add.sprite(isoPoint.x + spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+            if (obj.type === "building") {
+                scene.tmpArrow = scene.add.sprite(isoPoint.x, isoPoint.y + borderOffset.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
+            }
         } else {
             scene.tmpSprite = scene.add.sprite(isoPoint.x - spriteSize / 4 * (obj.width - obj.height), isoPoint.y + borderOffset.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
-        }
-        if (obj.type === "building") {
-            scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
+            if (obj.type === "building") {
+                scene.tmpArrow = scene.add.sprite(isoPoint.x + borderOffset.x, isoPoint.y + borderOffset.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
+            }
         }
         scene.tmpSprite.alpha = 0.7;
 
@@ -39,7 +47,9 @@ function spriteOver(isoPoint, i, j) {
         vect.x = (-obj.height * 100 + obj.width * 100);
         vect.y = (-obj.height * 56 - obj.width * 56);
         scene.tmpSprite.depth = scene.tmpSprite.y - Math.sqrt(vect.x ** 2 + vect.y ** 2) / 2;
-
+        if (obj.type === "building") {
+            scene.tmpArrow.depth = scene.tmpSprite.depth + 1;
+        }
         objCoords.forEach((curCoord) => {
             scene.mapData.forEach((element) => {
                 if (element.x === curCoord.x && element.y === curCoord.y) {
@@ -47,6 +57,17 @@ function spriteOver(isoPoint, i, j) {
                         scene.tmpSprite.tint = 0xe20000;
                         scene.tint = 0xe20000;
                     }
+                }
+                let cartCoord = {
+                    x: j * spriteSize / 2,
+                    y: i * spriteSize / 2,
+                };
+                if ((scene.orientation === "E" || scene.orientation === "W") && (cartCoord.y - (obj.height - 1) * spriteSize / 2 < 0 || cartCoord.x - (obj.width - 1) * spriteSize / 2 < 0)) {
+                    scene.tmpSprite.tint = 0xe20000;
+                    scene.tint = 0xe20000;
+                } else if ((scene.orientation === "N" || scene.orientation === "S") && (cartCoord.y - (obj.width - 1) * spriteSize / 2 < 0 || cartCoord.x - (obj.height - 1) * spriteSize / 2 < 0)) {
+                    scene.tmpSprite.tint = 0xe20000;
+                    scene.tint = 0xe20000;
                 }
             });
         });
@@ -83,6 +104,15 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                     }
                 }
             });
+            let cartCoord = {
+                x: j * spriteSize / 2,
+                y: i * spriteSize / 2,
+            };
+            if ((scene.orientation === "E" || scene.orientation === "W") && (cartCoord.y - (obj.height - 1) * spriteSize / 2 < 0 || cartCoord.x - (obj.width - 1) * spriteSize / 2 < 0)) {
+                isOnBlock = true;
+            } else if ((scene.orientation === "N" || scene.orientation === "S") && (cartCoord.y - (obj.width - 1) * spriteSize / 2 < 0 || cartCoord.x - (obj.height - 1) * spriteSize / 2 < 0)) {
+                isOnBlock = true;
+            }
         });
 
 
@@ -231,10 +261,13 @@ function spriteDown(point, isoPoint, i, j, sprite) {
                 }
             });
             defSprite.on("pointerover", () => {
-                spriteOver(isoPoint, i, j);
+                if(scene.curPlacedBlock === "destroy"){
+                    defSprite.tint = 0xe20000;
+                }
             });
             defSprite.on("pointerout", () => {
                 spriteOut();
+                defSprite.tint = undefined;
             });
             scene.curPlacedBlock = curPlacedBlockCopy;
 
@@ -248,11 +281,12 @@ function spriteDown(point, isoPoint, i, j, sprite) {
 function removeSprite(nth, keepInMapData) {
     let nthElement = -1;
     let curN = 0;
+    let isDone = false;
     scene.mapData.forEach((curData) => {
         if (curData.name !== "invisible" && curData.nthElement === nth) {
             scene.spritesGroup.getChildren()[nthElement].destroy();
         }
-        if (curData.nthElement === nth && keepInMapData === false) {
+        if (curData.nthElement === nth && keepInMapData === false && isDone === false) {
             scene.mapData.splice(curN, objects[curData.name].width * objects[curData.name].height);
             let curNthElem = 0;
             for (let i = 1; i < scene.mapData.length; i++) {
@@ -261,6 +295,7 @@ function removeSprite(nth, keepInMapData) {
                 }
                 scene.mapData[i].nthElement = curNthElem;
             }
+            isDone = true;
             curN--;
         }
         if (curData.name !== "invisible") {
@@ -458,6 +493,7 @@ let GameScene = new Phaser.Class({
                 citizens: 0,
                 money: 0,
                 pollution: 0,
+                curLevel: 0
             });
         }
 
@@ -469,6 +505,10 @@ let GameScene = new Phaser.Class({
     },
 
     create: function () {
+        minPosCamX = scene.cameras.main.scrollX - (mapSize / 2 * spriteSize - spriteSize - windowWidth / 2);
+        maxPosCamX = scene.cameras.main.scrollX + (mapSize / 2 * spriteSize - spriteSize - windowWidth / 2);
+        minPosCamY = scene.cameras.main.scrollY - (mapSize / 2 * 102 / 2 - 102 / 2);
+        maxPosCamY = scene.cameras.main.scrollY + (mapSize / 2 * 102 / 2 - 102 / 2);
 
         //display the floor and prepare the map making
         for (let i = 0; i < mapSize; i++) {
@@ -547,8 +587,21 @@ let GameScene = new Phaser.Class({
     update: function (timer) {
         //move camera
         if (scene.pointer.isDown && scene.pointer.justMoved && scene.pointer.buttons === 1) {
-            scene.cameras.main.scrollX -= (scene.pointer.x - scene.pointer.prevPosition.x) / scene.cameras.main.zoom;
-            scene.cameras.main.scrollY -= (scene.pointer.y - scene.pointer.prevPosition.y) / scene.cameras.main.zoom;
+            let isMovableX = true;
+            let isMovableY = true;
+            if (scene.cameras.main.scrollY - (scene.pointer.y - scene.pointer.prevPosition.y) <= minPosCamY || scene.cameras.main.scrollY - (scene.pointer.y - scene.pointer.prevPosition.y) >= maxPosCamY) {
+                isMovableY = false;
+            }
+
+            if (scene.cameras.main.scrollX - (scene.pointer.x - scene.pointer.prevPosition.x) <= minPosCamX || scene.cameras.main.scrollX - (scene.pointer.x - scene.pointer.prevPosition.x) >= maxPosCamX) {
+                isMovableX = false;
+            }
+            if (isMovableX) {
+                scene.cameras.main.scrollX -= (scene.pointer.x - scene.pointer.prevPosition.x) / scene.cameras.main.zoom;
+            }
+            if (isMovableY) {
+                scene.cameras.main.scrollY -= (scene.pointer.y - scene.pointer.prevPosition.y) / scene.cameras.main.zoom;
+            }
         }
 
         if ((scene.keys.UP.isDown || scene.keys.Z.isDown) && scene.cameras.main.scrollY > minPosCamY) {
@@ -556,7 +609,7 @@ let GameScene = new Phaser.Class({
                 scene.cameras.main.scrollY -= 0.017;
             }
         }
-        if ((scene.keys.DOWN.isDown || scene.keys.S.isDown) && scene.cameras.main.scrollY < -minPosCamY) {
+        if ((scene.keys.DOWN.isDown || scene.keys.S.isDown) && scene.cameras.main.scrollY < maxPosCamY) {
             for (let i = 0; i < 500; i++) {
                 scene.cameras.main.scrollY += 0.017;
             }
@@ -567,7 +620,9 @@ let GameScene = new Phaser.Class({
                 scene.cameras.main.scrollX -= 0.017;
             }
         }
-        if ((scene.keys.RIGHT.isDown || scene.keys.D.isDown) && scene.cameras.main.scrollX < -minPosCamX) {
+
+
+        if ((scene.keys.RIGHT.isDown || scene.keys.D.isDown) && scene.cameras.main.scrollX < maxPosCamX) {
             for (let i = 0; i < 500; i++) {
                 scene.cameras.main.scrollX += 0.017;
             }
@@ -585,9 +640,10 @@ let GameScene = new Phaser.Class({
         }
 
         if (Phaser.Input.Keyboard.JustDown(scene.keys.R)) {
+            console.log(scene.mapData);
             if (scene.curPlacedBlock !== undefined) {
                 let object = objects[scene.curPlacedBlock];
-                if (object.type === "building") {
+                if (object!== undefined && object.type === "building") {
                     scene.orientation = orientations[(orientations.indexOf(scene.orientation) + 1) % 4];
 
                     scene.curPlacedBlock = scene.curPlacedBlock.replace(/.$/, scene.orientation);
@@ -597,12 +653,15 @@ let GameScene = new Phaser.Class({
 
                     if (scene.orientation === "N" || scene.orientation === "S") {
                         scene.tmpSprite = scene.add.sprite(scene.tmpSprite.x + spriteSize / 2 * (object.width - object.height), scene.tmpSprite.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                        if (object.type === "building") {
+                            scene.tmpArrow = scene.add.sprite(scene.tmpArrow.x, scene.tmpArrow.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
+                        }
                     } else {
                         scene.tmpSprite = scene.add.sprite(scene.tmpSprite.x - spriteSize / 2 * (object.width - object.height), scene.tmpSprite.y, scene.curPlacedBlock, false).setOrigin(0.5, 1);
+                        if (object.type === "building") {
+                            scene.tmpArrow = scene.add.sprite(scene.tmpArrow.x, scene.tmpArrow.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
+                        }
                     }
-
-
-                    scene.tmpArrow = scene.add.sprite(scene.tmpSprite.x, scene.tmpSprite.y, "arrow" + scene.orientation, false).setOrigin(0.5, 1);
                     scene.tmpSprite.alpha = 0.7;
                     if (scene.tint !== undefined) {
                         scene.tmpSprite.tint = scene.tint;
@@ -612,6 +671,7 @@ let GameScene = new Phaser.Class({
                     vect.x = (-object.height * 100 + object.width * 100);
                     vect.y = (-object.height * 55 - object.width * 55);
                     scene.tmpSprite.depth = scene.tmpSprite.y - Math.sqrt(vect.x ** 2 + vect.y ** 2) / 2;
+                    scene.tmpArrow.depth = scene.tmpSprite.depth + 1;
                 }
             }
         }
@@ -620,9 +680,6 @@ let GameScene = new Phaser.Class({
             scene.scale.stopFullscreen();
         }
 
-        if (Phaser.Input.Keyboard.JustDown(scene.keys.ESC)) {
-            scene.scale.stopFullscreen();
-        }
 
         if (Math.round(timer / 1000) !== prevSecond) {
             prevSecond = Math.round(timer / 1000);
@@ -670,6 +727,12 @@ let GameScene = new Phaser.Class({
 
             scene.mapData[0].money += scene.toProduce.money;
             scene.mapData[0].pollution += scene.toProduce.pollution;
+        }
+
+
+        //level
+        if(scene.mapData.length > 1 && scene.mapData[0].curLevel === 0){
+            scene.mapData[0].curLevel = 1;
         }
     }
 });

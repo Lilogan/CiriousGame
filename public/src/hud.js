@@ -11,6 +11,21 @@ let isLast = false; //check if page in hud menu is the last one
 let gameScene; // The game scene
 let prevSecond = -1;
 
+function nbElement(name) {
+    let nb = 0;
+    console.log(name);
+    gameScene.mapData.forEach((curData) => {
+        if (curData.name === name) {
+            nb++
+        }
+    });
+    if(objects[name].nbMax === 0){
+        return -1;
+    }else{
+        return nb;
+    }
+}
+
 function buildHud(begin, buildType, curPage) {
     //reset the hud
     if (hudBuildGroup !== undefined) {
@@ -68,7 +83,8 @@ function buildHud(begin, buildType, curPage) {
 
     for (let i = 0; i < Object.values(objects).length; i++) {
         let curObject = Object.values(objects)[i];
-        if (curObject.type === buildType && curObject.isIcon === true) {
+        let curIndex = Object.keys(objects)[i];
+        if (curObject.type === buildType && curObject.isIcon === true && curObject.level <= gameScene.mapData[0].curLevel && nbElement(curIndex) < curObject.nbMax) {
             nbElementOfGoodType++;
         }
     }
@@ -76,10 +92,10 @@ function buildHud(begin, buildType, curPage) {
     while (nbElementSet < 12 && values !== undefined) {
         values = Object.values(objects)[begin + curPos];
         let index = Object.keys(objects)[begin + curPos];
-        if (index !== undefined && values.type === buildType && values.isIcon === true && values !== undefined) {
+        if (index !== undefined && values.type === buildType && values.isIcon === true && values !== undefined && values.level <= gameScene.mapData[0].curLevel&& nbElement(index) < values.nbMax) {
             scene.sprite = hudBuildGroup.create(50 - (3 * curLine - nbElementSet) * 100, windowHeight - hudHeight - buildingWindowHeight + 110 + curLine * 90, index + "Icon");
             scene.sprite.setOrigin(0.5, 1);
-            if(values.type === "road"){
+            if (values.type === "road") {
                 scene.sprite.setDisplaySize(80, 41);
             } else {
                 scene.sprite.setDisplaySize(70, 70);
@@ -149,7 +165,7 @@ function showResources() {
     resourcesGroup.add(colorMaxRecPollution);
     colorMaxRecPollution.fillRectShape(maxRecPollution);
 
-    let currentRecPollution = new Phaser.Geom.Rectangle(windowWidth - 640, windowHeight - 30, 52, - Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 * 40 / 20);
+    let currentRecPollution = new Phaser.Geom.Rectangle(windowWidth - 640, windowHeight - 30, 52, -Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1) * 100) / 100 * 40 / 20);
     let colorCurrentRecPollution = scene.add.graphics({key: "graph", fillStyle: {color: 0xb21a1a}});
     resourcesGroup.add(colorCurrentRecPollution);
     colorCurrentRecPollution.fillRectShape(currentRecPollution);
@@ -158,12 +174,12 @@ function showResources() {
     hudPollutionIcon.setOrigin(0, 0);
     hudPollutionIcon.setDisplaySize(52, 40);
 
-    let pollutionProgressBarText = scene.add.text(windowWidth - 640, windowHeight - 25, Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 + " mg/hbt");
+    let pollutionProgressBarText = scene.add.text(windowWidth - 640, windowHeight - 25, Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1) * 100) / 100 + " mg/hbt");
     pollutionProgressBarText.setColor("black");
     pollutionProgressBarText.setFontSize(15);
     resourcesGroup.add(pollutionProgressBarText);
 
-    let pollutionProgressBarPercentage = scene.add.text(windowWidth - 580, windowHeight - 55, "(" +  Math.round(Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1)*100)/100 / 20 * 100 * 100) / 100 + "%)");
+    let pollutionProgressBarPercentage = scene.add.text(windowWidth - 580, windowHeight - 55, "(" + Math.round(Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1) * 100) / 100 / 20 * 100 * 100) / 100 + "%)");
     pollutionProgressBarPercentage.setColor("black");
     pollutionProgressBarPercentage.setFontSize(15);
     resourcesGroup.add(pollutionProgressBarPercentage);
@@ -280,7 +296,7 @@ let HudScene = new Phaser.Class({
             if (!buildHudState) {
                 buildHudState = true;
                 gameScene.curPlacedBlock = undefined;
-                buildHud(0, "road", 0);
+                buildHud(0, "building", 0);
             } else {
                 buildHudState = false;
                 hudBuildGroup.destroy(true);

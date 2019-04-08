@@ -5,7 +5,7 @@ let gameScene; // The game scene
 
 
 function download(filename) {
-    let text = btoa(JSON.stringify(scene.scene.get("GameScene").mapData));
+    let text = (JSON.stringify(scene.scene.get("GameScene").mapData));
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
@@ -84,8 +84,8 @@ let InGameMenuScene = new Phaser.Class({
 
         mainMenu.setInteractive();
         mainMenu.on("pointerdown", () => {
-            scene.scene.stop("GameScene");
             scene.scene.stop("HudScene");
+            scene.scene.stop("GameScene");
             scene.scene.get("GameScene").mapData = undefined;
             scene.scene.start("MenuScene");
             scene.scene.stop();

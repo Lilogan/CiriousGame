@@ -8,13 +8,11 @@ Menu simplifié
 Musique et son
 Menu option + Menu "easter egg"
 Particules
+voitures
 
-/!\ régler les flèches à la pose des batiments
-/!\ mettre une limite pour qu'on ne puisse pas poser hors de la map
-/!\ mettre une limite pour qu'on puisse pas sortir de la map avec la souris ?
-/!\ régler les sprites qui passent au dessus des autres
+done mettre une limite pour qu'on puisse pas sortir de la map avec la souris ?
 /!\ faire des commentaires un peu partout
 /!\ mettre un peu tout en fonction et trier les fonctions par fichier
-/!\ déplacement zqsd ne marche pas (on l'enlève ?)
-/!\ quand on passe en mode "destruction" faire en sorte que les batiment sur lesquels on passe deviennent rouge (qu'on comprenne quon va les détruires)
-/!\ faire en sorte qu'on puisse pas poser 2 mairies et qu'on puisse pas poser d'usine avant de maison (ou on peut attendre les palier de pop pour gérer ça)
+done déplacement zqsd ne marche pas (on l'enlève ?)
+done uand on passe en mode "destruction" faire en sorte que les batiment sur lesquels on passe deviennent rouge (qu'on comprenne quon va les détruires)
+done faire en sorte qu'on puisse pas poser 2 mairies et qu'on puisse pas poser d'usine avant de maison (ou on peut attendre les palier de pop pour gérer ça)

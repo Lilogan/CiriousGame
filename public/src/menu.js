@@ -1,5 +1,5 @@
 let scene;
-
+let showPlayMenu = false;
 let MenuScene = new Phaser.Class({
         Extends: Phaser.Scene,
 
@@ -61,6 +61,8 @@ let MenuScene = new Phaser.Class({
             this.load.image('jouer', '/assets/menu/jouer.png');
             this.load.image('options', '/assets/menu/options.png');
             this.load.image('quitter', '/assets/menu/quitter.png');
+            this.load.image('newgame', '/assets/menu/newgame.png');
+            this.load.image('loadgame', '/assets/menu/loadgame.png');
 
             //in game menu
             this.load.image('fullscreenmode', '/assets/inGameMenu/fullscreen.png');
@@ -83,14 +85,44 @@ let MenuScene = new Phaser.Class({
             scene.scene.bringToTop();
             let sprite = this.add.sprite(window.screen.width / 2, window.screen.height / 10 * 3.5, 'jouer', false).setOrigin(0.5, 0);
             let option = scene.add.sprite(window.screen.width / 2, window.screen.height / 10 * 5, 'options', false).setOrigin(0.5, 0);
-            scene.add.sprite(window.screen.width / 2, window.screen.height / 10 * 6.5, 'quitter', false).setOrigin(0.5, 0);
+            let leave = scene.add.sprite(window.screen.width / 2, window.screen.height / 10 * 6.5, 'quitter', false).setOrigin(0.5, 0);
             sprite.setInteractive();
             sprite.on("pointerdown", () => {
-                this.scene.start('GameScene');
-                this.scene.start('HudScene');
-                this.scene.stop('MenuScene');
-            }, this);
+                if (showPlayMenu === false) {
+                    showPlayMenu = true;
+                    let newGame = this.add.sprite(window.screen.width / 4 * 3, window.screen.height / 4, 'newgame', false).setOrigin(0.5, 0);
+                    let loadGame = this.add.sprite(window.screen.width / 4 * 3, window.screen.height / 4 * 2, 'loadgame', false).setOrigin(0.5, 0);
 
+                    newGame.setInteractive();
+                    newGame.on("pointerdown", () => {
+                        showPlayMenu = false;
+                        this.scene.start('GameScene');
+                        this.scene.start('HudScene');
+                        this.scene.stop('MenuScene');
+                    });
+                    loadGame.setInteractive();
+                    loadGame.on("pointerdown", () => {
+                        showPlayMenu = false;
+                        $("#file-input").trigger("click");
+                    });
+                }
+            }, this);
+            document.getElementById("file-input").onchange = function () {
+                var selectedFile = document.getElementById('file-input').files[0];
+                var reader = new FileReader();
+                reader.onloadend = function () {
+                    if (reader.readyState === 2) {
+                        let gameScene = scene.scene.get("GameScene");
+                        gameScene.mapData = JSON.parse(reader.result);
+                        scene.scene.start('GameScene');
+                        scene.scene.start('HudScene');
+                        scene.scene.stop('MenuScene');
+                        document.getElementById("file-input").value = "";
+                    }
+
+                };
+                reader.readAsText(selectedFile);
+            };
             let fullscreen = this.add.image(40, 40, 'fullscreen').setInteractive();
             fullscreen.setDisplaySize(50, 50);
 
@@ -117,23 +149,8 @@ let MenuScene = new Phaser.Class({
                 } else {
                     fullscreen.setDisplaySize(50, 50);
                 }
-            })
-
-            option.setInteractive();
-            option.on("pointerdown", () => {
-                $("#file-input").trigger("click");
-                var selectedFile = document.getElementById('file-input').files[0];
-                var reader = new FileReader();
-                reader.onload = function () {
-                    let gameScene = scene.scene.get("GameScene");
-                    gameScene.mapData = JSON.parse(atob(reader.result).toString());
-                    scene.scene.start('GameScene');
-                    scene.scene.start('HudScene');
-                    scene.scene.stop('MenuScene');
-                };
-                reader.readAsText(selectedFile);
-
             });
+
         },
 
         update: function () {
