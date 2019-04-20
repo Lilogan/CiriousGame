@@ -1,15 +1,15 @@
 let scene; // The scene
+let camera; // The camera
+let pointer; // The cursor
+let controls; // Arrows control (up, down, right, left)
+let zoomMin = 0.25; // Minimal zoom
+let zoomMax = 1; // Maximal zoom
+let mapSize = 10; // Size of the map
 let spriteWidth = 200; // Width of a floor
 let spriteHeight = 19; // Height of a floor
 let spriteDepth = 100; // Depth of a floor
-let mapSize = 10; // Size of the map
 let borders = 100; // Number of pixel around the map
-let zoomMin = 0.25; // Minimal zoom
-let zoomMax = 1; // Maximal zoom
-let pointer; // The cursor
-let controls; // Arrows control (up, down, right, left)
-let camera; // The camera
-
+let hudHeight = 80;
 
 function fromCartToIso(point) /*Cartesian to Isometric*/ {
     let isoPoint = new Phaser.Geom.Point;
@@ -27,6 +27,12 @@ function fromIsoToCart(point) /*Isometric to Cartesian*/ {
     return cartPoint;
 }
 
+function spritePreview(isoPoint, i, j) {}
+
+function spriteHide() {}
+
+function spritePut(point, isoPoint, i, j, sprite) {}
+
 let GameScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -35,18 +41,51 @@ let GameScene = new Phaser.Class({
         Phaser.Scene.call(this, {key: "GameScene"});
     },
     preload: function () {
-        // Define some variable
+        // Define some variables
         scene = this;
+        scene.hudHeight = hudHeight;
         pointer = scene.input.activePointer;
         camera = scene.cameras.main;
-        //Create some groups
-        scene.floorGroup = scene.add.group();
-        scene.buildingGroup = scene.add.group();
+
+        // Create group of display sprite
+        scene.spriteGroup = scene.add.group();
+
+        // Variables for add resources
+        scene.toProduce = {
+            energy: 0,
+            water: 0,
+            citizens: 0,
+            money: 0,
+            pollution: 0
+        };
+        scene.storageMax = {
+            energy: 0,
+            water: 0,
+            citizens: 0,
+            money: 0,
+            pollution: 0
+        };
+
+        // Initialisation of the data
+        if (scene.mapData === undefined) {
+            scene.mapData = [];
+            scene.mapData.push({
+                name: "data",
+                energy: 0,
+                water: 0,
+                citizens: 0,
+                money: 0,
+                pollution: 0,
+                curLevel: 0
+            });
+        }
     },
     create: function () {
-        //Center the camera on the middle floor and set borders
-        camera.setBounds(-(mapSize * spriteWidth / 2 + borders), -((spriteDepth + spriteHeight)  / 2 + borders), (mapSize * spriteWidth + 2 * borders), (mapSize * spriteDepth + spriteHeight + 2 * borders));
+        // Set the border of the world for the camera
+        camera.setBounds(-(mapSize * spriteWidth / 2 + borders), -((spriteDepth + spriteHeight + borders) / 2), (mapSize * spriteWidth + 2 * borders), (mapSize * spriteDepth + spriteHeight + borders + hudHeight));
+        // Center the camera
         camera.centerToBounds();
+        // Set the minimal zoom if the map is too small
         zoomMin = Math.max(zoomMin, camera.width / camera.getBounds().width);
 
         // Set up arrows controls
@@ -63,7 +102,7 @@ let GameScene = new Phaser.Class({
         };
         controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
 
-        //Create the map with floors and add to their group
+        //Create the map with floors and add properties for adding building
         for (let i = 0; i < mapSize; i++) {
             for (let j = 0; j < mapSize; j++) {
                 let point = new Phaser.Geom.Point();
@@ -71,8 +110,22 @@ let GameScene = new Phaser.Class({
                 point.y = i * spriteWidth / 2;
                 let isoPoint = fromCartToIso(point);
                 let sprite = scene.add.sprite(isoPoint.x, isoPoint.y, "grass");
-                sprite.setInteractive({draggable: true});
-                scene.floorGroup.add(sprite);
+                sprite.setInteractive({draggable: true, pixelPerfect: true});
+
+                //Preview the selected building
+                sprite.on("pointerover", () => {
+                    spritePreview(isoPoint, i, j);
+                }, this);
+
+                //Hide the previewed building
+                sprite.on("pointerout", () => {
+                    spriteHide();
+                }, this);
+
+                //Put the previewed building
+                sprite.on("pointerdown", () => {
+                    spritePut(point, isoPoint, i, j, sprite);
+                }, this);
             }
         }
 
@@ -85,14 +138,14 @@ let GameScene = new Phaser.Class({
         // Modify zoom with the mouse wheel
         window.addEventListener("wheel", (e) => {
             if (e.deltaY < 0) {
-                camera.zoomTo(Phaser.Math.Clamp(camera.zoom * 1.3, zoomMin, zoomMax),100);
+                camera.zoomTo(Phaser.Math.Clamp(camera.zoom * 1.3, zoomMin, zoomMax), 100);
             } else if (e.deltaY > 0) {
-                camera.zoomTo(Phaser.Math.Clamp(camera.zoom/1.3, zoomMin, zoomMax),100);
+                camera.zoomTo(Phaser.Math.Clamp(camera.zoom / 1.3, zoomMin, zoomMax), 100);
             }
         });
 
     },
-    update: function (time,delta) {
+    update: function (time, delta) {
         // Check form arrows keys
         controls.update(delta);
     }

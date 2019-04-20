@@ -1,7 +1,6 @@
 // Type : Type of the sprites (road, building, other)
 // Width : number of tiles of width
 // Height : number of tiles of height
-// IsIcon : is the sprite the icon on the build hud
 // For roads :
 // W/N/E/S : where the road connect with
 // For building :
