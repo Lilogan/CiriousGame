@@ -157,7 +157,7 @@ function buildHud(curPage) /* Display the build hud */ {
         // Header
         addRectangle(0, windowHeight - hudHeight - buildHudHeight,buildHudWidth,25,0x293133),
         // Title
-        addText((buildHudWidth - 25) / 2, windowHeight - hudHeight - buildHudHeight + 5, "Building", 0,"black",0.5,0),
+        addText((buildHudWidth - 25) / 2, windowHeight - hudHeight - buildHudHeight + 5, "Building", 0,"white",0.5,0),
         // Close
         addSprite(buildHudWidth - 25, windowHeight - hudHeight - buildHudHeight, "closeHud", 0,0, {}, 0, 0)
     ];
@@ -199,7 +199,7 @@ function buildHud(curPage) /* Display the build hud */ {
         hudBuildGroup.addMultiple(icon);
         icon[0].on("pointerdown", () => {
             gameScene.orientation = "W";
-            gameScene.curPlacedBlock = index;
+            gameScene.curPlacedBlock = element;
             buildHudState = false;
             hudBuildGroup.destroy(true);
         });
@@ -241,8 +241,6 @@ let HudScene = new Phaser.Class({
         gameScene = scene.scene.get("GameScene");
         hudHeight = gameScene.hudHeight;
         pointer = scene.input.activePointer;
-
-        //scene.hudBuildGroup = scene.add.group("buildHud");
 
         // Put hud scene in front of the others
         scene.scene.bringToTop();

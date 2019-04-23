@@ -10,6 +10,7 @@ let spriteHeight = 19; // Height of a floor
 let spriteDepth = 100; // Depth of a floor
 let borders = 100; // Number of pixel around the map
 let hudHeight = 80;
+let tmpSprite;
 
 function fromCartToIso(point) /*Cartesian to Isometric*/ {
     let isoPoint = new Phaser.Geom.Point;
@@ -27,9 +28,54 @@ function fromIsoToCart(point) /*Isometric to Cartesian*/ {
     return cartPoint;
 }
 
-function spritePreview(isoPoint, i, j) {}
+function getCoordsFromObject(obj, x, y) /* Get all the points of an object */ {
+    // Get all places occupied by an object
+    let kMax;
+    let lMax;
+    if (scene.orientation === "E" || scene.orientation === "W") {
+        kMax = obj.height;
+        lMax = obj.width;
+    } else {
+        kMax = obj.width;
+        lMax = obj.height;
+    }
 
-function spriteHide() {}
+    let coords = [];
+    for (let k = 0; k < kMax; k++) {
+        for (let l = 0; l < lMax; l++) {
+            let tmpPoint = {
+                x: (x - l) * spriteWidth / 2,
+                y: (y - k) * spriteWidth / 2
+            };
+            let tmpIsoPoint = fromCartToIso(tmpPoint);
+            coords.push(tmpIsoPoint);
+        }
+    }
+
+    return coords;
+}
+
+function spritePreview(isoPoint, i, j) {
+    if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
+        let obj = objects[scene.curPlacedBlock];
+        console.log(obj);
+        //let objCoords = getCoordsFromObject(obj, i, j);
+        if (scene.orientation === "N" || scene.orientation === "S") {
+            tmpSprite = scene.add.sprite(isoPoint.x + spriteWidth / 4 * (obj.width - obj.height), isoPoint.y, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5, 0);
+        } else {
+            tmpSprite = scene.add.sprite(isoPoint.x - spriteWidth / 4 * (obj.width - obj.height), isoPoint.y, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5, 0);
+        }
+        tmpSprite.alpha = 0.7;
+    }
+
+
+}
+
+function spriteHide() {
+    if (tmpSprite !== undefined) {
+        tmpSprite.destroy();
+    }
+}
 
 function spritePut(point, isoPoint, i, j, sprite) {}
 
