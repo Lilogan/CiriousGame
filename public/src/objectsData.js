@@ -123,6 +123,54 @@ let objects = {
         "storage": {"energy": 1000, "water": 1000, "citizens": 0},
         "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
     },
+    "cityhall1": {
+        "name": "Mairie",
+        "type": "building",
+        "width": 3,
+        "height": 3,
+        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
+        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
+    },
+    "cityhall2": {
+        "name": "Mairie",
+        "type": "building",
+        "width": 3,
+        "height": 3,
+        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
+        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
+    },
+    "cityhall3": {
+        "name": "Mairie",
+        "type": "building",
+        "width": 3,
+        "height": 3,
+        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
+        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
+    },
+    "cityhall4": {
+        "name": "Mairie",
+        "type": "building",
+        "width": 3,
+        "height": 3,
+        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
+        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
+    },
+    "cityhall5": {
+        "name": "Mairie",
+        "type": "building",
+        "width": 3,
+        "height": 3,
+        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
+        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
+    },
+    "cityhall6": {
+        "name": "Mairie",
+        "type": "building",
+        "width": 3,
+        "height": 3,
+        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
+        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
+    },
     "factory1": {
         "name": "Usine 1",
         "type": "building",

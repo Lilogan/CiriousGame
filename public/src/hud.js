@@ -5,29 +5,38 @@ let windowHeight = window.screen.height; // Window height
 let hudHeight; // Height of hud
 let pointer; // The mouse pointer
 let hudBuildGroup; // Group of all item who can be build displayed on hud
-let buildingWindowWidth = 300; // Build hud width
-let buildingWindowHeight = 400; // Build hud height
-let buildHudState = false; // Is building hud displayed
 let resourcesGroup; // Group of all resources displayed on hud
-let isLast = false; // Is page in hud menu is the last one
+let buildHudWidth = 300; // Build hud width
+let buildHudHeight = 400; // Build hud height
+let buildHudIconSize = 70; // Size of build hud icon
+let buildHudSpace = 30; // Space between two icons
+let buildHudState = false; // Is building hud displayed
 let prevSecond = -1;
 
-function addRectangle(x, y, width, height, color) {
+function addRectangle(x, y, width, height, color) /* Create rectangle */ {
     let graphics;
+    // Object
     let rectangle = new Phaser.Geom.Rectangle(x,y,width,height);
+    // Graphics
     graphics = scene.add.graphics({fillStyle: {color: color}});
+    // Add graphics to object
     graphics.fillRectShape(rectangle);
+
     return graphics;
 }
 
-function addSprite(x, y, key, sizeX = 0, sizeY = 0, interactive = undefined, originX = undefined, originY = undefined) {
+function addSprite(x, y, key, sizeX = 0, sizeY = 0, interactive = undefined, originX = undefined, originY = undefined) /* Create sprite */ {
+    // Sprite + coord
     let sprite = scene.add.sprite(x,y,key);
+    // Size
     if (sizeX !== 0 && sizeY !== 0){
         sprite.setDisplaySize(sizeX,sizeY);
     }
+    // Origin
     if (originX !== undefined && originY !== undefined){
         sprite.setOrigin(originX,originY);
     }
+    // Interactive
     if(interactive || interactive === {}) {
         sprite.setInteractive(interactive);
     }
@@ -35,19 +44,24 @@ function addSprite(x, y, key, sizeX = 0, sizeY = 0, interactive = undefined, ori
     return sprite;
 }
 
-function addText(x, y, key, size, color = "black", originX = undefined, originY = undefined){
+function addText(x, y, key, size = 0, color = "black", originX = undefined, originY = undefined) /* Create text */ {
+    // Text + coord
     let text = scene.add.text(x,y,key);
+    // Color
     text.setColor(color);
+    // Size (0 no change)
     if(size !== 0){
         text.setFontSize(size);
     }
+    // Origin
     if (originX !== undefined && originY !== undefined){
         text.setOrigin(originX,originY);
     }
+
     return text;
 }
 
-function addProgressBar(x, y, key, color, size, length, dataCurr, dataMax, dataVar){
+function addProgressBar(x, y, key, color, size, length, dataCurr, dataMax, dataVar) /* Create progress bar */ {
     //Icon
     let icon = addSprite(x,y,key,1.6*size, 1.6*size, false,0,0);
     //Background
@@ -60,10 +74,13 @@ function addProgressBar(x, y, key, color, size, length, dataCurr, dataMax, dataV
     return [icon,background,progress,text];
 }
 
-function showResources() {
+function showResources() /* Display resources */ {
+    // Reset resources
     if (resourcesGroup !== undefined) {
         resourcesGroup.destroy(true);
     }
+
+    // Create resources group
     resourcesGroup = scene.add.group("resourcesGroup");
 
     // Pollution progress bar
@@ -105,7 +122,111 @@ function showResources() {
 
 }
 
-function buildHud(begin, buildType, curPage){}
+function nbBuildingMap(name) /* Count number of a building who be place*/ {
+    let nb = 0;
+    gameScene.mapData.forEach((curData) => {
+        console.log(name);
+        console.log(curData);
+        if (curData.name === name) {
+            nb++;
+        }
+    });
+    return nb;
+}
+
+function buildHud(curPage) /* Display the build hud */ {
+    //Reset hud
+    if (hudBuildGroup !== undefined) {
+        hudBuildGroup.destroy(true);
+    }
+
+    // Define of some variables
+    let buildingAvailable = [];
+    let buildHudMaxElement = (buildHudWidth*buildHudHeight) / Math.pow((buildHudIconSize+buildHudSpace),2);
+    let step = buildHudIconSize + buildHudSpace;
+    let lastPage = true;
+
+    // Create the hud build group
+    hudBuildGroup = scene.add.group("buildHud");
+
+
+    // Create all graph for the build hud and add to a group
+    let hudGraph = [
+        // Background
+        addRectangle(0, windowHeight - buildHudHeight - hudHeight, buildHudWidth, buildHudHeight,0xffffff),
+        // Header
+        addRectangle(0, windowHeight - hudHeight - buildHudHeight,buildHudWidth,25,0x293133),
+        // Title
+        addText((buildHudWidth - 25) / 2, windowHeight - hudHeight - buildHudHeight + 5, "Building", 0,"black",0.5,0),
+        // Close
+        addSprite(buildHudWidth - 25, windowHeight - hudHeight - buildHudHeight, "closeHud", 0,0, {}, 0, 0)
+    ];
+    hudBuildGroup.addMultiple(hudGraph);
+
+    // Add function for close the build hud
+    hudGraph[3].on('pointerdown', function () {
+        buildHudState = false;
+        hudBuildGroup.destroy(true);
+    });
+
+    // Take all building who can be place
+    for (let i = 0; i < Object.values(objects).length; i++) {
+        let curObject = Object.values(objects)[i];
+        if (curObject.type === "building" /*&& curObject.level <= gameScene.mapData[0].curLevel*/) {
+            buildingAvailable.push(Object.keys(objects)[i]);
+        }
+    }
+
+    // Take element for the page
+    if(curPage > 1){
+        buildingAvailable.splice(0, buildHudMaxElement * (curPage-1));
+    }
+
+    // Remove excess buildings
+    if(buildingAvailable.length > buildHudMaxElement) {
+        lastPage = false;
+        buildingAvailable.splice(buildHudMaxElement, buildingAvailable.length - buildHudMaxElement);
+    }
+
+    //Show all building available
+    buildingAvailable.forEach(function(element, index) {
+        let col = index % (buildHudWidth/step);
+        let line = Math.trunc(index /(buildHudWidth/step));
+        let icon = [
+            addSprite(step/2 + step * col, windowHeight - hudHeight - buildHudHeight + 40 + line * 9*step/10, element + "Icon",buildHudIconSize,buildHudIconSize,{},0.5,0),
+            addText(step/2 + step * col, windowHeight - hudHeight - buildHudHeight + 40 + buildHudIconSize + line * 9*step/10, objects[element].name,step/10 - 1,"black",0.5,0)
+        ];
+        hudBuildGroup.addMultiple(icon);
+        icon[0].on("pointerdown", () => {
+            gameScene.orientation = "W";
+            gameScene.curPlacedBlock = index;
+            buildHudState = false;
+            hudBuildGroup.destroy(true);
+        });
+
+    });
+
+    // Add sprite for page up if it's needed
+    if(curPage > 1) {
+        let sprite = addSprite((buildHudWidth-25)/5, windowHeight - hudHeight - buildHudHeight,"previousPage",25,25,{},0.5, 0);
+        hudBuildGroup.add(sprite);
+        sprite.on("pointerdown", () => {
+            hudBuildGroup.destroy(true);
+            buildHud(curPage - 1);
+        });
+    }
+
+    // Add sprite for page down if it's needed
+    if(!lastPage){
+        let sprite = addSprite(4*(buildHudWidth-25)/5, windowHeight - hudHeight - buildHudHeight,"nextPage",25,25,{},0.5, 0);
+        hudBuildGroup.add(sprite);
+        sprite.on("pointerdown", () => {
+            hudBuildGroup.destroy(true);
+            buildHud(curPage + 1);
+        });
+    }
+
+}
 
 let HudScene = new Phaser.Class({
 
@@ -121,7 +242,7 @@ let HudScene = new Phaser.Class({
         hudHeight = gameScene.hudHeight;
         pointer = scene.input.activePointer;
 
-        scene.hudBuildGroup = scene.add.group("buildHud");
+        //scene.hudBuildGroup = scene.add.group("buildHud");
 
         // Put hud scene in front of the others
         scene.scene.bringToTop();
@@ -133,21 +254,21 @@ let HudScene = new Phaser.Class({
         addRectangle(0, windowHeight - hudHeight + 1, windowWidth, hudHeight - 1,0xffffff);
 
         // Add hud's sprites and display them
-        scene.buildBuildingIcon = addSprite(50, windowHeight - hudHeight + hudHeight / 2, "buildBuilding",60,60,{pixelPerfect: false});
-        scene.deleteBuildingIcon = addSprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding",60,60,{pixelPerfect: false});
+        let buildIcon = addSprite(50, windowHeight - hudHeight + hudHeight / 2, "buildBuilding",60,60,{pixelPerfect: false});
+        let removeIcon = addSprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding",60,60,{pixelPerfect: false});
 
         // Add function on click on these sprites
-        scene.buildBuildingIcon.on("pointerdown", () => {
+        buildIcon.on("pointerdown", () => {
             if (!buildHudState) {
                 buildHudState = true;
                 gameScene.curPlacedBlock = undefined;
-                //buildHud(0, "building", 0);
+                buildHud(1);
             } else {
                 buildHudState = false;
                 hudBuildGroup.destroy(true);
             }
-        }, this);
-        scene.deleteBuildingIcon.on("pointerdown", () => {
+        },);
+        removeIcon.on("pointerdown", () => {
             gameScene.curPlacedBlock = "destroy";
         });
 

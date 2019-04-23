@@ -41,7 +41,7 @@ let MenuScene = new Phaser.Class({
                     scene.load.image(index + "-N", "/assets/buildings/" + index + "-N"+".png");
                     scene.load.image(index + "-E", "/assets/buildings/" + index + "-E"+".png");
                     scene.load.image(index + "-S", "/assets/buildings/" + index + "-S"+".png");
-                    scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + "-W" + ".png");
+                    scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + ".png");
                 }else if(values.type === "road"){
                     scene.load.image(index, "/assets/roads/" + index + ".png");
                     scene.load.image(index+"Icon", "/assets/hudIcons/roads/" + index + ".png");
