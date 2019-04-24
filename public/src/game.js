@@ -42,10 +42,11 @@ function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
 function spritePreview(isoPoint, i, j) {
     if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
         let obj = objects[scene.curPlacedBlock];
+        let points = getCoordsFromObject(obj,i,j);
         tmpSprite = scene.add.sprite(isoPoint.x , isoPoint.y - spriteHeight, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height)/10 , 1);
         tmpSprite.alpha = 0.7;
         tmpSprite.depth = i + j - Math.min(obj.width , obj.height);
-        tmpSprite.points = getCoordsFromObject(obj,i,j);
+
     }
 
 
@@ -70,6 +71,18 @@ function spritePut() {
 }
 
 function spriteRemove() {}
+
+const reverse = array => [...array].reverse();
+const compose = (a, b) => x => a(b(x));
+
+const flipMatrix = matrix => (
+    matrix[0].map((column, index) => (
+        matrix.map(row => row[index])
+    ))
+);
+
+const rotateMatrix = compose(flipMatrix, reverse);
+const rotateMatrixCounterClockwise = compose(reverse, flipMatrix);
 
 let GameScene = new Phaser.Class({
 
@@ -106,16 +119,8 @@ let GameScene = new Phaser.Class({
 
         // Initialisation of the data
         if (scene.mapData === undefined) {
-            scene.mapData = [];
-            scene.mapData.push({
-                name: "data",
-                energy: 0,
-                water: 0,
-                citizens: 0,
-                money: 0,
-                pollution: 0,
-                curLevel: 0
-            });
+            scene.mapData = Array(mapSize).fill(Array(mapSize));
+            console.log(scene.mapData);
         }
     },
     create: function () {
