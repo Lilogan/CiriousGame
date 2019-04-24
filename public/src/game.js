@@ -2,15 +2,15 @@ let scene; // The scene
 let camera; // The camera
 let pointer; // The cursor
 let controls; // Arrows control (up, down, right, left)
+let tmpSprite; // Temp sprite for preview
 let zoomMin = 0.25; // Minimal zoom
 let zoomMax = 1; // Maximal zoom
-let mapSize = 10; // Size of the map
+let mapSize = 20; // Size of the map
 let spriteWidth = 200; // Width of a floor
-let spriteHeight = 19; // Height of a floor
+let spriteHeight = 18; // Height of a floor
 let spriteDepth = 100; // Depth of a floor
 let borders = 100; // Number of pixel around the map
 let hudHeight = 80;
-let tmpSprite;
 
 function fromCartToIso(point) /*Cartesian to Isometric*/ {
     let isoPoint = new Phaser.Geom.Point;
@@ -28,44 +28,24 @@ function fromIsoToCart(point) /*Isometric to Cartesian*/ {
     return cartPoint;
 }
 
-function getCoordsFromObject(obj, x, y) /* Get all the points of an object */ {
+function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
     // Get all places occupied by an object
-    let kMax;
-    let lMax;
-    if (scene.orientation === "E" || scene.orientation === "W") {
-        kMax = obj.height;
-        lMax = obj.width;
-    } else {
-        kMax = obj.width;
-        lMax = obj.height;
-    }
-
-    let coords = [];
-    for (let k = 0; k < kMax; k++) {
-        for (let l = 0; l < lMax; l++) {
-            let tmpPoint = {
-                x: (x - l) * spriteWidth / 2,
-                y: (y - k) * spriteWidth / 2
-            };
-            let tmpIsoPoint = fromCartToIso(tmpPoint);
-            coords.push(tmpIsoPoint);
+    let points = [];
+    for (let x = 0; x < obj.width; x++){
+        for (let y = 0; y < obj.height; y++){
+            points.push(new Phaser.Geom.Point(i + x, j + y))
         }
     }
-
-    return coords;
+    return points
 }
 
 function spritePreview(isoPoint, i, j) {
     if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
         let obj = objects[scene.curPlacedBlock];
-        console.log(obj);
-        //let objCoords = getCoordsFromObject(obj, i, j);
-        if (scene.orientation === "N" || scene.orientation === "S") {
-            tmpSprite = scene.add.sprite(isoPoint.x + spriteWidth / 4 * (obj.width - obj.height), isoPoint.y, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5, 0);
-        } else {
-            tmpSprite = scene.add.sprite(isoPoint.x - spriteWidth / 4 * (obj.width - obj.height), isoPoint.y, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5, 0);
-        }
+        tmpSprite = scene.add.sprite(isoPoint.x , isoPoint.y - spriteHeight, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height)/10 , 1);
         tmpSprite.alpha = 0.7;
+        tmpSprite.depth = i + j - Math.min(obj.width , obj.height);
+        tmpSprite.points = getCoordsFromObject(obj,i,j);
     }
 
 
@@ -77,7 +57,19 @@ function spriteHide() {
     }
 }
 
-function spritePut(point, isoPoint, i, j, sprite) {}
+function spritePut() {
+    if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy" && tmpSprite !== undefined) {
+        let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
+        sprite.depth = tmpSprite.depth;
+        sprite.points = tmpSprite.points;
+        tmpSprite.destroy();
+        sprite.setInteractive({pixelPerfect: true ,draggable: true});
+        scene.spriteGroup.add(sprite);
+        console.log(sprite.points);
+    }
+}
+
+function spriteRemove() {}
 
 let GameScene = new Phaser.Class({
 
@@ -128,7 +120,7 @@ let GameScene = new Phaser.Class({
     },
     create: function () {
         // Set the border of the world for the camera
-        camera.setBounds(-(mapSize * spriteWidth / 2 + borders), -((spriteDepth + spriteHeight + borders) / 2), (mapSize * spriteWidth + 2 * borders), (mapSize * spriteDepth + spriteHeight + borders + hudHeight));
+        camera.setBounds(-(mapSize * spriteWidth / 2 + borders), -(spriteDepth + spriteHeight + borders/2), (mapSize * spriteWidth + 2 * borders), (mapSize * spriteDepth + spriteHeight + borders + hudHeight));
         // Center the camera
         camera.centerToBounds();
         // Set the minimal zoom if the map is too small
@@ -156,6 +148,8 @@ let GameScene = new Phaser.Class({
                 point.y = i * spriteWidth / 2;
                 let isoPoint = fromCartToIso(point);
                 let sprite = scene.add.sprite(isoPoint.x, isoPoint.y, "grass");
+                sprite.setOrigin(0.5,1);
+                sprite.depth = -1;
                 sprite.setInteractive({draggable: true, pixelPerfect: true});
 
                 //Preview the selected building
@@ -170,7 +164,7 @@ let GameScene = new Phaser.Class({
 
                 //Put the previewed building
                 sprite.on("pointerdown", () => {
-                    spritePut(point, isoPoint, i, j, sprite);
+                    spritePut();
                 }, this);
             }
         }
@@ -189,6 +183,11 @@ let GameScene = new Phaser.Class({
                 camera.zoomTo(Phaser.Math.Clamp(camera.zoom / 1.3, zoomMin, zoomMax), 100);
             }
         });
+
+        // Cancel with right click
+        // window.addEventListener("contextmenu", (e) => {
+        //     scene.curPlacedBlock = undefined;
+        // });
 
     },
     update: function (time, delta) {

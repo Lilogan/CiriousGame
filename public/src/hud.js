@@ -166,6 +166,7 @@ function buildHud(curPage) /* Display the build hud */ {
     // Add function for close the build hud
     hudGraph[3].on('pointerdown', function () {
         buildHudState = false;
+        gameScene.curPlacedBlock = undefined;
         hudBuildGroup.destroy(true);
     });
 
