@@ -11,6 +11,7 @@ let buildHudHeight = 400; // Build hud height
 let buildHudIconSize = 70; // Size of build hud icon
 let buildHudSpace = 30; // Space between two icons
 let buildHudState = false; // Is building hud displayed
+let removeIcon;
 let prevSecond = -1;
 
 function addRectangle(x, y, width, height, color) /* Create rectangle */ {
@@ -88,13 +89,13 @@ function showResources() /* Display resources */ {
         //Background
         addRectangle(windowWidth - 640, windowHeight - 70, 52, 40, 0x000000, resourcesGroup),
         //Progress Bar
-        addRectangle(windowWidth - 640, windowHeight - 30, 52, -Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1) * 100) / 100 * 40 / 200, 0xb21a1a, resourcesGroup),
+        addRectangle(windowWidth - 640, windowHeight - 30, 52, -Math.round(gameScene.data.pollution / (gameScene.data.citizens + 1) * 100) / 100 * 40 / 200, 0xb21a1a, resourcesGroup),
         //Icon
         addSprite(windowWidth - 640, windowHeight - 70, "pollutionIcon", 52, 40, false, 0, 0, resourcesGroup),
         //Text under
-        addText(windowWidth - 640, windowHeight - 25, Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1) * 100) / 100 + " mg/hbt", 15),
+        addText(windowWidth - 640, windowHeight - 25, Math.round(gameScene.data.pollution / (gameScene.data.citizens + 1) * 100) / 100 + " mg/hbt", 15),
         //Percentage
-        addText(windowWidth - 580, windowHeight - 55, "(" + Math.round(Math.round(gameScene.mapData[0].pollution / (gameScene.mapData[0].citizens + 1) * 100) / 100 / 20 * 100 * 100) / 100 + "%)", 15)
+        addText(windowWidth - 580, windowHeight - 55, "(" + Math.round(Math.round(gameScene.data.pollution / (gameScene.data.citizens + 1) * 100) / 100 / 20 * 100 * 100) / 100 + "%)", 15)
 
     ]);
 
@@ -103,7 +104,7 @@ function showResources() /* Display resources */ {
         // Icon
         addSprite(windowWidth - 480, windowHeight - 70, "citizensIcon",24,24,false,0,0),
         // Text
-        addText(windowWidth - 450, windowHeight - 65, gameScene.mapData[0].citizens + "/" + gameScene.storageMax.citizens + "",15),
+        addText(windowWidth - 450, windowHeight - 65, gameScene.data.citizens + "/" + gameScene.storageMax.citizens + "",15),
     ]);
 
     // Money number
@@ -111,14 +112,14 @@ function showResources() /* Display resources */ {
         // Icon
         addSprite(windowWidth - 480, windowHeight - 35, "moneyIcon", 24, 24,false,0,0),
         // Text
-        addText(windowWidth - 450, windowHeight - 30, gameScene.mapData[0].money + "(+" + gameScene.toProduce.money + "/sec)",15)
+        addText(windowWidth - 450, windowHeight - 30, gameScene.data.money + "(+" + gameScene.toProduce.money + "/sec)",15)
     ]);
 
     // Energy progress bar
-    resourcesGroup.addMultiple(addProgressBar(windowWidth - 300, windowHeight - 70, "energyIcon",0xffcc00,15,250, gameScene.mapData[0].energy, gameScene.storageMax.energy, gameScene.toProduce.energy));
+    resourcesGroup.addMultiple(addProgressBar(windowWidth - 300, windowHeight - 70, "energyIcon",0xffcc00,15,250, gameScene.data.energy, gameScene.storageMax.energy, gameScene.toProduce.energy));
 
     // Water progress bar
-    resourcesGroup.addMultiple(addProgressBar(windowWidth - 300, windowHeight - 35, "waterIcon",0x008acf, 15,250, gameScene.mapData[0].water, gameScene.storageMax.water,gameScene.toProduce.water));
+    resourcesGroup.addMultiple(addProgressBar(windowWidth - 300, windowHeight - 35, "waterIcon",0x008acf, 15,250, gameScene.data.water, gameScene.storageMax.water,gameScene.toProduce.water));
 
 }
 
@@ -173,7 +174,7 @@ function buildHud(curPage) /* Display the build hud */ {
     // Take all building who can be place
     for (let i = 0; i < Object.values(objects).length; i++) {
         let curObject = Object.values(objects)[i];
-        if (curObject.type === "building" /*&& curObject.level <= gameScene.mapData[0].curLevel*/) {
+        if (curObject.type === "building" /*&& curObject.level <= gameScene.data.curLevel*/) {
             buildingAvailable.push(Object.keys(objects)[i]);
         }
     }
@@ -254,7 +255,7 @@ let HudScene = new Phaser.Class({
 
         // Add hud's sprites and display them
         let buildIcon = addSprite(50, windowHeight - hudHeight + hudHeight / 2, "buildBuilding",60,60,{pixelPerfect: false});
-        let removeIcon = addSprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding",60,60,{pixelPerfect: false});
+        removeIcon = addSprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding",60,60,{pixelPerfect: false});
 
         // Add function on click on these sprites
         buildIcon.on("pointerdown", () => {
@@ -269,13 +270,20 @@ let HudScene = new Phaser.Class({
         },);
         removeIcon.on("pointerdown", () => {
             gameScene.curPlacedBlock = "destroy";
+            removeIcon.setTintFill(0xe20000);
         });
 
     },
     update: function (timer) {
+        // Update Resources
         if (Math.round(timer / 1000) + 0.5 !== prevSecond) {
             prevSecond = Math.round(timer / 1000) + 0.5;
             showResources();
+        }
+
+        // Clear the tint of destroy icon
+        if(removeIcon.isTinted && gameScene.curPlacedBlock !== "destroy"){
+            removeIcon.clearTint();
         }
     }
 });

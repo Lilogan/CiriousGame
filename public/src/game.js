@@ -12,7 +12,23 @@ let spriteDepth = 100; // Depth of a floor
 let borders = 100; // Number of pixel around the map
 let hudHeight = 80;
 
-function fromCartToIso(point) /*Cartesian to Isometric*/ {
+function addObjects(obj1,obj2) /* Adding two objects */ {
+    let obj ={};
+    Object.keys(obj2).map(function(a){
+        obj[a] = obj1[a] + obj2[a]
+    });
+    return obj;
+}
+
+function subObjects(obj1,obj2) /* Subtract two objects */ {
+    let obj ={};
+    Object.keys(obj2).map(function(a){
+        obj[a] = obj1[a] - obj2[a]
+    });
+    return obj;
+}
+
+function fromCartToIso(point) /* Cartesian to Isometric */ {
     let isoPoint = new Phaser.Geom.Point;
     isoPoint.x = (point.x - point.y);
     isoPoint.y = (point.x + point.y) / 2;
@@ -20,7 +36,7 @@ function fromCartToIso(point) /*Cartesian to Isometric*/ {
     return isoPoint;
 }
 
-function fromIsoToCart(point) /*Isometric to Cartesian*/ {
+function fromIsoToCart(point) /* Isometric to Cartesian */ {
     let cartPoint = new Phaser.Geom.Point;
     cartPoint.x = (2 * point.y + point.x) / 2;
     cartPoint.y = (2 * point.y - point.x) / 2;
@@ -31,58 +47,89 @@ function fromIsoToCart(point) /*Isometric to Cartesian*/ {
 function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
     // Get all places occupied by an object
     let points = [];
-    for (let x = 0; x < obj.width; x++){
-        for (let y = 0; y < obj.height; y++){
-            points.push(new Phaser.Geom.Point(i + x, j + y))
+    for (let x = 0; x < obj.height; x++){
+        for (let y = 0; y < obj.width; y++){
+            if(i - x < 0 || j - y < 0){
+                return [];
+            }
+            points.push(new Phaser.Geom.Point(i - x, j - y))
         }
     }
     return points
 }
 
-function spritePreview(isoPoint, i, j) {
-    if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
-        let obj = objects[scene.curPlacedBlock];
-        let points = getCoordsFromObject(obj,i,j);
-        tmpSprite = scene.add.sprite(isoPoint.x , isoPoint.y - spriteHeight, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height)/10 , 1);
-        tmpSprite.alpha = 0.7;
-        tmpSprite.depth = i + j - Math.min(obj.width , obj.height);
-
+function spritePreview(isoPoint, i, j) /* Preview the selected sprite on coord */ {
+    let obj = objects[scene.curPlacedBlock];
+    let points = getCoordsFromObject(obj,i,j);
+    tmpSprite = scene.add.sprite(isoPoint.x , isoPoint.y - spriteHeight, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height)/10 , 1);
+    tmpSprite.alpha = 0.7;
+    tmpSprite.depth = i + j - Math.min(obj.width , obj.height);
+    tmpSprite.name = scene.curPlacedBlock;
+    tmpSprite.obj = obj;
+    tmpSprite.putable = true;
+    if(points.length > 0){
+        points.forEach((point) => {
+            if (scene.mapData[point.x][point.y] !== undefined){
+            tmpSprite.putable = false;
+            }
+        });
+    }else{
+        tmpSprite.putable = false;
     }
 
-
+    if(tmpSprite.putable){
+        tmpSprite.points = points;
+    }else{
+        tmpSprite.setTint(0xe20000);
+    }
 }
 
-function spriteHide() {
+function spriteHide() /* Hide the previewed sprite */ {
     if (tmpSprite !== undefined) {
         tmpSprite.destroy();
     }
 }
 
-function spritePut() {
-    if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy" && tmpSprite !== undefined) {
-        let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
-        sprite.depth = tmpSprite.depth;
-        sprite.points = tmpSprite.points;
-        tmpSprite.destroy();
-        sprite.setInteractive({pixelPerfect: true ,draggable: true});
-        scene.spriteGroup.add(sprite);
-        console.log(sprite.points);
+function spritePut() /* Place the previewed sprite */ {
+    let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
+    let points = tmpSprite.points;
+    tmpSprite.destroy();
+    sprite.depth = tmpSprite.depth;
+    sprite.name = tmpSprite.name;
+    sprite.points = points;
+    scene.spriteGroup.add(sprite);
+    points.forEach((point) =>{
+        scene.mapData[point.x][point.y] = sprite;
+    });
+
+    scene.toProduce = addObjects(scene.toProduce, objects[sprite.name].production);
+    scene.storageMax = addObjects(scene.storageMax, objects[sprite.name].storage);
+}
+
+function spriteRemove(i,j) /* Remove the sprite on coord */ {
+    let sprite = scene.mapData[i][j];
+    if (sprite !== undefined) {
+        let points = sprite.points;
+        scene.toProduce = subObjects(scene.toProduce, objects[sprite.name].production);
+        scene.storageMax = subObjects(scene.storageMax, objects[sprite.name].storage);
+        sprite.destroy();
+        points.forEach((point) => {
+            delete scene.mapData[point.x][point.y];
+        })
     }
 }
 
-function spriteRemove() {}
-
-const reverse = array => [...array].reverse();
-const compose = (a, b) => x => a(b(x));
-
-const flipMatrix = matrix => (
-    matrix[0].map((column, index) => (
-        matrix.map(row => row[index])
-    ))
-);
-
-const rotateMatrix = compose(flipMatrix, reverse);
-const rotateMatrixCounterClockwise = compose(reverse, flipMatrix);
+// const reverse = array => [...array].reverse();
+// const compose = (a, b) => x => a(b(x));
+//
+// const flipMatrix = matrix => (
+//     matrix[0].map((column, index) => (
+//         matrix.map(row => row[index])
+//     ))
+// );
+//
+// const rotateMatrix = compose(flipMatrix, reverse);
+// const rotateMatrixCounterClockwise = compose(reverse, flipMatrix);
 
 let GameScene = new Phaser.Class({
 
@@ -95,6 +142,14 @@ let GameScene = new Phaser.Class({
         // Define some variables
         scene = this;
         scene.hudHeight = hudHeight;
+        scene.data = {
+            energy: 0,
+            water: 0,
+            citizens: 0,
+            money: 0,
+            pollution: 0,
+            curLevel: 0
+        };
         pointer = scene.input.activePointer;
         camera = scene.cameras.main;
 
@@ -119,8 +174,10 @@ let GameScene = new Phaser.Class({
 
         // Initialisation of the data
         if (scene.mapData === undefined) {
-            scene.mapData = Array(mapSize).fill(Array(mapSize));
-            console.log(scene.mapData);
+            scene.mapData = [];
+            for (let i = 0; i < mapSize; i++) {
+                scene.mapData[i] = new Array(mapSize);
+            }
         }
     },
     create: function () {
@@ -145,7 +202,7 @@ let GameScene = new Phaser.Class({
         };
         controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
 
-        //Create the map with floors and add properties for adding building
+        // Create the map with floors and add properties for adding building
         for (let i = 0; i < mapSize; i++) {
             for (let j = 0; j < mapSize; j++) {
                 let point = new Phaser.Geom.Point();
@@ -154,23 +211,43 @@ let GameScene = new Phaser.Class({
                 let isoPoint = fromCartToIso(point);
                 let sprite = scene.add.sprite(isoPoint.x, isoPoint.y, "grass");
                 sprite.setOrigin(0.5,1);
-                sprite.depth = -1;
+                sprite.depth = -10;
                 sprite.setInteractive({draggable: true, pixelPerfect: true});
 
-                //Preview the selected building
+                // Preview the selected building and tint it if it's not placeable
                 sprite.on("pointerover", () => {
-                    spritePreview(isoPoint, i, j);
-                }, this);
+                    if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
+                        spritePreview(isoPoint, i, j);
+                    }else if (scene.curPlacedBlock === "destroy"){
+                        if (scene.mapData[i][j] !== undefined){
+                            scene.mapData[i][j].setTint(0xe20000);
+                        }
+                    }
 
-                //Hide the previewed building
+                });
+
+                // Hide the previewed building and clear tint
                 sprite.on("pointerout", () => {
                     spriteHide();
-                }, this);
+                    if (scene.mapData[i][j] !== undefined && scene.mapData[i][j].isTinted) {
+                        scene.mapData[i][j].clearTint();
+                    }
+                });
 
-                //Put the previewed building
-                sprite.on("pointerdown", () => {
-                    spritePut();
-                }, this);
+                // Put the previewed building or destroy a building
+                sprite.on("pointerdown", (pointer) => {
+                    if (pointer.buttons === 1) {
+                        if(scene.curPlacedBlock !== undefined) {
+                            if (scene.curPlacedBlock === "destroy") {
+                                spriteRemove(i, j);
+                            } else if (tmpSprite !== undefined) {
+                                if(tmpSprite.putable === true) {
+                                    spritePut();
+                                }
+                            }
+                        }
+                    }
+                });
             }
         }
 
@@ -190,9 +267,14 @@ let GameScene = new Phaser.Class({
         });
 
         // Cancel with right click
-        // window.addEventListener("contextmenu", (e) => {
-        //     scene.curPlacedBlock = undefined;
-        // });
+        scene.input.on('pointerdown', function(pointer){
+            if(pointer.buttons === 2){
+                if (scene.curPlacedBlock !== undefined) {
+                    scene.curPlacedBlock = undefined;
+                    spriteHide();
+                }
+            }
+        });
 
     },
     update: function (time, delta) {

@@ -1,6 +1,7 @@
 let scene; // Global Variable for the scene
 let windowWidth = window.screen.width;
 let windowHeight = window.screen.height;
+let orientation = ["N","S","E","W"];
 
 let MenuScene = new Phaser.Class({
     Extends: Phaser.Scene,
@@ -43,8 +44,15 @@ let MenuScene = new Phaser.Class({
                     scene.load.image(index + "-S", "/assets/buildings/" + index + "-S"+".png");
                     scene.load.image(index+"Icon", "/assets/hudIcons/buildings/" + index + ".png");
                 }else if(values.type === "road"){
-                    scene.load.image(index, "/assets/roads/" + index + ".png");
-                    scene.load.image(index+"Icon", "/assets/hudIcons/roads/" + index + ".png");
+                    for (let bin = 0; bin < 16; bin++){
+                        let road = index;
+                        orientation.forEach(function(item, index) {
+                            if(Math.floor(bin/Math.pow(2,index)) % 2 === 1){
+                                road += item;
+                            }
+                        });
+                        scene.load.image(road, "/assets/roads/" + road + ".png");
+                    }
                 }
 
             });

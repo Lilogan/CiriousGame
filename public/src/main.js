@@ -2,6 +2,10 @@ import HudScene from "./hud.js";
 import MenuScene from "./menu.js";
 import GameScene from "./game.js";
 
+document.addEventListener("contextmenu", function (event) {
+    event.preventDefault();
+});
+
 let config = {
     type: Phaser.AUTO,
     width: window.screen.width,

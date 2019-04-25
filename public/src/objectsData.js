@@ -9,104 +9,10 @@
 let objects = {
     "invisible": {"type": "other", "width": 1, "height": 1, "cityHallLink": false},
     "data": {"type": "other", "width": 1, "height": 1, "cityHallLink": false},
-    "roadSE": {
+    "road": {
         "type": "road",
         "width": 1,
         "height": 1,
-        "north": false,
-        "south": true,
-        "east": true,
-        "west": false
-    },
-    "roadEW": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": false,
-        "south": false,
-        "east": true,
-        "west": true
-    },
-    "roadNE": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": true,
-        "south": false,
-        "east": true,
-        "west": false
-    },
-    "roadNEW": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": true,
-        "south": false,
-        "east": true,
-        "west": true
-    },
-    "roadNS": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": true,
-        "south": true,
-        "east": false,
-        "west": false
-    },
-    "roadNSE": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": true,
-        "south": true,
-        "east": true,
-        "west": false
-    },
-    "roadNSEW": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": true,
-        "south": true,
-        "east": true,
-        "west": true
-    },
-    "roadNSW": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": true,
-        "south": true,
-        "east": false,
-        "west": true
-    },
-    "roadNW": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": true,
-        "south": false,
-        "east": false,
-        "west": true
-    },
-    "roadSEW": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": false,
-        "south": true,
-        "east": true,
-        "west": true
-    },
-    "roadSW": {
-        "type": "road",
-        "width": 1,
-        "height": 1,
-        "north": false,
-        "south": true,
-        "east": false,
-        "west": true
     },
     "arrows": {
         "type": "other",
@@ -116,54 +22,6 @@ let objects = {
         "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
     },
     "cityhall": {
-        "name": "Mairie",
-        "type": "building",
-        "width": 3,
-        "height": 3,
-        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
-        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
-    },
-    "cityhall1": {
-        "name": "Mairie",
-        "type": "building",
-        "width": 3,
-        "height": 3,
-        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
-        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
-    },
-    "cityhall2": {
-        "name": "Mairie",
-        "type": "building",
-        "width": 3,
-        "height": 3,
-        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
-        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
-    },
-    "cityhall3": {
-        "name": "Mairie",
-        "type": "building",
-        "width": 3,
-        "height": 3,
-        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
-        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
-    },
-    "cityhall4": {
-        "name": "Mairie",
-        "type": "building",
-        "width": 3,
-        "height": 3,
-        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
-        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
-    },
-    "cityhall5": {
-        "name": "Mairie",
-        "type": "building",
-        "width": 3,
-        "height": 3,
-        "storage": {"energy": 1000, "water": 1000, "citizens": 0},
-        "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0}
-    },
-    "cityhall6": {
         "name": "Mairie",
         "type": "building",
         "width": 3,
