@@ -123,18 +123,6 @@ function showResources() /* Display resources */ {
 
 }
 
-function nbBuildingMap(name) /* Count number of a building who be place*/ {
-    let nb = 0;
-    gameScene.mapData.forEach((curData) => {
-        console.log(name);
-        console.log(curData);
-        if (curData.name === name) {
-            nb++;
-        }
-    });
-    return nb;
-}
-
 function buildHud(curPage) /* Display the build hud */ {
     //Reset hud
     if (hudBuildGroup !== undefined) {

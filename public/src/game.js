@@ -36,19 +36,46 @@ function fromCartToIso(point) /* Cartesian to Isometric */ {
     return isoPoint;
 }
 
-function updateRoad(i,j){
+function roadNameOrder(name) {
+    let returned = "road";
+
+    if (name.indexOf("N") !== -1) {
+        returned += "N";
+    }
+    if (name.indexOf("S") !== -1) {
+        returned += "S";
+    }
+    if (name.indexOf("E") !== -1) {
+        returned += "E";
+    }
+    if (name.indexOf("W") !== -1) {
+        returned += "W";
+    }
+
+    return returned;
+}
+
+function roadUpdate(i, j, updateNext = false, destroy = false){
     let road = "road";
-    if (scene.mapData[i-1][j].name.search("road") !== -1){
-        road += "N";
-    }
-    if (scene.mapData[i+1][j].name.search("road") !== -1){
-        road += "S";
-    }
-    if (scene.mapData[i][j-1].name.search("road") !== -1){
-        road += "E";
-    }
-    if (scene.mapData[i+1][j+1].name.search("road") !== -1){
-        road += "W";
+    console.log(scene.mapData);
+    let scan = [scene.mapData[i][j-1],scene.mapData[i][j+1],scene.mapData[i-1][j],scene.mapData[i+1][j]];
+    let orientation = ["N","S","E","W"];
+    let nextOrientation = ["S","N","W","E"];
+    for (let i = 0; i < 4; i++){
+        if (scan[i] !== undefined){
+            if (scan[i].name.search("road") !== -1){
+                road += orientation[i];
+                if (updateNext){
+                    if(destroy){
+                        scan[i].name = scan[i].name.replace(nextOrientation[i],"");
+                    }else {
+                        scan[i].name += nextOrientation[i];
+                        scan[i].name = roadNameOrder(scan[i].name);
+                    }
+                    scan[i].setTexture(scan[i].name);
+                }
+            }
+        }
     }
 
     return road;
@@ -95,7 +122,7 @@ function spritePreview(isoPoint, i, j) /* Preview the selected sprite on coord *
     if(scene.curPlacedBlock !== "road") {
         tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height) / 10, 1);
     }else{
-        name = updateRoad(i,j);
+        name = roadUpdate(i,j);
         tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name, false).setOrigin(0.5, 1);
     }
 
@@ -119,7 +146,7 @@ function spriteHide() /* Hide the previewed sprite */ {
     }
 }
 
-function spritePut() /* Place the previewed sprite */ {
+function spritePut(i,j) /* Place the previewed sprite */ {
     let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
     let points = tmpSprite.points;
     tmpSprite.destroy();
@@ -130,21 +157,29 @@ function spritePut() /* Place the previewed sprite */ {
     points.forEach((point) =>{
         scene.mapData[point.x][point.y] = sprite;
     });
-
-    scene.toProduce = addObjects(scene.toProduce, objects[sprite.name].production);
-    scene.storageMax = addObjects(scene.storageMax, objects[sprite.name].storage);
+    if (sprite.name.search("road") === -1) {
+        scene.toProduce = addObjects(scene.toProduce, objects[sprite.name].production);
+        scene.storageMax = addObjects(scene.storageMax, objects[sprite.name].storage);
+    }else{
+        roadUpdate(i,j,true);
+    }
 }
 
 function spriteRemove(i,j) /* Remove the sprite on coord */ {
     let sprite = scene.mapData[i][j];
     if (sprite !== undefined) {
         let points = sprite.points;
-        scene.toProduce = subObjects(scene.toProduce, objects[sprite.name].production);
-        scene.storageMax = subObjects(scene.storageMax, objects[sprite.name].storage);
+        if (sprite.name.search("road") === -1) {
+            scene.toProduce = subObjects(scene.toProduce, objects[sprite.name].production);
+            scene.storageMax = subObjects(scene.storageMax, objects[sprite.name].storage);
+        }else{
+            roadUpdate(i,j,true,true);
+        }
         sprite.destroy();
         points.forEach((point) => {
             delete scene.mapData[point.x][point.y];
-        })
+        });
+
     }
 }
 
@@ -271,7 +306,7 @@ let GameScene = new Phaser.Class({
                                 spriteRemove(i, j);
                             } else if (tmpSprite !== undefined) {
                                 if(tmpSprite.putable === true) {
-                                    spritePut();
+                                    spritePut(i,j);
                                 }
                             }
                         }

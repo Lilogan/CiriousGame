@@ -51,7 +51,6 @@ let MenuScene = new Phaser.Class({
                                 road += item;
                             }
                         });
-                        console.log(road);
                         scene.load.image(road, "/assets/roads/" + road + ".png");
                     }
                 }
