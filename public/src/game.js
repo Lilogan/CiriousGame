@@ -36,6 +36,24 @@ function fromCartToIso(point) /* Cartesian to Isometric */ {
     return isoPoint;
 }
 
+function updateRoad(i,j){
+    let road = "road";
+    if (scene.mapData[i-1][j].name.search("road") !== -1){
+        road += "N";
+    }
+    if (scene.mapData[i+1][j].name.search("road") !== -1){
+        road += "S";
+    }
+    if (scene.mapData[i][j-1].name.search("road") !== -1){
+        road += "E";
+    }
+    if (scene.mapData[i+1][j+1].name.search("road") !== -1){
+        road += "W";
+    }
+
+    return road;
+}
+
 function fromIsoToCart(point) /* Isometric to Cartesian */ {
     let cartPoint = new Phaser.Geom.Point;
     cartPoint.x = (2 * point.y + point.x) / 2;
@@ -60,28 +78,39 @@ function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
 
 function spritePreview(isoPoint, i, j) /* Preview the selected sprite on coord */ {
     let obj = objects[scene.curPlacedBlock];
+    let name = scene.curPlacedBlock;
     let points = getCoordsFromObject(obj,i,j);
-    tmpSprite = scene.add.sprite(isoPoint.x , isoPoint.y - spriteHeight, scene.curPlacedBlock + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height)/10 , 1);
-    tmpSprite.alpha = 0.7;
-    tmpSprite.depth = i + j - Math.min(obj.width , obj.height);
-    tmpSprite.name = scene.curPlacedBlock;
-    tmpSprite.obj = obj;
-    tmpSprite.putable = true;
+    let putable = true ;
+
     if(points.length > 0){
         points.forEach((point) => {
             if (scene.mapData[point.x][point.y] !== undefined){
-            tmpSprite.putable = false;
+                putable = false;
             }
         });
     }else{
-        tmpSprite.putable = false;
+        putable = false;
     }
 
-    if(tmpSprite.putable){
+    if(scene.curPlacedBlock !== "road") {
+        tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height) / 10, 1);
+    }else{
+        name = updateRoad(i,j);
+        tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name, false).setOrigin(0.5, 1);
+    }
+
+    if(putable){
         tmpSprite.points = points;
     }else{
         tmpSprite.setTint(0xe20000);
     }
+
+    tmpSprite.alpha = 0.7;
+    tmpSprite.depth = i + j - Math.min(obj.width , obj.height);
+    tmpSprite.name = name;
+    tmpSprite.obj = obj;
+    tmpSprite.putable = putable;
+
 }
 
 function spriteHide() /* Hide the previewed sprite */ {

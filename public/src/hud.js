@@ -256,6 +256,7 @@ let HudScene = new Phaser.Class({
         // Add hud's sprites and display them
         let buildIcon = addSprite(50, windowHeight - hudHeight + hudHeight / 2, "buildBuilding",60,60,{pixelPerfect: false});
         removeIcon = addSprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding",60,60,{pixelPerfect: false});
+        let roadIcon = addSprite(210, windowHeight - hudHeight + hudHeight / 2, "buildRoad",60,60,{pixelPerfect: false});
 
         // Add function on click on these sprites
         buildIcon.on("pointerdown", () => {
@@ -271,6 +272,9 @@ let HudScene = new Phaser.Class({
         removeIcon.on("pointerdown", () => {
             gameScene.curPlacedBlock = "destroy";
             removeIcon.setTintFill(0xe20000);
+        });
+        roadIcon.on("pointerdown", () => {
+            gameScene.curPlacedBlock = "road";
         });
 
     },

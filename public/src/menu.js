@@ -51,6 +51,7 @@ let MenuScene = new Phaser.Class({
                                 road += item;
                             }
                         });
+                        console.log(road);
                         scene.load.image(road, "/assets/roads/" + road + ".png");
                     }
                 }
@@ -59,6 +60,7 @@ let MenuScene = new Phaser.Class({
 
             // Hud icons and interactive shapes
             this.load.image("deleteBuilding", "/assets/hudIcons/icons/deleteBuilding.png");
+            this.load.image("buildRoad", "/assets/hudIcons/icons/buildRoad.png");
             this.load.image("buildBuilding", "/assets/hudIcons/icons/buildBuilding.png");
             this.load.image("energyIcon", "/assets/hudIcons/icons/energyIcon.png");
             this.load.image("waterIcon", "/assets/hudIcons/icons/waterIcon.png");
