@@ -11,7 +11,7 @@ let buildHudHeight = 400; // Build hud height
 let buildHudIconSize = 70; // Size of build hud icon
 let buildHudSpace = 30; // Space between two icons
 let buildHudState = false; // Is building hud displayed
-let removeIcon;
+let icons;
 let prevSecond = -1;
 
 function addRectangle(x, y, width, height, color) /* Create rectangle */ {
@@ -73,6 +73,14 @@ function addProgressBar(x, y, key, color, size, length, dataCurr, dataMax, dataV
     let text = addText((x+size*2)+ length * 0.12, y+(size/3.75)+ size / 15,dataCurr + "/" + dataMax + "(+" + dataVar + "/sec)",0.8*size, "white");
 
     return [icon,background,progress,text];
+}
+
+function clearTint(){
+    icons.forEach((icon) => {
+        if(icon.isTinted){
+            icon.clearTint();
+        }
+    })
 }
 
 function showResources() /* Display resources */ {
@@ -182,16 +190,19 @@ function buildHud(curPage) /* Display the build hud */ {
     buildingAvailable.forEach(function(element, index) {
         let col = index % (buildHudWidth/step);
         let line = Math.trunc(index /(buildHudWidth/step));
-        let icon = [
+        let group = [
             addSprite(step/2 + step * col, windowHeight - hudHeight - buildHudHeight + 40 + line * 9*step/10, element + "Icon",buildHudIconSize,buildHudIconSize,{},0.5,0),
             addText(step/2 + step * col, windowHeight - hudHeight - buildHudHeight + 40 + buildHudIconSize + line * 9*step/10, objects[element].name,step/10 - 1,"black",0.5,0)
         ];
-        hudBuildGroup.addMultiple(icon);
-        icon[0].on("pointerdown", () => {
-            gameScene.orientation = "W";
-            gameScene.curPlacedBlock = element;
-            buildHudState = false;
-            hudBuildGroup.destroy(true);
+        hudBuildGroup.addMultiple(group);
+        group[0].on("pointerdown", () => {
+            if(pointer.buttons === 1) {
+                gameScene.spriteOrientation = 0;
+                gameScene.curPlacedBlock = element;
+                buildHudState = false;
+                icons[0].setTintFill(0x0000e2);
+                hudBuildGroup.destroy(true);
+            }
         });
 
     });
@@ -242,27 +253,44 @@ let HudScene = new Phaser.Class({
         addRectangle(0, windowHeight - hudHeight + 1, windowWidth, hudHeight - 1,0xffffff);
 
         // Add hud's sprites and display them
-        let buildIcon = addSprite(50, windowHeight - hudHeight + hudHeight / 2, "buildBuilding",60,60,{pixelPerfect: false});
-        removeIcon = addSprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding",60,60,{pixelPerfect: false});
-        let roadIcon = addSprite(210, windowHeight - hudHeight + hudHeight / 2, "buildRoad",60,60,{pixelPerfect: false});
+        icons = [
+            addSprite(50, windowHeight - hudHeight + hudHeight / 2, "buildBuilding",60,60,{pixelPerfect: false}),
+            addSprite(130, windowHeight - hudHeight + hudHeight / 2, "deleteBuilding",60,60,{pixelPerfect: false}),
+            addSprite(210, windowHeight - hudHeight + hudHeight / 2, "buildRoad",60,60,{pixelPerfect: false})
+        ];
 
         // Add function on click on these sprites
-        buildIcon.on("pointerdown", () => {
+        icons[0].on("pointerdown", () => {
             if (!buildHudState) {
                 buildHudState = true;
                 gameScene.curPlacedBlock = undefined;
+                clearTint();
                 buildHud(1);
             } else {
                 buildHudState = false;
+                icons[0].clearTint();
                 hudBuildGroup.destroy(true);
             }
-        },);
-        removeIcon.on("pointerdown", () => {
-            gameScene.curPlacedBlock = "destroy";
-            removeIcon.setTintFill(0xe20000);
         });
-        roadIcon.on("pointerdown", () => {
+
+        icons[1].on("pointerdown", () => {
+            gameScene.curPlacedBlock = "destroy";
+            clearTint();
+            icons[1].setTintFill(0xe20000);
+        });
+
+        icons[2].on("pointerdown", () => {
             gameScene.curPlacedBlock = "road";
+            clearTint();
+            icons[2].setTintFill(0x00e200);
+        });
+
+        scene.input.on('pointerdown', (pointer) => {
+            if(pointer.buttons === 2){
+                clearTint();
+                buildHudState = false;
+                hudBuildGroup.destroy(true);
+            }
         });
 
     },
@@ -271,11 +299,6 @@ let HudScene = new Phaser.Class({
         if (Math.round(timer / 1000) + 0.5 !== prevSecond) {
             prevSecond = Math.round(timer / 1000) + 0.5;
             showResources();
-        }
-
-        // Clear the tint of destroy icon
-        if(removeIcon.isTinted && gameScene.curPlacedBlock !== "destroy"){
-            removeIcon.clearTint();
         }
     }
 });

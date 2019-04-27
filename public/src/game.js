@@ -3,6 +3,7 @@ let camera; // The camera
 let pointer; // The cursor
 let controls; // Arrows control (up, down, right, left)
 let tmpSprite; // Temp sprite for preview
+let key; // Input keys
 let zoomMin = 0.25; // Minimal zoom
 let zoomMax = 1; // Maximal zoom
 let mapSize = 20; // Size of the map
@@ -10,7 +11,9 @@ let spriteWidth = 200; // Width of a floor
 let spriteHeight = 18; // Height of a floor
 let spriteDepth = 100; // Depth of a floor
 let borders = 100; // Number of pixel around the map
-let hudHeight = 80;
+let hudHeight = 80; // Hud Height
+let orientation = ["W","N","E","S"];
+
 
 function addObjects(obj1,obj2) /* Adding two objects */ {
     let obj ={};
@@ -28,12 +31,29 @@ function subObjects(obj1,obj2) /* Subtract two objects */ {
     return obj;
 }
 
+function cloneObjects(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
+
 function fromCartToIso(point) /* Cartesian to Isometric */ {
     let isoPoint = new Phaser.Geom.Point;
     isoPoint.x = (point.x - point.y);
     isoPoint.y = (point.x + point.y) / 2;
 
     return isoPoint;
+}
+
+function fromIsoToCart(point) /* Isometric to Cartesian */ {
+    let cartPoint = new Phaser.Geom.Point;
+    cartPoint.x = (2 * point.y + point.x) / 2;
+    cartPoint.y = (2 * point.y - point.x) / 2;
+
+    return cartPoint;
 }
 
 function roadNameOrder(name) {
@@ -57,10 +77,8 @@ function roadNameOrder(name) {
 
 function roadUpdate(i, j, updateNext = false, destroy = false){
     let road = "road";
-    console.log(scene.mapData);
-    let scan = [scene.mapData[i][j-1],scene.mapData[i][j+1],scene.mapData[i-1][j],scene.mapData[i+1][j]];
-    let orientation = ["N","S","E","W"];
-    let nextOrientation = ["S","N","W","E"];
+    let scan = [scene.mapData[i+1][j],scene.mapData[i][j-1],scene.mapData[i-1][j],scene.mapData[i][j+1]];
+    let nextOrientation = ["E","S","W","N"];
     for (let i = 0; i < 4; i++){
         if (scan[i] !== undefined){
             if (scan[i].name.search("road") !== -1){
@@ -77,16 +95,9 @@ function roadUpdate(i, j, updateNext = false, destroy = false){
             }
         }
     }
+    road = roadNameOrder(road);
 
     return road;
-}
-
-function fromIsoToCart(point) /* Isometric to Cartesian */ {
-    let cartPoint = new Phaser.Geom.Point;
-    cartPoint.x = (2 * point.y + point.x) / 2;
-    cartPoint.y = (2 * point.y - point.x) / 2;
-
-    return cartPoint;
 }
 
 function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
@@ -103,11 +114,23 @@ function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
     return points
 }
 
-function spritePreview(isoPoint, i, j) /* Preview the selected sprite on coord */ {
-    let obj = objects[scene.curPlacedBlock];
+function spritePreview(i, j, isoPoint = undefined) /* Preview the selected sprite on coord */ {
+    let obj = cloneObjects(objects[scene.curPlacedBlock]);
+
+    if(scene.spriteOrientation % 2 === 1){
+        [obj.height, obj.width] = [obj.width, obj.height];
+    }
+
     let name = scene.curPlacedBlock;
     let points = getCoordsFromObject(obj,i,j);
-    let putable = true ;
+    let putable = true;
+
+    if(isoPoint === undefined){
+        let origin = new Phaser.Geom.Point();
+        origin.x = j * spriteWidth / 2;
+        origin.y = i * spriteWidth / 2;
+        isoPoint = fromCartToIso(origin);
+    }
 
     if(points.length > 0){
         points.forEach((point) => {
@@ -120,7 +143,7 @@ function spritePreview(isoPoint, i, j) /* Preview the selected sprite on coord *
     }
 
     if(scene.curPlacedBlock !== "road") {
-        tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name + "-" + scene.orientation, false).setOrigin(0.5 + (obj.width - obj.height) / 10, 1);
+        tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name + "-" + orientation[scene.spriteOrientation], false).setOrigin(0.5 + (obj.width - obj.height) / 10, 1);
     }else{
         name = roadUpdate(i,j);
         tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name, false).setOrigin(0.5, 1);
@@ -143,6 +166,8 @@ function spritePreview(isoPoint, i, j) /* Preview the selected sprite on coord *
 function spriteHide() /* Hide the previewed sprite */ {
     if (tmpSprite !== undefined) {
         tmpSprite.destroy();
+        delete tmpSprite.obj;
+        tmpSprite = undefined;
     }
 }
 
@@ -206,6 +231,7 @@ let GameScene = new Phaser.Class({
         // Define some variables
         scene = this;
         scene.hudHeight = hudHeight;
+        scene.spriteOrientation = 0;
         scene.data = {
             energy: 0,
             water: 0,
@@ -216,6 +242,7 @@ let GameScene = new Phaser.Class({
         };
         pointer = scene.input.activePointer;
         camera = scene.cameras.main;
+        key = this.input.keyboard.addKeys('Z, S, Q, D, R, M');
 
         // Create group of display sprite
         scene.spriteGroup = scene.add.group();
@@ -281,7 +308,7 @@ let GameScene = new Phaser.Class({
                 // Preview the selected building and tint it if it's not placeable
                 sprite.on("pointerover", () => {
                     if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
-                        spritePreview(isoPoint, i, j);
+                        spritePreview(i, j, isoPoint);
                     }else if (scene.curPlacedBlock === "destroy"){
                         if (scene.mapData[i][j] !== undefined){
                             scene.mapData[i][j].setTint(0xe20000);
@@ -306,7 +333,7 @@ let GameScene = new Phaser.Class({
                                 spriteRemove(i, j);
                             } else if (tmpSprite !== undefined) {
                                 if(tmpSprite.putable === true) {
-                                    spritePut(i,j);
+                                    spritePut(i, j);
                                 }
                             }
                         }
@@ -331,7 +358,7 @@ let GameScene = new Phaser.Class({
         });
 
         // Cancel with right click
-        scene.input.on('pointerdown', function(pointer){
+        scene.input.on('pointerdown', (pointer) => {
             if(pointer.buttons === 2){
                 if (scene.curPlacedBlock !== undefined) {
                     scene.curPlacedBlock = undefined;
@@ -340,6 +367,17 @@ let GameScene = new Phaser.Class({
             }
         });
 
+
+        key.R.on("down", () => {
+            if (scene.curPlacedBlock !== undefined) {
+                if (scene.curPlacedBlock === "road" ) {
+                    origin = tmpSprite.points[0];
+                    scene.spriteOrientation = (scene.spriteOrientation + 1) % 4;
+                    spriteHide();
+                    spritePreview(origin.x,origin.y);
+                }
+            }
+        });
     },
     update: function (time, delta) {
         // Check form arrows keys
