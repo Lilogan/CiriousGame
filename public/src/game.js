@@ -31,7 +31,7 @@ function subObjects(obj1,obj2) /* Subtract two objects */ {
     return obj;
 }
 
-function cloneObjects(obj) {
+function cloneObjects(obj) /* Clone a object */{
     if (null == obj || "object" != typeof obj) return obj;
     var copy = obj.constructor();
     for (var attr in obj) {
@@ -75,7 +75,7 @@ function roadNameOrder(name) {
     return returned;
 }
 
-function roadUpdate(i, j, updateNext = false, destroy = false){
+function roadUpdate(i, j, updateNext = false, destroy = false) {
     let road = "road";
     let scan = [scene.mapData[i+1][j],scene.mapData[i][j-1],scene.mapData[i-1][j],scene.mapData[i][j+1]];
     let nextOrientation = ["E","S","W","N"];
@@ -112,6 +112,42 @@ function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
         }
     }
     return points
+}
+
+function spriteConnect(i,j){
+    let sprite = scene.mapData[i][j];
+    let points = sprite.points;
+    let toCheck = [];
+    let direction = sprite.name.split("-")[1];
+    let start = 0;
+    let max = sprite.obj.height * sprite.obj.width;
+    let step = 1;
+
+    if(direction === 'W'){
+        step = sprite.obj.height;
+    }else if (direction === 'N'){
+        start = sprite.obj.height * (sprite.obj.width - 1);
+    }else if (direction === 'E'){
+        start = sprite.obj.height -1;
+        step = sprite.obj.height;
+    }else if (direction === 'S'){
+        max = sprite.obj.height;
+    }
+
+    for (let id = start; id < max; id += step){
+        let point = points[id];
+        let toCheck = scene.mapData[point.x][point.y];
+        if (toCheck !== undefined){
+            if (toCheck.name === "road"){
+                sprite.connect = toCheck.connect;
+            }
+        }
+    }
+
+    console.log(points);
+    console.log(sprite.obj.height);
+    console.log(sprite.obj.width);
+
 }
 
 function spritePreview(i, j, isoPoint = undefined) /* Preview the selected sprite on coord */ {
@@ -174,10 +210,12 @@ function spriteHide() /* Hide the previewed sprite */ {
 function spritePut(i,j) /* Place the previewed sprite */ {
     let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
     let points = tmpSprite.points;
-    tmpSprite.destroy();
+    sprite.obj = tmpSprite.obj;
     sprite.depth = tmpSprite.depth;
     sprite.name = tmpSprite.name;
+    spriteHide();
     sprite.points = points;
+
     scene.spriteGroup.add(sprite);
     points.forEach((point) =>{
         scene.mapData[point.x][point.y] = sprite;
@@ -188,6 +226,7 @@ function spritePut(i,j) /* Place the previewed sprite */ {
     }else{
         roadUpdate(i,j,true);
     }
+    spriteConnect(i,j);
 }
 
 function spriteRemove(i,j) /* Remove the sprite on coord */ {
@@ -370,7 +409,7 @@ let GameScene = new Phaser.Class({
 
         key.R.on("down", () => {
             if (scene.curPlacedBlock !== undefined) {
-                if (scene.curPlacedBlock === "road" ) {
+                if (scene.curPlacedBlock !== "road" ) {
                     origin = tmpSprite.points[0];
                     scene.spriteOrientation = (scene.spriteOrientation + 1) % 4;
                     spriteHide();
