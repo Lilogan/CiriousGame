@@ -4,6 +4,7 @@ let pointer; // The cursor
 let controls; // Arrows control (up, down, right, left)
 let tmpSprite; // Temp sprite for preview
 let key; // Input keys
+let posStart; // Position of roads connect to cityhall
 let zoomMin = 0.25; // Minimal zoom
 let zoomMax = 1; // Maximal zoom
 let mapSize = 20; // Size of the map
@@ -33,8 +34,8 @@ function subObjects(obj1,obj2) /* Subtract two objects */ {
 
 function cloneObjects(obj) /* Clone a object */{
     if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
+    let copy = obj.constructor();
+    for (let attr in obj) {
         if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
     }
     return copy;
@@ -79,18 +80,18 @@ function roadUpdate(i, j, updateNext = false, destroy = false) {
     let road = "road";
     let scan = [scene.mapData[i+1][j],scene.mapData[i][j-1],scene.mapData[i-1][j],scene.mapData[i][j+1]];
     let nextOrientation = ["E","S","W","N"];
-    for (let i = 0; i < 4; i++){
-        if (scan[i] !== undefined){
-            if (scan[i].name.search("road") !== -1){
-                road += orientation[i];
+    for (let k = 0; k < 4; k++){
+        if (scan[k] !== undefined){
+            if (scan[k].name.search("road") !== -1){
+                road += orientation[k];
                 if (updateNext){
                     if(destroy){
-                        scan[i].name = scan[i].name.replace(nextOrientation[i],"");
+                        scan[k].name = scan[k].name.replace(nextOrientation[k],"");
                     }else {
-                        scan[i].name += nextOrientation[i];
-                        scan[i].name = roadNameOrder(scan[i].name);
+                        scan[k].name += nextOrientation[k];
+                        scan[k].name = roadNameOrder(scan[k].name);
                     }
-                    scan[i].setTexture(scan[i].name);
+                    scan[k].setTexture(scan[k].name);
                 }
             }
         }
@@ -117,37 +118,37 @@ function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
 function spriteConnect(i,j){
     let sprite = scene.mapData[i][j];
     let points = sprite.points;
-    let toCheck = [];
-    let direction = sprite.name.split("-")[1];
     let start = 0;
     let max = sprite.obj.height * sprite.obj.width;
     let step = 1;
+    let addX = 0;
+    let addY = 0;
+    let direction = sprite.name.split("-")[1];
 
-    if(direction === 'W'){
+    if (direction === 'W') {
         step = sprite.obj.height;
-    }else if (direction === 'N'){
+        addY += 1;
+    } else if (direction === 'N') {
         start = sprite.obj.height * (sprite.obj.width - 1);
-    }else if (direction === 'E'){
-        start = sprite.obj.height -1;
+        addX -= 1;
+    } else if (direction === 'E') {
+        start = sprite.obj.height - 1;
         step = sprite.obj.height;
-    }else if (direction === 'S'){
+        addY -= 1;
+    } else if (direction === 'S') {
         max = sprite.obj.height;
+        addX += 1;
     }
 
     for (let id = start; id < max; id += step){
         let point = points[id];
         let toCheck = scene.mapData[point.x][point.y];
         if (toCheck !== undefined){
-            if (toCheck.name === "road"){
-                sprite.connect = toCheck.connect;
+            if (toCheck.name.search("road") !== -1){
+                sprite.connected = true;
             }
         }
     }
-
-    console.log(points);
-    console.log(sprite.obj.height);
-    console.log(sprite.obj.width);
-
 }
 
 function spritePreview(i, j, isoPoint = undefined) /* Preview the selected sprite on coord */ {
@@ -220,13 +221,18 @@ function spritePut(i,j) /* Place the previewed sprite */ {
     points.forEach((point) =>{
         scene.mapData[point.x][point.y] = sprite;
     });
-    if (sprite.name.search("road") === -1) {
+
+    if (sprite.name.search("cityhall") !== -1){
+        sprite.connected = true;
+    }else if (sprite.name.search("road") !== -1) {
+        roadUpdate(i,j,true);
+    } else{
         scene.toProduce = addObjects(scene.toProduce, objects[sprite.name].production);
         scene.storageMax = addObjects(scene.storageMax, objects[sprite.name].storage);
-    }else{
-        roadUpdate(i,j,true);
+        spriteConnect(i,j);
     }
-    spriteConnect(i,j);
+
+
 }
 
 function spriteRemove(i,j) /* Remove the sprite on coord */ {
@@ -245,6 +251,10 @@ function spriteRemove(i,j) /* Remove the sprite on coord */ {
         });
 
     }
+}
+
+function addResources(){
+
 }
 
 // const reverse = array => [...array].reverse();
