@@ -4,7 +4,8 @@ let pointer; // The cursor
 let controls; // Arrows control (up, down, right, left)
 let tmpSprite; // Temp sprite for preview
 let key; // Input keys
-let posStart; // Position of roads connect to cityhall
+let cityhall; // The CityHall
+let tmpPath = []; // The path for see if a building is connected to CityHall
 let zoomMin = 0.25; // Minimal zoom
 let zoomMax = 1; // Maximal zoom
 let mapSize = 20; // Size of the map
@@ -14,20 +15,99 @@ let spriteDepth = 100; // Depth of a floor
 let borders = 100; // Number of pixel around the map
 let hudHeight = 80; // Hud Height
 let orientation = ["W","N","E","S"];
+let resetProduce = {
+    energy: 0,
+    water: 0,
+    citizens: 0,
+    money: 0,
+    pollution: 0
+};
+let resetStorage = {
+    energy: 0,
+    water: 0,
+    citizens: 0,
+    pollution: 0
+};
+let prevSec = -1;
 
+function download(content, fileName) {
+    let a = document.createElement("a");
+    let file = new Blob([content], {type: "text/plain"});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
 
-function addObjects(obj1,obj2) /* Adding two objects */ {
-    let obj ={};
+function upload() {
+    let input = document.createElement( "input");
+    input.type = "file";
+    input.accept = "text/plain";
+
+    input.addEventListener('change', () => {
+        let reader = new FileReader();
+        reader.addEventListener('load', () => {
+            let save = CryptoJS.AES.decrypt(reader.result, "EcoCity").toString(CryptoJS.enc.Utf8).split('/');
+            let data = JSON.parse(save[1]);
+            let map = JSON.parse(save[0]);
+            reload(map,data);
+        });
+        reader.readAsText(input.files[0]);
+    });
+    input.click();
+
+}
+
+function reload(map,data){
+    scene.spriteGroup.destroy(true);
+    scene.spriteGroup = scene.add.group();
+
+    scene.mapData.forEach((row, x) => {
+        row.forEach((sprite, y)=>{
+            spriteRemove(x,y);
+        })
+    });
+
+    map.forEach((row) => {
+        row.forEach((element) =>{
+            if (element !== null) {
+                let isoPoint = new Phaser.Geom.Point(element.x, element.y);
+                let point = fromIsoToCart(isoPoint);
+                point.x = Math.ceil(point.x * 2 / spriteWidth);
+                point.y = Math.ceil(point.y * 2 / spriteWidth);
+                if (element.name.search("road") !== -1){
+                    scene.curPlacedBlock = "road";
+                }else{
+                    scene.curPlacedBlock = element.name;
+                    let direction = element.textureKey.split('-')[1];
+                    scene.spriteOrientation = orientation.indexOf(direction);
+
+                }
+
+                spritePreview(point.x, point.y,false);
+                spritePut(point.x, point.y);
+            }
+        });
+    });
+    scene.curPlacedBlock = undefined;
+    scene.data = data;
+}
+
+function addObjects(obj1,obj2,objMax = undefined) /* Adding two objects */ {
+    let obj = {...obj1};
     Object.keys(obj2).map(function(a){
-        obj[a] = obj1[a] + obj2[a]
+        if(objMax !== undefined && objMax[a] !== undefined  && (obj[a] + obj2[a]) > objMax[a]){
+            obj[a] = objMax[a];
+        }else {
+            obj[a] += obj2[a];
+        }
     });
     return obj;
 }
 
 function subObjects(obj1,obj2) /* Subtract two objects */ {
-    let obj ={};
+    let obj ={...obj1};
     Object.keys(obj2).map(function(a){
-        obj[a] = obj1[a] - obj2[a]
+        obj[a] -= obj2[a];
     });
     return obj;
 }
@@ -76,22 +156,37 @@ function roadNameOrder(name) {
     return returned;
 }
 
-function roadUpdate(i, j, updateNext = false, destroy = false) {
+function roadUpdate(x, y, updateNext = false, destroy = false) {
     let road = "road";
-    let scan = [scene.mapData[i+1][j],scene.mapData[i][j-1],scene.mapData[i-1][j],scene.mapData[i][j+1]];
+    let scan = [];
     let nextOrientation = ["E","S","W","N"];
-    for (let k = 0; k < 4; k++){
-        if (scan[k] !== undefined){
-            if (scan[k].name.search("road") !== -1){
-                road += orientation[k];
+    let range = [1,-1];
+
+    range.forEach((add) => {
+        if(y + add >= 0 && y + add < mapSize){
+            scan.push(scene.mapData[x][y+add]);
+        }else{
+            scan.push(undefined);
+        }
+        if(x - add >= 0 && x - add < mapSize){
+            scan.push(scene.mapData[x-add][y]);
+        }else{
+            scan.push(undefined);
+        }
+    });
+
+    for (let id in scan){
+        if (scan[id] !== undefined){
+            if (scan[id].name.search("road") !== -1){
+                road += orientation[id];
                 if (updateNext){
                     if(destroy){
-                        scan[k].name = scan[k].name.replace(nextOrientation[k],"");
+                        scan[id].name = scan[id].name.replace(nextOrientation[id],"");
                     }else {
-                        scan[k].name += nextOrientation[k];
-                        scan[k].name = roadNameOrder(scan[k].name);
+                        scan[id].name += nextOrientation[id];
+                        scan[id].name = roadNameOrder(scan[id].name);
                     }
-                    scan[k].setTexture(scan[k].name);
+                    scan[id].setTexture(scan[id].name);
                 }
             }
         }
@@ -101,57 +196,86 @@ function roadUpdate(i, j, updateNext = false, destroy = false) {
     return road;
 }
 
-function getCoordsFromObject(obj, i, j) /* Get all the points of an object */ {
+function getCoordsFromObject(obj, x, y) /* Get all the points of an object */ {
     // Get all places occupied by an object
     let points = [];
-    for (let x = 0; x < obj.height; x++){
-        for (let y = 0; y < obj.width; y++){
-            if(i - x < 0 || j - y < 0){
+    for (let addY = 0; addY < obj.height; addY++){
+        for (let addX = 0; addX < obj.width; addX++){
+            if(x - addX < 0 || y - addY < 0){
                 return [];
             }
-            points.push(new Phaser.Geom.Point(i - x, j - y))
+            points.push(new Phaser.Geom.Point(x - addX, y - addY))
         }
     }
     return points
 }
 
-function spriteConnect(i,j){
-    let sprite = scene.mapData[i][j];
-    let points = sprite.points;
-    let start = 0;
-    let max = sprite.obj.height * sprite.obj.width;
-    let step = 1;
-    let addX = 0;
-    let addY = 0;
-    let direction = sprite.name.split("-")[1];
+function spriteConnect(sprite)/* Check element around the sprite */{
+    let points = sprite.data.points;
+    let direction = sprite.data.orientation;
+    let returned = [];
 
-    if (direction === 'W') {
-        step = sprite.obj.height;
-        addY += 1;
-    } else if (direction === 'N') {
-        start = sprite.obj.height * (sprite.obj.width - 1);
-        addX -= 1;
-    } else if (direction === 'E') {
-        start = sprite.obj.height - 1;
-        step = sprite.obj.height;
-        addY -= 1;
-    } else if (direction === 'S') {
-        max = sprite.obj.height;
-        addX += 1;
-    }
-
-    for (let id = start; id < max; id += step){
-        let point = points[id];
-        let toCheck = scene.mapData[point.x][point.y];
-        if (toCheck !== undefined){
-            if (toCheck.name.search("road") !== -1){
-                sprite.connected = true;
-            }
+    points.forEach((point, id) => {
+        let toCheck = [];
+        // If it's a road
+        if(direction === undefined) {
+            let range = [-1, 1];
+            range.forEach((add) => {
+                if (point.x + add >= 0 && point.x + add < mapSize) {
+                    let xPoint = Phaser.Geom.Point.Clone(point);
+                    xPoint.x += add;
+                    toCheck.push(xPoint);
+                }
+                if (point.y + add >= 0 && point.y + add < mapSize) {
+                    let yPoint = Phaser.Geom.Point.Clone(point);
+                    yPoint.y += add;
+                    toCheck.push(yPoint);
+                }
+            });
         }
-    }
+        // If orientation is W
+        else if (direction === 0 && id < sprite.data.obj.width) {
+            let nextPoint = Phaser.Geom.Point.Clone(point);
+            nextPoint.y += 1;
+            toCheck.push(nextPoint);
+        }
+        // If orientation is N
+        else if (direction === 1 && (id + 1) % sprite.data.obj.width === 0) {
+            let nextPoint = Phaser.Geom.Point.Clone(point);
+            nextPoint.x -= 1;
+            toCheck.push(nextPoint);
+        }
+        // If orientation is E
+        else if (direction === 2 && id < sprite.data.obj.width * sprite.data.obj.height && id >= sprite.data.obj.width * (sprite.data.obj.height - 1)) {
+            let nextPoint = Phaser.Geom.Point.Clone(point);
+            nextPoint.y -= 1;
+            toCheck.push(nextPoint);
+        }
+        // If orientation is S
+        else if (direction === 3 && id % sprite.data.obj.width === 0) {
+            let nextPoint = Phaser.Geom.Point.Clone(point);
+            nextPoint.x += 1;
+            toCheck.push(nextPoint);
+        }
+
+        toCheck.forEach((nextPoint) => {
+            if (nextPoint.x >= 0 && nextPoint.x < mapSize && nextPoint.y >= 0 && nextPoint.y < mapSize) {
+                let nextSprite = scene.mapData[nextPoint.x][nextPoint.y];
+                if (nextSprite !== undefined && nextSprite !== sprite) {
+                    returned.push(nextSprite);
+                    if (nextSprite.name.search("road") !== -1) {
+                        sprite.data.connected = true;
+                    }
+                }
+            }
+        });
+    });
+
+    return returned;
+
 }
 
-function spritePreview(i, j, isoPoint = undefined) /* Preview the selected sprite on coord */ {
+function spritePreview(x, y, highlight = true, isoPoint = undefined) /* Preview the selected sprite on coord */ {
     let obj = cloneObjects(objects[scene.curPlacedBlock]);
 
     if(scene.spriteOrientation % 2 === 1){
@@ -159,13 +283,13 @@ function spritePreview(i, j, isoPoint = undefined) /* Preview the selected sprit
     }
 
     let name = scene.curPlacedBlock;
-    let points = getCoordsFromObject(obj,i,j);
+    let points = getCoordsFromObject(obj,x,y);
     let putable = true;
 
     if(isoPoint === undefined){
         let origin = new Phaser.Geom.Point();
-        origin.x = j * spriteWidth / 2;
-        origin.y = i * spriteWidth / 2;
+        origin.x = x * spriteWidth / 2;
+        origin.y = y * spriteWidth / 2;
         isoPoint = fromCartToIso(origin);
     }
 
@@ -181,19 +305,20 @@ function spritePreview(i, j, isoPoint = undefined) /* Preview the selected sprit
 
     if(scene.curPlacedBlock !== "road") {
         tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name + "-" + orientation[scene.spriteOrientation], false).setOrigin(0.5 + (obj.width - obj.height) / 10, 1);
+        tmpSprite.orientation = scene.spriteOrientation;
     }else{
-        name = roadUpdate(i,j);
+        name = roadUpdate(x,y);
         tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name, false).setOrigin(0.5, 1);
     }
 
-    if(putable){
+    if (putable){
         tmpSprite.points = points;
-    }else{
+    }else if (highlight){
         tmpSprite.setTint(0xe20000);
     }
 
     tmpSprite.alpha = 0.7;
-    tmpSprite.depth = i + j - Math.min(obj.width , obj.height);
+    tmpSprite.depth = y + x - Math.min(obj.width , obj.height);
     tmpSprite.name = name;
     tmpSprite.obj = obj;
     tmpSprite.putable = putable;
@@ -203,58 +328,95 @@ function spritePreview(i, j, isoPoint = undefined) /* Preview the selected sprit
 function spriteHide() /* Hide the previewed sprite */ {
     if (tmpSprite !== undefined) {
         tmpSprite.destroy();
-        delete tmpSprite.obj;
+        delete tmpSprite.data;
         tmpSprite = undefined;
     }
 }
 
-function spritePut(i,j) /* Place the previewed sprite */ {
-    let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
-    let points = tmpSprite.points;
-    sprite.obj = tmpSprite.obj;
-    sprite.depth = tmpSprite.depth;
-    sprite.name = tmpSprite.name;
-    spriteHide();
-    sprite.points = points;
-
-    scene.spriteGroup.add(sprite);
-    points.forEach((point) =>{
-        scene.mapData[point.x][point.y] = sprite;
-    });
-
-    if (sprite.name.search("cityhall") !== -1){
-        sprite.connected = true;
-    }else if (sprite.name.search("road") !== -1) {
-        roadUpdate(i,j,true);
-    } else{
-        scene.toProduce = addObjects(scene.toProduce, objects[sprite.name].production);
-        scene.storageMax = addObjects(scene.storageMax, objects[sprite.name].storage);
-        spriteConnect(i,j);
-    }
-
-
-}
-
-function spriteRemove(i,j) /* Remove the sprite on coord */ {
-    let sprite = scene.mapData[i][j];
-    if (sprite !== undefined) {
-        let points = sprite.points;
-        if (sprite.name.search("road") === -1) {
-            scene.toProduce = subObjects(scene.toProduce, objects[sprite.name].production);
-            scene.storageMax = subObjects(scene.storageMax, objects[sprite.name].storage);
-        }else{
-            roadUpdate(i,j,true,true);
-        }
-        sprite.destroy();
+function spritePut(x,y) /* Place the previewed sprite */ {
+    if(tmpSprite.putable === true) {
+        let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
+        let points = tmpSprite.points;
+        sprite.setDataEnabled();
+        sprite.data.obj = tmpSprite.obj;
+        sprite.depth = tmpSprite.depth;
+        sprite.name = tmpSprite.name;
+        sprite.data.orientation = tmpSprite.orientation;
+        sprite.data.connected = false;
+        spriteHide();
+        sprite.data.points = points;
+        scene.spriteGroup.add(sprite);
         points.forEach((point) => {
-            delete scene.mapData[point.x][point.y];
+            scene.mapData[point.x][point.y] = sprite;
         });
 
+        if (sprite.name.search("cityhall") !== -1) {
+            cityhall = sprite;
+            sprite.data.connected = true;
+        } else if (sprite.name.search("road") !== -1) {
+            roadUpdate(x, y, true);
+        } else {
+            spriteConnect(sprite);
+        }
+        addResources();
     }
 }
 
-function addResources(){
+function spriteRemove(x,y) /* Remove the sprite on coord */ {
+    let sprite = scene.mapData[x][y];
+    if (sprite !== undefined) {
+        if(sprite.data !== undefined) {
+            let points = sprite.data.points;
+            points.forEach((point) => {
+                delete scene.mapData[point.x][point.y];
+            });
+        }
+        if (sprite.name.search("road") !== -1) {
+            roadUpdate(x,y,true,true);
+        }else if (sprite.name.search("cityhall") !== -1){
+            cityhall = undefined;
+        }
+        sprite.destroy();
 
+        addResources();
+    }
+}
+
+function addResources(sprite = undefined){
+    let toCheck;
+
+    if(sprite === undefined){
+        if(cityhall !== undefined){
+            sprite = cityhall;
+            tmpPath = [];
+            tmpPath.push(sprite.data.points[0]);
+            scene.toProduce = addObjects(resetProduce, sprite.data.obj.production);
+            scene.storageMax = addObjects(resetStorage, sprite.data.obj.storage);
+        }else{
+            scene.toProduce = cloneObjects(resetProduce);
+            scene.storageMax = cloneObjects(resetStorage);
+        }
+
+    }
+
+    if(sprite !== undefined) {
+        toCheck = spriteConnect(sprite);
+        toCheck.forEach((cSprite) => {
+            if (cSprite !== undefined && cSprite !== sprite && !tmpPath.includes(cSprite.data.points[0])) {
+                tmpPath.push(cSprite.data.points[0]);
+                if (cSprite.name.search("road") !== -1) {
+                    addResources(cSprite);
+                } else {
+                    spriteConnect(cSprite);
+                    if(cSprite.data.connected){
+                        scene.toProduce = addObjects(scene.toProduce, cSprite.data.obj.production);
+                        scene.storageMax = addObjects(scene.storageMax, cSprite.data.obj.storage);
+                    }
+
+                }
+            }
+        });
+    }
 }
 
 // const reverse = array => [...array].reverse();
@@ -291,7 +453,7 @@ let GameScene = new Phaser.Class({
         };
         pointer = scene.input.activePointer;
         camera = scene.cameras.main;
-        key = this.input.keyboard.addKeys('Z, S, Q, D, R, M');
+        key = this.input.keyboard.addKeys('Z, S, Q, D, R, M, L');
 
         // Create group of display sprite
         scene.spriteGroup = scene.add.group();
@@ -308,7 +470,6 @@ let GameScene = new Phaser.Class({
             energy: 0,
             water: 0,
             citizens: 0,
-            money: 0,
             pollution: 0
         };
 
@@ -343,11 +504,11 @@ let GameScene = new Phaser.Class({
         controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
 
         // Create the map with floors and add properties for adding building
-        for (let i = 0; i < mapSize; i++) {
-            for (let j = 0; j < mapSize; j++) {
+        for (let j = 0; j < mapSize; j++) {
+            for (let i = 0; i < mapSize; i++) {
                 let point = new Phaser.Geom.Point();
-                point.x = j * spriteWidth / 2;
-                point.y = i * spriteWidth / 2;
+                point.x = i * spriteWidth / 2;
+                point.y = j * spriteWidth / 2;
                 let isoPoint = fromCartToIso(point);
                 let sprite = scene.add.sprite(isoPoint.x, isoPoint.y, "grass");
                 sprite.setOrigin(0.5,1);
@@ -357,7 +518,7 @@ let GameScene = new Phaser.Class({
                 // Preview the selected building and tint it if it's not placeable
                 sprite.on("pointerover", () => {
                     if (scene.curPlacedBlock !== undefined && scene.curPlacedBlock !== "destroy") {
-                        spritePreview(i, j, isoPoint);
+                        spritePreview(i, j,true, isoPoint);
                     }else if (scene.curPlacedBlock === "destroy"){
                         if (scene.mapData[i][j] !== undefined){
                             scene.mapData[i][j].setTint(0xe20000);
@@ -419,7 +580,7 @@ let GameScene = new Phaser.Class({
 
         key.R.on("down", () => {
             if (scene.curPlacedBlock !== undefined) {
-                if (scene.curPlacedBlock !== "road" ) {
+                if (scene.curPlacedBlock !== "road" && tmpSprite.points !== undefined) {
                     origin = tmpSprite.points[0];
                     scene.spriteOrientation = (scene.spriteOrientation + 1) % 4;
                     spriteHide();
@@ -427,10 +588,31 @@ let GameScene = new Phaser.Class({
                 }
             }
         });
+
+        key.M.on("down", () => {
+            let map = JSON.stringify(scene.mapData,['name','x','y','textureKey']);
+            let data = JSON.stringify(scene.data);
+            let save = map + "/" + data;
+            let encrypt = CryptoJS.AES.encrypt(save,"EcoCity");
+            download(encrypt,"save");
+        });
+        key.L.on("down", () => {
+            upload();
+        });
+
+
+
+
     },
     update: function (time, delta) {
         // Check form arrows keys
         controls.update(delta);
+
+        // Add resources to produce
+        if (Math.round(time / 1000) !== prevSec) {
+            prevSec = Math.round(time / 1000);
+            scene.data = addObjects(scene.data, scene.toProduce, scene.storageMax);
+        }
     }
 });
 

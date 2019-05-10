@@ -144,7 +144,7 @@ function buildHud(curPage) /* Display the build hud */ {
     let lastPage = true;
 
     // Create the hud build group
-    hudBuildGroup = scene.add.group("buildHud");
+    hudBuildGroup = scene.add.group();
 
 
     // Create all graph for the build hud and add to a group
@@ -288,8 +288,10 @@ let HudScene = new Phaser.Class({
         scene.input.on('pointerdown', (pointer) => {
             if(pointer.buttons === 2){
                 clearTint();
-                buildHudState = false;
-                hudBuildGroup.destroy(true);
+                if(buildHudState){
+                    buildHudState = false;
+                    hudBuildGroup.destroy(true);
+                }
             }
         });
 
