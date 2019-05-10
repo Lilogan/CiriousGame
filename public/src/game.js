@@ -275,7 +275,7 @@ function spriteConnect(sprite)/* Check element around the sprite */{
 
 }
 
-function spritePreview(x, y, highlight = true, isoPoint = undefined) /* Preview the selected sprite on coord */ {
+function spritePreview(x, y, force = true, isoPoint = undefined) /* Preview the selected sprite on coord */ {
     let obj = cloneObjects(objects[scene.curPlacedBlock]);
 
     if(scene.spriteOrientation % 2 === 1){
@@ -302,26 +302,27 @@ function spritePreview(x, y, highlight = true, isoPoint = undefined) /* Preview 
     }else{
         putable = false;
     }
+    console.log(putable);
+    if(force || (putable && !force)) {
+        if (scene.curPlacedBlock !== "road") {
+            tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name + "-" + orientation[scene.spriteOrientation], false).setOrigin(0.5 + (obj.width - obj.height) / 10, 1);
+            tmpSprite.orientation = scene.spriteOrientation;
+        } else {
+            name = roadUpdate(x, y);
+            tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name, false).setOrigin(0.5, 1);
+        }
+        if (putable) {
+            tmpSprite.points = points;
+        } else {
+            tmpSprite.setTint(0xe20000);
+        }
 
-    if(scene.curPlacedBlock !== "road") {
-        tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name + "-" + orientation[scene.spriteOrientation], false).setOrigin(0.5 + (obj.width - obj.height) / 10, 1);
-        tmpSprite.orientation = scene.spriteOrientation;
-    }else{
-        name = roadUpdate(x,y);
-        tmpSprite = scene.add.sprite(isoPoint.x, isoPoint.y - spriteHeight, name, false).setOrigin(0.5, 1);
+        tmpSprite.alpha = 0.7;
+        tmpSprite.depth = y + x - Math.min(obj.width , obj.height);
+        tmpSprite.name = name;
+        tmpSprite.obj = obj;
+        tmpSprite.putable = putable;
     }
-
-    if (putable){
-        tmpSprite.points = points;
-    }else if (highlight){
-        tmpSprite.setTint(0xe20000);
-    }
-
-    tmpSprite.alpha = 0.7;
-    tmpSprite.depth = y + x - Math.min(obj.width , obj.height);
-    tmpSprite.name = name;
-    tmpSprite.obj = obj;
-    tmpSprite.putable = putable;
 
 }
 
@@ -334,7 +335,7 @@ function spriteHide() /* Hide the previewed sprite */ {
 }
 
 function spritePut(x,y) /* Place the previewed sprite */ {
-    if(tmpSprite.putable === true) {
+    if(tmpSprite !== undefined && tmpSprite.putable === true) {
         let sprite = scene.add.sprite(tmpSprite.x, tmpSprite.y, tmpSprite.texture.key).setOrigin(tmpSprite.originX, tmpSprite.originY);
         let points = tmpSprite.points;
         sprite.setDataEnabled();

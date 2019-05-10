@@ -92,8 +92,8 @@ let objects = {
     "habitation4": {
         "name": "Gratte Ciel",
         "type": "building",
-        "width": 3,
-        "height": 3,
+        "width": 2,
+        "height": 2,
         "storage": {"energy": 0, "water": 0, "citizens": 25},
         "production": {"energy": 0, "water": 0, "money": 0, "pollution": 0,"citizens": 2}
     },
