@@ -11,6 +11,7 @@ let buildHudHeight = 400; // Build hud height
 let buildHudIconSize = 70; // Size of build hud icon
 let buildHudSpace = 30; // Space between two icons
 let buildHudState = false; // Is building hud displayed
+let pollutionCitizens = 5;
 let icons;
 let prevSecond = -1;
 
@@ -75,12 +76,17 @@ function addProgressBar(x, y, key, color, size, length, dataCurr, dataMax, dataV
     return [icon,background,progress,text];
 }
 
-function clearTint(){
+function clearTint() {
     icons.forEach((icon) => {
-        if(icon.isTinted){
+        if (icon.isTinted) {
             icon.clearTint();
         }
-    })
+    });
+
+    if (buildHudState) {
+    buildHudState = false;
+    hudBuildGroup.destroy(true);
+    }
 }
 
 function showResources() /* Display resources */ {
@@ -92,18 +98,24 @@ function showResources() /* Display resources */ {
     // Create resources group
     resourcesGroup = scene.add.group("resourcesGroup");
 
+    let pollutionMax = gameScene.data.citizens * pollutionCitizens;
+    let displayPollution = gameScene.data.pollution / pollutionMax;
+    if (displayPollution > 1){
+        displayPollution = 1;
+    }
+
     // Pollution progress bar
     resourcesGroup.addMultiple([
         //Background
         addRectangle(windowWidth - 640, windowHeight - 70, 52, 40, 0x000000, resourcesGroup),
         //Progress Bar
-        addRectangle(windowWidth - 640, windowHeight - 30, 52, -Math.round(gameScene.data.pollution / (gameScene.data.citizens + 1) * 100) / 100 * 40 / 200, 0xb21a1a, resourcesGroup),
+        addRectangle(windowWidth - 640, windowHeight - 30, 52, -32 * displayPollution, 0xb21a1a, resourcesGroup),
         //Icon
         addSprite(windowWidth - 640, windowHeight - 70, "pollutionIcon", 52, 40, false, 0, 0, resourcesGroup),
         //Text under
-        addText(windowWidth - 640, windowHeight - 25, Math.round(gameScene.data.pollution / (gameScene.data.citizens + 1) * 100) / 100 + " mg/hbt", 15),
+        addText(windowWidth - 640, windowHeight - 25, (gameScene.data.pollution / gameScene.data.citizens).toFixed(3) + " mg/hbt", 15),
         //Percentage
-        addText(windowWidth - 580, windowHeight - 55, "(" + Math.round(Math.round(gameScene.data.pollution / (gameScene.data.citizens + 1) * 100) / 100 / 20 * 100 * 100) / 100 + "%)", 15)
+        addText(windowWidth - 580, windowHeight - 55, "(" + Math.round(gameScene.data.pollution / pollutionMax * 100)+ "%)", 15)
 
     ]);
 
@@ -262,9 +274,9 @@ let HudScene = new Phaser.Class({
         // Add function on click on these sprites
         icons[0].on("pointerdown", () => {
             if (!buildHudState) {
+                clearTint();
                 buildHudState = true;
                 gameScene.curPlacedBlock = undefined;
-                clearTint();
                 buildHud(1);
             } else {
                 buildHudState = false;
@@ -274,14 +286,14 @@ let HudScene = new Phaser.Class({
         });
 
         icons[1].on("pointerdown", () => {
-            gameScene.curPlacedBlock = "destroy";
             clearTint();
+            gameScene.curPlacedBlock = "destroy";
             icons[1].setTintFill(0xe20000);
         });
 
         icons[2].on("pointerdown", () => {
-            gameScene.curPlacedBlock = "road";
             clearTint();
+            gameScene.curPlacedBlock = "road";
             icons[2].setTintFill(0x00e200);
         });
 
